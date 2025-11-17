@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toast Notifications - Tailwind CSS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+        
+        .toast {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        .toast.hiding {
+            animation: slideOut 0.3s ease-in forwards;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+        
+        .progress-bar {
+            animation: progress 5s linear forwards;
+        }
+        
+        @keyframes progress {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-8">
+    <div class="max-w-4xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Toast Notifications</h1>
+        <p class="text-gray-600 mb-8">Ejemplos de notificaciones toast con Tailwind CSS</p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+            <!-- Botones para probar los toasts -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Mostrar Toasts</h2>
+                
+                <button onclick="showToast('success', '¡Operación completada con éxito!')" 
+                        class="w-full mb-3 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <i class="fas fa-check-circle mr-2"></i> Éxito
+                </button>
+                
+                <button onclick="showToast('error', 'Ha ocurrido un error inesperado')" 
+                        class="w-full mb-3 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <i class="fas fa-exclamation-circle mr-2"></i> Error
+                </button>
+                
+                <button onclick="showToast('warning', 'Esta acción no se puede deshacer')" 
+                        class="w-full mb-3 bg-yellow-500 hover:bg-yellow-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <i class="fas fa-exclamation-triangle mr-2"></i> Advertencia
+                </button>
+                
+                <button onclick="showToast('info', 'Se ha actualizado tu perfil correctamente')" 
+                        class="w-full mb-3 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <i class="fas fa-info-circle mr-2"></i> Información
+                </button>
+                
+                <button onclick="showToast('update', 'Los cambios se han guardado correctamente')" 
+                        class="w-full mb-3 bg-indigo-500 hover:bg-indigo-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <i class="fas fa-sync-alt mr-2"></i> Actualización
+                </button>
+                
+                <button onclick="showToast('delete', 'El registro ha sido eliminado permanentemente')" 
+                        class="w-full bg-purple-500 hover:bg-purple-600 text-white py-2 px-4 rounded-lg transition-colors flex items-center justify-center">
+                    <i class="fas fa-trash-alt mr-2"></i> Eliminación
+                </button>
+            </div>
+            
+            <!-- Vista previa de los toasts -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Vista Previa</h2>
+                
+                <div class="space-y-4">
+                    <!-- Toast de éxito -->
+                    <div class="flex items-center p-4 rounded-lg border-l-4 border-green-500 bg-green-50">
+                        <i class="fas fa-check-circle text-green-500 text-xl mr-3"></i>
+                        <div class="flex-1">
+                            <p class="text-green-800 font-medium">Éxito</p>
+                            <p class="text-green-600 text-sm">¡Operación completada con éxito!</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Toast de error -->
+                    <div class="flex items-center p-4 rounded-lg border-l-4 border-red-500 bg-red-50">
+                        <i class="fas fa-exclamation-circle text-red-500 text-xl mr-3"></i>
+                        <div class="flex-1">
+                            <p class="text-red-800 font-medium">Error</p>
+                            <p class="text-red-600 text-sm">Ha ocurrido un error inesperado</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Toast de actualización -->
+                    <div class="flex items-center p-4 rounded-lg border-l-4 border-indigo-500 bg-indigo-50">
+                        <i class="fas fa-sync-alt text-indigo-500 text-xl mr-3"></i>
+                        <div class="flex-1">
+                            <p class="text-indigo-800 font-medium">Actualización</p>
+                            <p class="text-indigo-600 text-sm">Los cambios se han guardado correctamente</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Toast de eliminación -->
+                    <div class="flex items-center p-4 rounded-lg border-l-4 border-purple-500 bg-purple-50">
+                        <i class="fas fa-trash-alt text-purple-500 text-xl mr-3"></i>
+                        <div class="flex-1">
+                            <p class="text-purple-800 font-medium">Eliminación</p>
+                            <p class="text-purple-600 text-sm">El registro ha sido eliminado permanentemente</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Código de ejemplo -->
+        <div class="bg-gray-800 text-gray-200 p-6 rounded-lg">
+            <h2 class="text-xl font-semibold mb-4">Código de Implementación</h2>
+            <pre class="overflow-x-auto">
+<code class="text-sm">
+// Función para mostrar toast
+function showToast(type, message, duration = 5000) {
+    const toastContainer = document.getElementById('toast-container');
+    
+    // Crear elemento toast
+    const toast = document.createElement('div');
+    toast.className = `toast mb-3 p-4 rounded-lg shadow-lg border-l-4 flex items-center max-w-md ${
+        type === 'success' ? 'bg-green-50 border-green-500' :
+        type === 'error' ? 'bg-red-50 border-red-500' :
+        type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
+        type === 'info' ? 'bg-blue-50 border-blue-500' :
+        type === 'update' ? 'bg-indigo-50 border-indigo-500' :
+        'bg-purple-50 border-purple-500'
+    }`;
+    
+    // Icono según el tipo
+    const iconClass = 
+        type === 'success' ? 'fas fa-check-circle text-green-500' :
+        type === 'error' ? 'fas fa-exclamation-circle text-red-500' :
+        type === 'warning' ? 'fas fa-exclamation-triangle text-yellow-500' :
+        type === 'info' ? 'fas fa-info-circle text-blue-500' :
+        type === 'update' ? 'fas fa-sync-alt text-indigo-500' :
+        'fas fa-trash-alt text-purple-500';
+    
+    // Título según el tipo
+    const title = 
+        type === 'success' ? 'Éxito' :
+        type === 'error' ? 'Error' :
+        type === 'warning' ? 'Advertencia' :
+        type === 'info' ? 'Información' :
+        type === 'update' ? 'Actualización' :
+        'Eliminación';
+    
+    // Color del texto según el tipo
+    const textColor = 
+        type === 'success' ? 'text-green-800' :
+        type === 'error' ? 'text-red-800' :
+        type === 'warning' ? 'text-yellow-800' :
+        type === 'info' ? 'text-blue-800' :
+        type === 'update' ? 'text-indigo-800' :
+        'text-purple-800';
+    
+    const textColorLight = 
+        type === 'success' ? 'text-green-600' :
+        type === 'error' ? 'text-red-600' :
+        type === 'warning' ? 'text-yellow-600' :
+        type === 'info' ? 'text-blue-600' :
+        type === 'update' ? 'text-indigo-600' :
+        'text-purple-600';
+    
+    toast.innerHTML = `
+        <i class="${iconClass} text-xl mr-3"></i>
+        <div class="flex-1">
+            <p class="${textColor} font-medium">${title}</p>
+            <p class="${textColorLight} text-sm">${message}</p>
+        </div>
+        <button onclick="this.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="absolute bottom-0 left-0 h-1 bg-current opacity-25 progress-bar"></div>
+    `;
+    
+    // Agregar toast al contenedor
+    toastContainer.appendChild(toast);
+    
+    // Auto-eliminar después del tiempo especificado
+    setTimeout(() => {
+        if (toast.parentElement) {
+            toast.classList.add('hiding');
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 300);
+        }
+    }, duration);
+}
+</code>
+            </pre>
+        </div>
+    </div>
+
+    <!-- Contenedor para los toasts -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script>
+        // Función para mostrar toast
+        function showToast(type, message, duration = 5000) {
+            const toastContainer = document.getElementById('toast-container');
+            
+            // Crear elemento toast
+            const toast = document.createElement('div');
+            toast.className = `toast mb-3 p-4 rounded-lg shadow-lg border-l-4 flex items-center max-w-md relative overflow-hidden ${
+                type === 'success' ? 'bg-green-50 border-green-500' :
+                type === 'error' ? 'bg-red-50 border-red-500' :
+                type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
+                type === 'info' ? 'bg-blue-50 border-blue-500' :
+                type === 'update' ? 'bg-indigo-50 border-indigo-500' :
+                'bg-purple-50 border-purple-500'
+            }`;
+            
+            // Icono según el tipo
+            const iconClass = 
+                type === 'success' ? 'fas fa-check-circle text-green-500' :
+                type === 'error' ? 'fas fa-exclamation-circle text-red-500' :
+                type === 'warning' ? 'fas fa-exclamation-triangle text-yellow-500' :
+                type === 'info' ? 'fas fa-info-circle text-blue-500' :
+                type === 'update' ? 'fas fa-sync-alt text-indigo-500' :
+                'fas fa-trash-alt text-purple-500';
+            
+            // Título según el tipo
+            const title = 
+                type === 'success' ? 'Éxito' :
+                type === 'error' ? 'Error' :
+                type === 'warning' ? 'Advertencia' :
+                type === 'info' ? 'Información' :
+                type === 'update' ? 'Actualización' :
+                'Eliminación';
+            
+            // Color del texto según el tipo
+            const textColor = 
+                type === 'success' ? 'text-green-800' :
+                type === 'error' ? 'text-red-800' :
+                type === 'warning' ? 'text-yellow-800' :
+                type === 'info' ? 'text-blue-800' :
+                type === 'update' ? 'text-indigo-800' :
+                'text-purple-800';
+            
+            const textColorLight = 
+                type === 'success' ? 'text-green-600' :
+                type === 'error' ? 'text-red-600' :
+                type === 'warning' ? 'text-yellow-600' :
+                type === 'info' ? 'text-blue-600' :
+                type === 'update' ? 'text-indigo-600' :
+                'text-purple-600';
+            
+            toast.innerHTML = `
+                <i class="${iconClass} text-xl mr-3"></i>
+                <div class="flex-1">
+                    <p class="${textColor} font-medium">${title}</p>
+                    <p class="${textColorLight} text-sm">${message}</p>
+                </div>
+                <button onclick="this.parentElement.remove()" class="ml-4 text-gray-400 hover:text-gray-600">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="absolute bottom-0 left-0 h-1 w-full bg-current opacity-25 progress-bar"></div>
+            `;
+            
+            // Agregar toast al contenedor
+            toastContainer.appendChild(toast);
+            
+            // Auto-eliminar después del tiempo especificado
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.add('hiding');
+                    setTimeout(() => {
+                        if (toast.parentElement) {
+                            toast.remove();
+                        }
+                    }, 300);
+                }
+            }, duration);
+        }
+        
+        // Ejemplo de uso automático al cargar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                showToast('success', '¡Bienvenido! Puedes probar las notificaciones haciendo clic en los botones.');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
