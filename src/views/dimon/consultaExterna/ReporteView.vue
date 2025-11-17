@@ -17,6 +17,67 @@
                         </button>
                     </div>
 
+                    <!-- Filtros principales -->
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                        <div class="flex flex-wrap gap-4 items-center">
+                            <div>
+                                <label class="block text-sm font-medium text-blue-800 mb-1">Año</label>
+                                <select v-model="filtroAnio" @change="cambiarAnio"
+                                    class="px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    <option v-for="anio in anosDisponibles" :key="anio" :value="anio">
+                                        {{ anio }}
+                                    </option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-blue-800 mb-1">Mes Inicio</label>
+                                <select v-model="filtroMesInicio" @change="filtrarReporte"
+                                    class="px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    <option value="1">Enero</option>
+                                    <option value="2">Febrero</option>
+                                    <option value="3">Marzo</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Mayo</option>
+                                    <option value="6">Junio</option>
+                                    <option value="7">Julio</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-blue-800 mb-1">Mes Fin</label>
+                                <select v-model="filtroMesFin" @change="filtrarReporte"
+                                    class="px-3 py-2 border border-blue-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    <option value="1">Enero</option>
+                                    <option value="2">Febrero</option>
+                                    <option value="3">Marzo</option>
+                                    <option value="4">Abril</option>
+                                    <option value="5">Mayo</option>
+                                    <option value="6">Junio</option>
+                                    <option value="7">Julio</option>
+                                    <option value="8">Agosto</option>
+                                    <option value="9">Septiembre</option>
+                                    <option value="10">Octubre</option>
+                                    <option value="11">Noviembre</option>
+                                    <option value="12">Diciembre</option>
+                                </select>
+                            </div>
+
+                            <div class="flex items-end">
+                                <button @click="aplicarFiltros" :disabled="loading"
+                                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                                    <i class="bi bi-funnel mr-2"></i>
+                                    Aplicar Filtros
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Resumen general -->
                     <div v-if="reporteData" class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
@@ -26,7 +87,8 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-blue-800">Total Establecimientos</p>
-                                    <p class="text-2xl font-bold text-blue-900">{{ reporteData.total_establecimientos }}</p>
+                                    <p class="text-2xl font-bold text-blue-900">{{ reporteData.total_establecimientos }}
+                                    </p>
                                 </div>
                             </div>
                         </div>
@@ -38,7 +100,8 @@
                                 </div>
                                 <div>
                                     <p class="text-sm font-medium text-yellow-800">Con Pendientes</p>
-                                    <p class="text-2xl font-bold text-yellow-900">{{ reporteData.establecimientos_con_pendientes }}</p>
+                                    <p class="text-2xl font-bold text-yellow-900">{{
+                                        reporteData.establecimientos_con_pendientes }}</p>
                                 </div>
                             </div>
                         </div>
@@ -51,7 +114,8 @@
                                 <div>
                                     <p class="text-sm font-medium text-green-800">Al Día</p>
                                     <p class="text-2xl font-bold text-green-900">
-                                        {{ reporteData.total_establecimientos - reporteData.establecimientos_con_pendientes }}
+                                        {{ reporteData.total_establecimientos -
+                                        reporteData.establecimientos_con_pendientes }}
                                     </p>
                                 </div>
                             </div>
@@ -70,7 +134,7 @@
                         </div>
                     </div>
 
-                    <!-- Filtros -->
+                    <!-- Filtros secundarios -->
                     <div class="flex flex-wrap gap-3 mb-6 items-center">
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -102,6 +166,8 @@
                                 <option value="pendientes-asc">Menos pendientes primero</option>
                                 <option value="nombre-asc">Nombre A-Z</option>
                                 <option value="nombre-desc">Nombre Z-A</option>
+                                <option value="registros-desc">Más registros primero</option>
+                                <option value="registros-asc">Menos registros primero</option>
                             </select>
                         </div>
 
@@ -116,30 +182,32 @@
                     <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
                         <DataTable :value="reporteFiltrado" :paginator="true" :rows="itemsPorPagina"
                             :totalRecords="totalRegistrosFiltrados" :loading="loading"
-                            :rowsPerPageOptions="[10, 25, 50, 100]"
+                            :rowsPerPageOptions="[10, 25, 50, 100]" scrollable scrollHeight="flex"
                             paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
                             currentPageReportTemplate="Mostrando {first} a {last} de {totalRecords} establecimientos"
-                            responsiveLayout="stack" rowHover class="p-datatable-sm text-sm">
+                            responsiveLayout="scroll" rowHover class="p-datatable-sm text-sm">
 
                             <!-- Columna enumeradora -->
-                            <Column header="N°" headerStyle="width: 3rem">
+                            <Column field="index" header="N°" headerStyle="width: 3rem" :sortable="false">
                                 <template #body="slotProps">
                                     {{ slotProps.index + 1 }}
                                 </template>
                             </Column>
 
                             <!-- Establecimiento -->
-                            <Column field="establecimiento" header="Establecimiento" :sortable="true">
+                            <Column field="establecimiento" header="Establecimiento" :sortable="true"
+                                headerStyle="min-width: 200px" frozen>
                                 <template #body="{ data }">
                                     <div>
                                         <div class="font-semibold text-gray-800">{{ data.establecimiento }}</div>
-                                        <div class="text-xs text-gray-500">{{ data.codigo_establecimiento }}</div>
+                                        <div class="text-xs text-blue-600 mt-1">{{ data.username }}</div>
                                     </div>
                                 </template>
                             </Column>
 
                             <!-- Departamento -->
-                            <Column field="departamento" header="Departamento" :sortable="true">
+                            <Column field="departamento" header="Departamento" :sortable="true"
+                                headerStyle="min-width: 120px">
                                 <template #body="{ data }">
                                     <span class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs">
                                         {{ data.departamento || 'N/A' }}
@@ -147,59 +215,63 @@
                                 </template>
                             </Column>
 
-                            <!-- Meses Pendientes -->
-                            <Column field="total_pendientes" header="Meses Pendientes" :sortable="true">
+                            <!-- Total Pendientes -->
+                            <Column field="total_pendientes" header="Meses Pendientes" :sortable="true"
+                                headerStyle="min-width: 100px">
                                 <template #body="{ data }">
                                     <div class="flex items-center space-x-2">
                                         <span :class="[
                                             'px-2 py-1 rounded-full text-xs font-bold',
-                                            data.total_pendientes === 0 
-                                                ? 'bg-green-100 text-green-800' 
-                                                : data.total_pendientes <= 2 
+                                            data.total_pendientes === 0
+                                                ? 'bg-green-100 text-green-800'
+                                                : data.total_pendientes <= 2
                                                     ? 'bg-yellow-100 text-yellow-800'
                                                     : 'bg-red-100 text-red-800'
                                         ]">
                                             {{ data.total_pendientes }}
                                         </span>
                                         <span class="text-xs text-gray-500">
-                                            de {{ reporteData?.meses_verificados?.length || 0 }} meses
+                                            de {{ mesesCabeceras.length }}
                                         </span>
                                     </div>
                                 </template>
                             </Column>
 
-                            <!-- Detalle de Meses -->
-                            <Column header="Detalle por Mes">
+                            <!-- Total Registros -->
+                            <Column field="total_registros" header="Total Registros" :sortable="true"
+                                headerStyle="min-width: 100px">
                                 <template #body="{ data }">
-                                    <div class="flex flex-wrap gap-1">
-                                        <template v-if="reporteData?.meses_verificados">
-                                            <span v-for="mes in reporteData.meses_verificados" :key="mes"
-                                                :class="[
-                                                    'px-2 py-1 rounded text-xs font-medium',
-                                                    data.meses_pendientes.includes(mes)
-                                                        ? 'bg-red-100 text-red-800 border border-red-200'
-                                                        : 'bg-green-100 text-green-800 border border-green-200'
-                                                ]"
-                                                :title="data.meses_pendientes.includes(mes) ? 'Pendiente' : 'Reportado'">
-                                                {{ mes.split('/')[0] }}
-                                            </span>
-                                        </template>
+                                    <span class="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs font-bold">
+                                        {{ calcularTotalRegistros(data) }}
+                                    </span>
+                                </template>
+                            </Column>
+
+                            <!-- Columnas dinámicas para cada mes -->
+                            <Column v-for="mes in mesesCabeceras" :key="mes" :field="mes" :header="mes"
+                                headerStyle="min-width: 80px" :sortable="true">
+                                <template #body="{ data }">
+                                    <div class="text-center">
+                                        <span :class="[
+                                            'px-2 py-1 rounded text-xs font-medium inline-block min-w-10 cursor-help',
+                                            obtenerCantidadRegistros(data, mes) > 0
+                                                ? 'bg-green-100 text-green-800 border border-green-200'
+                                                : 'bg-red-100 text-red-800 border border-red-200'
+                                        ]" :title="`${mes}: ${obtenerCantidadRegistros(data, mes)} registros`">
+                                            {{ obtenerCantidadRegistros(data, mes) }}
+                                        </span>
                                     </div>
                                 </template>
                             </Column>
 
                             <!-- Acciones -->
-                            <Column header="Acciones" headerStyle="width: 10%">
+                            <Column header="Acciones" headerStyle="width: 100px" :sortable="false">
                                 <template #body="{ data }">
-                                    <button v-if="data.total_pendientes > 0" @click="verDetalle(data)"
+                                    <button @click="verDetalle(data)"
                                         class="inline-flex items-center px-3 py-1 bg-blue-100 border border-blue-300 text-blue-700 rounded text-xs hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200">
                                         <i class="bi bi-eye mr-1"></i>
                                         Detalle
                                     </button>
-                                    <span v-else class="text-green-600 text-xs font-medium">
-                                        <i class="bi bi-check-circle mr-1"></i>
-                                        Al día
-                                    </span>
                                 </template>
                             </Column>
 
@@ -217,21 +289,48 @@
                     </div>
 
                     <!-- Modal de detalle -->
-                    <Dialog v-model:visible="mostrarModal" modal header="Detalle de Pendientes" :style="{ width: '600px' }">
+                    <Dialog v-model:visible="mostrarModal" modal header="Detalle de Registros por Mes"
+                        :style="{ width: '800px' }">
                         <div v-if="establecimientoSeleccionado" class="space-y-4">
                             <div class="bg-gray-50 rounded-lg p-4">
-                                <h4 class="font-semibold text-gray-800">{{ establecimientoSeleccionado.establecimiento }}</h4>
-                                <p class="text-sm text-gray-600">Código: {{ establecimientoSeleccionado.codigo_establecimiento }}</p>
-                                <p class="text-sm text-gray-600">Departamento: {{ establecimientoSeleccionado.departamento }}</p>
+                                <h4 class="font-semibold text-gray-800 text-lg">{{
+                                    establecimientoSeleccionado.establecimiento }}</h4>
+                                <div class="grid grid-cols-2 gap-2 mt-2">
+                                    <p class="text-sm text-gray-600"><span class="font-medium">Código:</span> {{
+                                        establecimientoSeleccionado.codigo_establecimiento }}</p>
+                                    <p class="text-sm text-gray-600"><span class="font-medium">Departamento:</span> {{
+                                        establecimientoSeleccionado.departamento }}</p>
+                                    <p class="text-sm text-gray-600"><span class="font-medium">Usuario:</span> {{
+                                        establecimientoSeleccionado.username }}</p>
+                                    <p class="text-sm text-gray-600"><span class="font-medium">Total Registros:</span>
+                                        <span class="font-bold text-blue-600">{{
+                                            calcularTotalRegistros(establecimientoSeleccionado) }}</span>
+                                    </p>
+                                </div>
                             </div>
 
                             <div>
-                                <h5 class="font-semibold text-gray-800 mb-3">Meses Pendientes de Reporte:</h5>
-                                <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                                    <div v-for="mes in establecimientoSeleccionado.meses_pendientes" :key="mes"
-                                        class="bg-red-50 border border-red-200 rounded p-3 text-center">
-                                        <div class="text-red-800 font-semibold">{{ mes }}</div>
-                                        <div class="text-red-600 text-xs mt-1">Pendiente</div>
+                                <h5 class="font-semibold text-gray-800 mb-3">Registros por Mes ({{ filtroAnio }}):</h5>
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                    <div v-for="mes in mesesCabeceras" :key="mes" :class="[
+                                        'border rounded p-3 text-center transition-all duration-200 hover:shadow-md',
+                                        obtenerCantidadRegistros(establecimientoSeleccionado, mes) > 0
+                                            ? 'bg-green-50 border-green-200 hover:bg-green-100'
+                                            : 'bg-red-50 border-red-200 hover:bg-red-100'
+                                    ]">
+                                        <div class="font-semibold text-sm"
+                                            :class="obtenerCantidadRegistros(establecimientoSeleccionado, mes) > 0 ? 'text-green-800' : 'text-red-800'">
+                                            {{ mes }}
+                                        </div>
+                                        <div class="text-2xl font-bold mt-2"
+                                            :class="obtenerCantidadRegistros(establecimientoSeleccionado, mes) > 0 ? 'text-green-600' : 'text-red-600'">
+                                            {{ obtenerCantidadRegistros(establecimientoSeleccionado, mes) }}
+                                        </div>
+                                        <div class="text-xs mt-1"
+                                            :class="obtenerCantidadRegistros(establecimientoSeleccionado, mes) > 0 ? 'text-green-600' : 'text-red-600'">
+                                            {{ obtenerCantidadRegistros(establecimientoSeleccionado, mes) > 0 ?
+                                            'registros' : 'pendiente' }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -265,6 +364,7 @@ interface EstablecimientoReporte {
     departamento: string
     meses_pendientes: string[]
     total_pendientes: number
+    registros_por_mes: { [mes: string]: number }
 }
 
 interface ReporteData {
@@ -281,11 +381,47 @@ const reporteData = ref<ReporteData | null>(null)
 const mostrarModal = ref<boolean>(false)
 const establecimientoSeleccionado = ref<EstablecimientoReporte | null>(null)
 const itemsPorPagina = ref<number>(25)
+
+// Filtros
+const filtroAnio = ref<number>(new Date().getFullYear())
+const filtroMesInicio = ref<number>(1) // Enero por defecto
+const filtroMesFin = ref<number>(new Date().getMonth() + 1) // Mes actual
 const filtroBusqueda = ref<string>('')
 const filtroEstado = ref<string>('todos')
 const filtroOrden = ref<string>('pendientes-desc')
 
+// Años disponibles (desde 2023 hasta el año actual + 1)
+const anosDisponibles = computed(() => {
+    const currentYear = new Date().getFullYear()
+    const years = []
+    for (let year = 2025; year <= currentYear + 1; year++) {
+        years.push(year)
+    }
+    return years
+})
+
 // Computed properties
+const mesesCabeceras = computed(() => {
+    if (!reporteData.value?.meses_verificados) return []
+
+    // Filtrar meses según los filtros seleccionados
+    return reporteData.value.meses_verificados.filter(mes => {
+        const partes = mes.split('/')
+        if (partes.length < 2) return false
+
+        const mesStr: string = partes[0] as string
+        const anioStr: string = partes[1] as string
+        const mesNum = parseInt(mesStr)
+        const anioNum = parseInt(anioStr)
+
+        // Validar que los números sean válidos
+        if (isNaN(mesNum) || isNaN(anioNum)) return false
+
+        return anioNum === filtroAnio.value &&
+            mesNum >= filtroMesInicio.value &&
+            mesNum <= filtroMesFin.value
+    })
+})
 const reporteFiltrado = computed(() => {
     if (!reporteData.value?.reporte_pendientes) return []
 
@@ -297,7 +433,8 @@ const reporteFiltrado = computed(() => {
         filtered = filtered.filter(est =>
             est.establecimiento.toLowerCase().includes(search) ||
             est.codigo_establecimiento.toLowerCase().includes(search) ||
-            est.departamento.toLowerCase().includes(search)
+            est.departamento.toLowerCase().includes(search) ||
+            est.username.toLowerCase().includes(search)
         )
     }
 
@@ -319,6 +456,10 @@ const reporteFiltrado = computed(() => {
                 return a.establecimiento.localeCompare(b.establecimiento)
             case 'nombre-desc':
                 return b.establecimiento.localeCompare(a.establecimiento)
+            case 'registros-desc':
+                return calcularTotalRegistros(b) - calcularTotalRegistros(a)
+            case 'registros-asc':
+                return calcularTotalRegistros(a) - calcularTotalRegistros(b)
             default:
                 return 0
         }
@@ -332,10 +473,40 @@ const totalRegistrosFiltrados = computed(() => {
 })
 
 // Métodos
+const obtenerCantidadRegistros = (establecimiento: EstablecimientoReporte, mes: string): number => {
+    return establecimiento.registros_por_mes?.[mes] || 0
+}
+
+const calcularTotalRegistros = (establecimiento: EstablecimientoReporte): number => {
+    if (!establecimiento.registros_por_mes) return 0
+
+    // Sumar solo los registros de los meses filtrados
+    return mesesCabeceras.value.reduce((sum, mes) => {
+        return sum + (establecimiento.registros_por_mes?.[mes] || 0)
+    }, 0)
+}
+
+const cambiarAnio = (): void => {
+    // Resetear meses al cambiar de año
+    filtroMesInicio.value = 1 // Enero por defecto
+    const mesActual = new Date().getMonth() + 1
+    filtroMesFin.value = filtroAnio.value === new Date().getFullYear() ? mesActual : 12
+}
+
+const aplicarFiltros = (): void => {
+    generarReporte()
+}
+
 const generarReporte = async (): Promise<void> => {
     try {
         loading.value = true
-        const response = await api.get<ReporteData>('/dimon/consultas-externas/reporte-establecimientos/')
+        const params = {
+            year: filtroAnio.value,
+            mes_inicio: filtroMesInicio.value,
+            mes_fin: filtroMesFin.value
+        }
+
+        const response = await api.get<ReporteData>('/dimon/consultas-externas/reporte-establecimientos/', { params })
         reporteData.value = response.data
         console.log('✅ Reporte generado:', response.data)
     } catch (error: any) {
@@ -359,20 +530,39 @@ const exportarExcel = async (): Promise<void> => {
     try {
         if (!reporteData.value) return
 
-        const excelData = reporteFiltrado.value.map(est => ({
-            'Código': est.codigo_establecimiento,
-            'Establecimiento': est.establecimiento,
-            'Departamento': est.departamento,
-            'Meses Pendientes': est.total_pendientes,
-            'Meses Pendientes Detalle': est.meses_pendientes.join(', '),
-            'Estado': est.total_pendientes === 0 ? 'AL DÍA' : 'PENDIENTE'
-        }))
+        // Preparar datos para Excel
+        const excelData = reporteFiltrado.value.map(est => {
+            const rowData: any = {
+                'Código': est.codigo_establecimiento,
+                'Establecimiento': est.establecimiento,
+                'Departamento': est.departamento,
+                'Usuario': est.username,
+                'Total Pendientes': est.total_pendientes,
+                'Total Registros': calcularTotalRegistros(est)
+            }
+
+            // Agregar columnas para cada mes filtrado
+            mesesCabeceras.value.forEach(mes => {
+                rowData[mes] = obtenerCantidadRegistros(est, mes)
+            })
+
+            rowData['Estado'] = est.total_pendientes === 0 ? 'AL DÍA' : 'PENDIENTE'
+
+            return rowData
+        })
 
         const worksheet = XLSX.utils.json_to_sheet(excelData)
 
+        // Ajustar anchos de columnas
         const wscols = [
-            { wch: 15 }, { wch: 40 }, { wch: 20 },
-            { wch: 15 }, { wch: 50 }, { wch: 15 }
+            { wch: 15 }, // Código
+            { wch: 40 }, // Establecimiento
+            { wch: 20 }, // Departamento
+            { wch: 20 }, // Usuario
+            { wch: 15 }, // Total Pendientes
+            { wch: 15 }, // Total Registros
+            ...mesesCabeceras.value.map(() => ({ wch: 10 })), // Columnas de meses
+            { wch: 15 }  // Estado
         ]
         worksheet['!cols'] = wscols
 
@@ -380,18 +570,21 @@ const exportarExcel = async (): Promise<void> => {
         XLSX.utils.book_append_sheet(workbook, worksheet, 'ReporteEstablecimientos')
 
         // Agregar información del período
-        if (reporteData.value.periodo_verificado) {
-            const infoData = [
-                ['REPORTE DE ESTABLECIMIENTOS'],
-                ['Período verificado:', reporteData.value.periodo_verificado],
-                ['Total establecimientos:', reporteData.value.total_establecimientos],
-                ['Establecimientos con pendientes:', reporteData.value.establecimientos_con_pendientes],
-                ['Fecha de generación:', new Date().toLocaleString('es-ES')],
-                ['']
-            ]
-            const infoSheet = XLSX.utils.aoa_to_sheet(infoData)
-            XLSX.utils.book_append_sheet(workbook, infoSheet, 'Información')
-        }
+        const infoData = [
+            ['REPORTE DE ESTABLECIMIENTOS - REGISTROS POR MES'],
+            ['Año:', filtroAnio.value],
+            ['Período:', `Meses ${filtroMesInicio.value} a ${filtroMesFin.value}`],
+            ['Total establecimientos:', reporteData.value.total_establecimientos],
+            ['Establecimientos con pendientes:', reporteData.value.establecimientos_con_pendientes],
+            ['Fecha de generación:', new Date().toLocaleString('es-ES')],
+            [''],
+            ['LEYENDA:'],
+            ['Número en celda = Cantidad real de registros subidos'],
+            ['Verde = Tiene registros, Rojo = Pendiente (0 registros)'],
+            ['']
+        ]
+        const infoSheet = XLSX.utils.aoa_to_sheet(infoData)
+        XLSX.utils.book_append_sheet(workbook, infoSheet, 'Información')
 
         const excelBuffer = XLSX.write(workbook, {
             bookType: 'xlsx',
@@ -404,7 +597,7 @@ const exportarExcel = async (): Promise<void> => {
         })
 
         const dateStr = new Date().toISOString().split('T')[0]
-        saveAs(blob, `reporte_establecimientos_${dateStr}.xlsx`)
+        saveAs(blob, `reporte_establecimientos_${filtroAnio.value}_${dateStr}.xlsx`)
 
     } catch (error) {
         console.error('Error al exportar a Excel:', error)
@@ -413,10 +606,30 @@ const exportarExcel = async (): Promise<void> => {
 
 // Lifecycle
 onMounted(() => {
+    // Inicializar con el año actual
+    filtroAnio.value = new Date().getFullYear()
+    filtroMesFin.value = new Date().getMonth() + 1
     generarReporte()
 })
 </script>
 
 <style scoped>
-/* Estilos personalizados si son necesarios */
+/* Estilos para mejorar la visualización de la tabla con scroll horizontal */
+:deep(.p-datatable-wrapper) {
+    max-height: 70vh;
+}
+
+:deep(.p-datatable-thead > tr > th) {
+    background-color: #f8fafc;
+    font-weight: 600;
+    text-align: center;
+}
+
+:deep(.p-datatable-tbody > tr > td) {
+    text-align: center;
+}
+
+:deep(.p-column-header-content) {
+    justify-content: center;
+}
 </style>
