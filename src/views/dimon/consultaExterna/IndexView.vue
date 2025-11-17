@@ -83,12 +83,12 @@
                             Limpiar
                         </button>
 
-                        <!-- Botón Exportar Excel -->
+                        <!-- Botón Exportar Excel
                         <button @click="exportToExcel" :disabled="registros.length === 0 || loading"
                             class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
                             <i class="bi bi-file-earmark-excel mr-2"></i>
                             Exportar Excel
-                        </button>
+                        </button> -->
 
                         <!-- Botón Descargar Plantilla -->
                         <button @click="descargarPlantilla"
@@ -401,15 +401,18 @@ interface ApiResponse {
 
 // Refs con tipos
 const columnasEstructura = ref<ColumnaEstructura[]>([
+    { numero: 0, nombre: 'Tipo de seguro', requerido: true, recomendacion: 'Ej: SIS, ESSALUD, Privado' },
     { numero: 1, nombre: 'Fecha Nacimiento', requerido: false, recomendacion: 'Formato DD/MM/YYYY' },
     { numero: 2, nombre: 'Sexo (M/F)', requerido: false, recomendacion: 'Solo "M" o "F"' },
-    { numero: 3, nombre: 'Fecha y Hora de Cita Otorgada', requerido: true, recomendacion: 'Formato DD/MM/YYYY HH:MM' },
-    { numero: 4, nombre: 'Fecha y Hora de atención efectiva', requerido: true, recomendacion: 'Formato DD/MM/YYYY HH:MM' },
-    { numero: 5, nombre: 'Diagnóstico Médico', requerido: false, recomendacion: 'Descripción textual' },
-    { numero: 6, nombre: 'Dx CIE-10 Principal', requerido: false, recomendacion: 'Código CIE-10' },
-    { numero: 7, nombre: 'Dx CIE-10 Secundario', requerido: false, recomendacion: 'Opcional' },
-    { numero: 8, nombre: 'Dx CIE-10 Terciario', requerido: false, recomendacion: 'Opcional' },
-    { numero: 9, nombre: 'Especialidad', requerido: false, recomendacion: 'Ej: Cardiología, Pediatría' }
+    { numero: 3, nombre: 'Lugar de procedencia', requerido: false, recomendacion: 'Ej: Lima, Arequipa' },
+    { numero: 4, nombre: 'N° HCL', requerido: false, recomendacion: 'Número de historia clínica' },
+    { numero: 5, nombre: 'Fecha y Hora de Cita Otorgada', requerido: true, recomendacion: 'Formato DD/MM/YYYY HH:MM' },
+    { numero: 6, nombre: 'Fecha y Hora de atención efectiva', requerido: true, recomendacion: 'Formato DD/MM/YYYY HH:MM' },
+    { numero: 7, nombre: 'Diagnóstico Médico', requerido: false, recomendacion: 'Descripción textual' },
+    { numero: 8, nombre: 'Dx CIE-10 Principal', requerido: false, recomendacion: 'Código CIE-10' },
+    { numero: 9, nombre: 'Dx CIE-10 Secundario', requerido: false, recomendacion: 'Opcional' },
+    { numero: 10, nombre: 'Dx CIE-10 Terciario', requerido: false, recomendacion: 'Opcional' },
+    { numero: 11, nombre: 'Especialidad', requerido: false, recomendacion: 'Ej: Cardiología, Pediatría' }
 ])
 
 // Variables reactivas con tipos

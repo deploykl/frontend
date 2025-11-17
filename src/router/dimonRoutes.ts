@@ -99,7 +99,7 @@ const DIMON_ROUTES: RouteRecordRaw[] = [
     meta: {
       title: "Reporte CE",
       requiresAuth: true,
-      requiredModule: [PERMISSIONS.CONSULTA_EXTERNA],
+      requiredModule: [PERMISSIONS.CONSULTA_EXTERNA_ADMIN],
     },
   },
   // ... resto de rutas con el mismo patrón
