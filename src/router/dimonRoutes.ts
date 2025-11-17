@@ -73,6 +73,16 @@ const DIMON_ROUTES: RouteRecordRaw[] = [
     },
   },
   {
+    path: "/dimon/consulta-externa/login",
+    name: "dimon-consulta-externa-login",
+    component: () => import("@/views/auth/LoginConsultaExterna.vue"),
+    meta: {
+      title: "Dashboard Consulta E.",
+      public: true,
+      ocultarMenuDash: true,
+    },
+  },
+   {
     path: "/dimon/consulta-externa/dashboard",
     name: "dimon-consulta-externa-dashboad",
     component: () => import("@/views/dimon/consultaExterna/DashboardView.vue"),
