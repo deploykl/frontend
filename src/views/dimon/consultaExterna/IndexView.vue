@@ -83,66 +83,78 @@
                             Limpiar
                         </button>
 
-                        <!-- Botón Exportar Excel -->
+                        <!-- Botón Exportar Excel
                         <button @click="exportToExcel" :disabled="registros.length === 0 || loading"
                             class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 active:bg-green-800 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
                             <i class="bi bi-file-earmark-excel mr-2"></i>
                             Exportar Excel
-                        </button>
+                        </button> -->
 
-                        <!-- Botón Descargar Plantilla -->
+                        <!-- Botón Descargar Plantilla
                         <button @click="descargarPlantilla"
                             class="inline-flex items-center px-4 py-2 bg-cyan-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-cyan-700 active:bg-cyan-800 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:ring-offset-2 transition-all duration-200">
                             <i class="bi bi-download mr-2"></i>
                             Descargar Plantilla
-                        </button>
+                        </button> -->
 
                         <!-- Filtros -->
-                        <div class="flex flex-wrap gap-3 items-center ml-auto">
+                        <div class="flex flex-wrap gap-4 items-center ml-auto">
                             <!-- Filtro de Usuario (solo para superusuarios) -->
                             <div class="relative" v-if="esSuperusuario">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="bi bi-person text-gray-400"></i>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                    <i class="pi pi-users text-gray-500 text-sm"></i>
                                 </div>
                                 <select v-model="filtroUsuario" @change="cargarRegistros"
-                                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    class="pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200 hover:border-gray-400 min-w-[180px] appearance-none">
                                     <option :value="null">Todos los usuarios</option>
                                     <option v-for="user in usuariosImportadores" :key="user.id" :value="user.id">
                                         {{ user.username }}
                                     </option>
                                 </select>
+                                <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                    <i class="pi pi-chevron-down text-gray-400 text-xs"></i>
+                                </div>
                             </div>
 
+                            <!-- Filtro de Año -->
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="bi bi-calendar text-gray-400"></i>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                    <i class="pi pi-calendar text-gray-500 text-sm"></i>
                                 </div>
                                 <select v-model="filtroAnio" @change="cargarRegistros"
-                                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
+                                    class="pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200 hover:border-gray-400 min-w-[140px] appearance-none">
                                     <option :value="null">Todos los años</option>
                                     <option v-for="year in añosDisponibles" :key="year" :value="year">
                                         {{ year }}
                                     </option>
                                 </select>
+                                <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                    <i class="pi pi-chevron-down text-gray-400 text-xs"></i>
+                                </div>
                             </div>
 
+                            <!-- Filtro de Mes -->
                             <div class="relative">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <i class="bi bi-filter text-gray-400"></i>
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none z-10">
+                                    <i class="pi pi-filter text-gray-500 text-sm"></i>
                                 </div>
                                 <select v-model="filtroMes" @change="cargarRegistros" :disabled="!filtroAnio"
-                                    class="pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white disabled:opacity-50 disabled:cursor-not-allowed">
-                                    <option :value="null">Todos</option>
+                                    class="pl-10 pr-8 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white shadow-sm transition-all duration-200 hover:border-gray-400 disabled:opacity-50 disabled:cursor-not-allowed min-w-[140px] appearance-none">
+                                    <option :value="null">Todos los meses</option>
                                     <option v-for="month in mesesFiltrados" :key="`${month.year}-${month.month}`"
                                         :value="month.month">
                                         {{ getMonthName(month.month) }}
                                     </option>
                                 </select>
+                                <div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none">
+                                    <i class="pi pi-chevron-down text-gray-400 text-xs"></i>
+                                </div>
                             </div>
 
+                            <!-- Botón Limpiar -->
                             <button @click="resetFiltros" :disabled="!filtroMes && !filtroAnio"
-                                class="inline-flex items-center px-3 py-2 border border-red-300 text-red-700 rounded-md hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                                <i class="bi bi-x-lg mr-1"></i>
+                                class="inline-flex items-center px-4 py-2.5 border border-red-300 text-red-700 bg-white rounded-lg hover:bg-red-50 hover:border-red-400 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-sm font-medium">
+                                <i class="pi pi-times mr-2 text-sm"></i>
                                 Limpiar
                             </button>
                         </div>
@@ -197,7 +209,7 @@
                                 <button @click="toggleErrores"
                                     class="inline-flex items-center px-3 py-1 bg-red-100 border border-red-300 text-red-700 rounded text-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200">
                                     {{ mostrarErrores ? 'Ocultar' : 'Mostrar' }} detalles de errores ({{
-                                    importResult.errores }})
+                                        importResult.errores }})
                                 </button>
 
                                 <transition enter-active-class="transition-all duration-300 ease-out"
@@ -270,7 +282,7 @@
                             <Column field="fecha_hora_cita_otorgada" header="Cita Otorgada">
                                 <template #body="{ data }">
                                     <span class="text-gray-700">{{ formatDateTime(data.fecha_hora_cita_otorgada)
-                                        }}</span>
+                                    }}</span>
                                 </template>
                             </Column>
 
@@ -401,15 +413,18 @@ interface ApiResponse {
 
 // Refs con tipos
 const columnasEstructura = ref<ColumnaEstructura[]>([
+    { numero: 0, nombre: 'Tipo de seguro', requerido: true, recomendacion: 'Ej: SIS, ESSALUD, Privado' },
     { numero: 1, nombre: 'Fecha Nacimiento', requerido: false, recomendacion: 'Formato DD/MM/YYYY' },
     { numero: 2, nombre: 'Sexo (M/F)', requerido: false, recomendacion: 'Solo "M" o "F"' },
-    { numero: 3, nombre: 'Fecha y Hora de Cita Otorgada', requerido: true, recomendacion: 'Formato DD/MM/YYYY HH:MM' },
-    { numero: 4, nombre: 'Fecha y Hora de atención efectiva', requerido: true, recomendacion: 'Formato DD/MM/YYYY HH:MM' },
-    { numero: 5, nombre: 'Diagnóstico Médico', requerido: false, recomendacion: 'Descripción textual' },
-    { numero: 6, nombre: 'Dx CIE-10 Principal', requerido: false, recomendacion: 'Código CIE-10' },
-    { numero: 7, nombre: 'Dx CIE-10 Secundario', requerido: false, recomendacion: 'Opcional' },
-    { numero: 8, nombre: 'Dx CIE-10 Terciario', requerido: false, recomendacion: 'Opcional' },
-    { numero: 9, nombre: 'Especialidad', requerido: false, recomendacion: 'Ej: Cardiología, Pediatría' }
+    { numero: 3, nombre: 'Lugar de procedencia', requerido: false, recomendacion: 'Ej: Lima, Arequipa' },
+    { numero: 4, nombre: 'N° HCL', requerido: false, recomendacion: 'Número de historia clínica' },
+    { numero: 5, nombre: 'Fecha y Hora de Cita Otorgada', requerido: true, recomendacion: 'Formato dd-mm-yyyy hh:mm:ss ó dd/mm/yyyy HH:MM:SS ó yyyy-mm-dd hh:mm:ss' },
+    { numero: 6, nombre: 'Fecha y Hora de atención efectiva', requerido: true, recomendacion: 'Formato dd-mm-yyyy hh:mm:ss ó dd/mm/yyyy HH:MM:SS ó yyyy-mm-dd hh:mm:ss' },
+    { numero: 7, nombre: 'Diagnóstico Médico', requerido: false, recomendacion: 'Descripción textual' },
+    { numero: 8, nombre: 'Dx CIE-10 Principal', requerido: false, recomendacion: 'Código CIE-10' },
+    { numero: 9, nombre: 'Dx CIE-10 Secundario', requerido: false, recomendacion: 'Opcional' },
+    { numero: 10, nombre: 'Dx CIE-10 Terciario', requerido: false, recomendacion: 'Opcional' },
+    { numero: 11, nombre: 'Especialidad', requerido: false, recomendacion: 'Ej: Cardiología, Pediatría' }
 ])
 
 // Variables reactivas con tipos

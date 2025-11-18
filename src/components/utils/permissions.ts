@@ -53,6 +53,7 @@ export const PERMISSIONS = {
   ADMIN_DIMON: 'Admin_dimon',
   ATENCIONES: 'Atenciones',
   CONSULTA_EXTERNA: 'Consulta Externa',
+  CONSULTA_EXTERNA_ADMIN: 'Consulta Externa Admin',
   UFM: 'UFM',
   ADMIN_DIEM: 'Admin_diem'
 } as const;
