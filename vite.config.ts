@@ -18,9 +18,9 @@ export default defineConfig({
       },
       includeAssets: ["icons/*.png", "favicon.ico"],
       manifest: {
-        name: "SGI - DGOS",
+        name: "SID - DGOS",
         short_name: "DGOS",
-        description: "Sistema de Gestión Integral - DGOS",
+        description: "SID - ",
         theme_color: "#053D4E",
         background_color: "#EFF6FF",
         display: "standalone",
@@ -61,7 +61,7 @@ export default defineConfig({
     },
   },
    server: {
-    port: 8080,
+    port: 8082,
     //port: 8082,
     host: true,
     allowedHosts: ["dgos.pe", "www.dgos.pe"],
