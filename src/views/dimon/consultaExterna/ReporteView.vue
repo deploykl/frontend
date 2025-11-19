@@ -67,14 +67,6 @@
                                     <option value="12">Diciembre</option>
                                 </select>
                             </div>
-
-                            <div class="flex items-end">
-                                <button @click="aplicarFiltros" :disabled="loading"
-                                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                                    <i class="bi bi-funnel mr-2"></i>
-                                    Aplicar Filtros
-                                </button>
-                            </div>
                         </div>
                     </div>
 
@@ -380,7 +372,7 @@ const loading = ref<boolean>(false)
 const reporteData = ref<ReporteData | null>(null)
 const mostrarModal = ref<boolean>(false)
 const establecimientoSeleccionado = ref<EstablecimientoReporte | null>(null)
-const itemsPorPagina = ref<number>(25)
+const itemsPorPagina = ref<number>(50)
 
 // Filtros
 const filtroAnio = ref<number>(new Date().getFullYear())
@@ -493,9 +485,6 @@ const cambiarAnio = (): void => {
     filtroMesFin.value = filtroAnio.value === new Date().getFullYear() ? mesActual : 12
 }
 
-const aplicarFiltros = (): void => {
-    generarReporte()
-}
 
 const generarReporte = async (): Promise<void> => {
     try {
@@ -508,9 +497,7 @@ const generarReporte = async (): Promise<void> => {
 
         const response = await api.get<ReporteData>('/dimon/consultas-externas/reporte-establecimientos/', { params })
         reporteData.value = response.data
-        console.log('✅ Reporte generado:', response.data)
     } catch (error: any) {
-        console.error('❌ Error generando reporte:', error)
         // Aquí podrías agregar notificaciones de error
     } finally {
         loading.value = false
@@ -631,5 +618,8 @@ onMounted(() => {
 
 :deep(.p-column-header-content) {
     justify-content: center;
+}
+*{
+    font-size: 0.80rem;
 }
 </style>

@@ -32,50 +32,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref} from 'vue'
+import { useToast } from '@/components/utils/useToast'
 
-interface Toast {
-    id: number
-    message: string
-    type: 'success' | 'error' | 'warning' | 'info' | 'update' | 'delete'
-    duration?: number
-}
-
-const toasts = ref<Toast[]>([])
-let toastId = 0
-
-// Función para mostrar toast
-const showToast = (message: string, type: Toast['type'] = 'info', duration: number = 5000) => {
-    const id = toastId++
-    const toast: Toast = {
-        id,
-        message,
-        type,
-        duration
-    }
-
-    toasts.value.push(toast)
-
-    // Auto-remover si tiene duración
-    if (duration > 0) {
-        setTimeout(() => {
-            removeToast(id)
-        }, duration)
-    }
-
-    return id
-}
-
-// Función para remover toast
-const removeToast = (id: number) => {
-    const index = toasts.value.findIndex(toast => toast.id === id)
-    if (index !== -1) {
-        toasts.value.splice(index, 1)
-    }
-}
+const { toasts, removeToast } = useToast()
 
 // Funciones para obtener clases dinámicas
-const getToastClasses = (type: Toast['type']) => {
+const getToastClasses = (type: string) => {
     const baseClasses = {
         success: 'bg-green-50 border-green-500 dark:bg-green-900/20 dark:border-green-400',
         error: 'bg-red-50 border-red-500 dark:bg-red-900/20 dark:border-red-400',
@@ -84,10 +46,10 @@ const getToastClasses = (type: Toast['type']) => {
         update: 'bg-indigo-50 border-indigo-500 dark:bg-indigo-900/20 dark:border-indigo-400',
         delete: 'bg-purple-50 border-purple-500 dark:bg-purple-900/20 dark:border-purple-400'
     }
-    return baseClasses[type]
+    return baseClasses[type as keyof typeof baseClasses] || baseClasses.info
 }
 
-const getIconClasses = (type: Toast['type']) => {
+const getIconClasses = (type: string) => {
     const baseClasses = {
         success: 'fas fa-check-circle text-green-500 dark:text-green-400',
         error: 'fas fa-exclamation-circle text-red-500 dark:text-red-400',
@@ -96,10 +58,10 @@ const getIconClasses = (type: Toast['type']) => {
         update: 'fas fa-sync-alt text-indigo-500 dark:text-indigo-400',
         delete: 'fas fa-trash-alt text-purple-500 dark:text-purple-400'
     }
-    return baseClasses[type]
+    return baseClasses[type as keyof typeof baseClasses] || baseClasses.info
 }
 
-const getTitleClasses = (type: Toast['type']) => {
+const getTitleClasses = (type: string) => {
     const baseClasses = {
         success: 'text-green-800 dark:text-green-200',
         error: 'text-red-800 dark:text-red-200',
@@ -108,10 +70,10 @@ const getTitleClasses = (type: Toast['type']) => {
         update: 'text-indigo-800 dark:text-indigo-200',
         delete: 'text-purple-800 dark:text-purple-200'
     }
-    return baseClasses[type]
+    return baseClasses[type as keyof typeof baseClasses] || baseClasses.info
 }
 
-const getMessageClasses = (type: Toast['type']) => {
+const getMessageClasses = (type: string) => {
     const baseClasses = {
         success: 'text-green-600 dark:text-green-300',
         error: 'text-red-600 dark:text-red-300',
@@ -120,10 +82,10 @@ const getMessageClasses = (type: Toast['type']) => {
         update: 'text-indigo-600 dark:text-indigo-300',
         delete: 'text-purple-600 dark:text-purple-300'
     }
-    return baseClasses[type]
+    return baseClasses[type as keyof typeof baseClasses] || baseClasses.info
 }
 
-const getTitle = (type: Toast['type']) => {
+const getTitle = (type: string) => {
     const titles = {
         success: 'Éxito',
         error: 'Error',
@@ -132,14 +94,8 @@ const getTitle = (type: Toast['type']) => {
         update: 'Actualización',
         delete: 'Eliminación'
     }
-    return titles[type]
+    return titles[type as keyof typeof titles] || 'Información'
 }
-
-// Exponer funciones al template padre
-defineExpose({
-    showToast,
-    removeToast
-})
 </script>
 
 <style scoped>

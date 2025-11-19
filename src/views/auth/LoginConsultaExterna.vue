@@ -263,23 +263,21 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "@/stores/auth/authStore";
+import { useAuthStoreConsultaExterna } from "@/stores/auth/authStoreConsultaExterna";
 import { useErrorStore } from "@/stores/errors/errorStore";
 import TwoFactorAuth from "@/components/security/TwoFactorAuth.vue";
 import DarkModeToggle from '@/components/DarkModeToggle.vue'
 
 // Router y stores
 const router = useRouter();
-const authStore = useAuthStore();
+const authStore = useAuthStoreConsultaExterna();
 const errorStore = useErrorStore();
 
 // Constantes de entorno
 const projectName = import.meta.env.VITE_PROJECT_NAME || "Sistema";
 const version = import.meta.env.VITE_VERSION || "1.0.0";
 
-/**
- * Maneja el proceso de login
- */
+
 const handleLogin = async (): Promise<void> => {
     if (authStore.isBlocked) {
         errorStore.showMessage('La cuenta está bloqueada temporalmente', 'warning');
@@ -295,22 +293,33 @@ const handleLogin = async (): Promise<void> => {
 
         // Ejecutar login pasando el router
         await authStore.login(router);
-        // 🔥 AGREGAR DELAY PARA QUE SE VEA EL TOAST
-        setTimeout(() => {
-            errorStore.showMessage('Inicio de sesión exitoso', 'success', 2000);
-        }, 100);
+        
+        // 🔥 VERIFICACIÓN ADICIONAL: Si no requiere 2FA, forzar redirección
+        if (!authStore.show2FA && !authStore.isLoading) {
+            console.log('🚀 Login exitoso, verificando redirección...');
+            
+            // Pequeño delay para asegurar que el store haya procesado todo
+            setTimeout(() => {
+                const token = localStorage.getItem('auth_token');
+                if (token) {
+                    console.log('✅ Token encontrado, redirigiendo...');
+                    router.push("/dimon/consulta-externa/index");
+                }
+            }, 500);
+        }
+        // Si requiere 2FA, no hacer nada - el handle2FASuccess se encargará
 
     } catch (error: any) {
-        // El error específico ya es manejado por el store
-        console.error('❌ Error en login:', error);
-
-        // Mostrar mensaje genérico solo si no es bloqueo de cuenta
-        if (error.message !== 'La cuenta está bloqueada temporalmente') {
-            errorStore.showMessage('Error al iniciar sesión. Verifica tus credenciales.', 'error');
+        
+        if (error.message?.includes('bloqueada')) {
+            errorStore.showMessage('La cuenta está bloqueada temporalmente', 'warning');
+        } else if (error.response?.status === 401) {
+            errorStore.showMessage('Credenciales incorrectas', 'error');
+        } else {
+            errorStore.showMessage('Error al iniciar sesión', 'error');
         }
     }
 };
-
 /**
  * Maneja el éxito de la autenticación 2FA
  */

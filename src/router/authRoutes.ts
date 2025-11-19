@@ -11,6 +11,17 @@ const authRoutes: Array<RouteRecordRaw> = [
       ocultarMenuDash: true,
     },
   },
+  {
+    path: "/change-password",
+    name: "change-password",
+    component: () => import("@/views/auth/ChangePasswordView.vue"),
+    meta: {
+      title: "Cambiar Contraseña",
+      requiresAuth: true,
+            public: true,
+
+    },
+  },
 ];
 
 export default authRoutes;
