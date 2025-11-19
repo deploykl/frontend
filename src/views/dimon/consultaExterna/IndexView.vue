@@ -693,18 +693,6 @@ const mesesFiltrados = computed(() => {
 })
 
 
-// 🔥 FUNCIÓN PARA OBTENER ESTADO LEGIBLE CON TIPOS CORRECTOS
-const getWebSocketState = (state: WebSocketState | undefined): string => {
-    if (state === undefined) return 'INDEFINIDO'
-
-    const states: Record<WebSocketState, string> = {
-        0: 'CONECTANDO',
-        1: 'ABIERTO',
-        2: 'CERRANDO',
-        3: 'CERRADO'
-    }
-    return states[state] || 'DESCONOCIDO'
-}
 
 // 🔥 CORRECCIÓN: Usar el token correcto
 const obtenerToken = (): string | null => {
@@ -716,7 +704,6 @@ const obtenerToken = (): string | null => {
     return token
 }
 
-// 🔥 NUEVO: Método para descargar errores
 // 🔥 NUEVO: Método para descargar errores - SIN LOGS
 const descargarErrores = async (archivoUrl: string): Promise<void> => {
     if (descargandoErrores.value) return
