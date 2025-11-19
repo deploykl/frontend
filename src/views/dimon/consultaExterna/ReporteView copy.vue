@@ -67,14 +67,6 @@
                                     <option value="12">Diciembre</option>
                                 </select>
                             </div>
-
-                            <div class="flex items-end">
-                                <button @click="aplicarFiltros" :disabled="loading"
-                                    class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                                    <i class="bi bi-funnel mr-2"></i>
-                                    Aplicar Filtros
-                                </button>
-                            </div>
                         </div>
                     </div>
 
@@ -115,7 +107,7 @@
                                     <p class="text-sm font-medium text-green-800">Al Día</p>
                                     <p class="text-2xl font-bold text-green-900">
                                         {{ reporteData.total_establecimientos -
-                                        reporteData.establecimientos_con_pendientes }}
+                                            reporteData.establecimientos_con_pendientes }}
                                     </p>
                                 </div>
                             </div>
@@ -249,7 +241,8 @@
 
                             <!-- Columnas dinámicas para cada mes -->
                             <Column v-for="mes in mesesCabeceras" :key="mes" :field="mes" :header="mes"
-                                headerStyle="min-width: 80px" :sortable="true">
+                                headerStyle="min-width: 80px" :sortable="true"
+                                :sort-field="(data) => obtenerValorOrdenamientoString(data, mes)">
                                 <template #body="{ data }">
                                     <div class="text-center">
                                         <span :class="[
@@ -329,7 +322,7 @@
                                         <div class="text-xs mt-1"
                                             :class="obtenerCantidadRegistros(establecimientoSeleccionado, mes) > 0 ? 'text-green-600' : 'text-red-600'">
                                             {{ obtenerCantidadRegistros(establecimientoSeleccionado, mes) > 0 ?
-                                            'registros' : 'pendiente' }}
+                                                'registros' : 'pendiente' }}
                                         </div>
                                     </div>
                                 </div>
@@ -380,12 +373,12 @@ const loading = ref<boolean>(false)
 const reporteData = ref<ReporteData | null>(null)
 const mostrarModal = ref<boolean>(false)
 const establecimientoSeleccionado = ref<EstablecimientoReporte | null>(null)
-const itemsPorPagina = ref<number>(25)
+const itemsPorPagina = ref<number>(50)
 
 // Filtros
 const filtroAnio = ref<number>(new Date().getFullYear())
-const filtroMesInicio = ref<number>(1) // Enero por defecto
-const filtroMesFin = ref<number>(new Date().getMonth() + 1) // Mes actual
+const filtroMesInicio = ref<number>(1)
+const filtroMesFin = ref<number>(new Date().getMonth() + 1)
 const filtroBusqueda = ref<string>('')
 const filtroEstado = ref<string>('todos')
 const filtroOrden = ref<string>('pendientes-desc')
@@ -404,7 +397,6 @@ const anosDisponibles = computed(() => {
 const mesesCabeceras = computed(() => {
     if (!reporteData.value?.meses_verificados) return []
 
-    // Filtrar meses según los filtros seleccionados
     return reporteData.value.meses_verificados.filter(mes => {
         const partes = mes.split('/')
         if (partes.length < 2) return false
@@ -414,7 +406,6 @@ const mesesCabeceras = computed(() => {
         const mesNum = parseInt(mesStr)
         const anioNum = parseInt(anioStr)
 
-        // Validar que los números sean válidos
         if (isNaN(mesNum) || isNaN(anioNum)) return false
 
         return anioNum === filtroAnio.value &&
@@ -422,6 +413,14 @@ const mesesCabeceras = computed(() => {
             mesNum <= filtroMesFin.value
     })
 })
+// 🔥 NUEVO: Función para obtener el valor de ordenamiento
+const obtenerValorOrdenamientoString = (establecimiento: EstablecimientoReporte, mes: string): string => {
+    const valor = establecimiento.registros_por_mes?.[mes] || 0
+    // Convertir a string con padding para ordenamiento correcto
+    return valor.toString().padStart(6, '0')
+}
+
+
 const reporteFiltrado = computed(() => {
     if (!reporteData.value?.reporte_pendientes) return []
 
@@ -480,21 +479,15 @@ const obtenerCantidadRegistros = (establecimiento: EstablecimientoReporte, mes: 
 const calcularTotalRegistros = (establecimiento: EstablecimientoReporte): number => {
     if (!establecimiento.registros_por_mes) return 0
 
-    // Sumar solo los registros de los meses filtrados
     return mesesCabeceras.value.reduce((sum, mes) => {
         return sum + (establecimiento.registros_por_mes?.[mes] || 0)
     }, 0)
 }
 
 const cambiarAnio = (): void => {
-    // Resetear meses al cambiar de año
-    filtroMesInicio.value = 1 // Enero por defecto
+    filtroMesInicio.value = 1
     const mesActual = new Date().getMonth() + 1
     filtroMesFin.value = filtroAnio.value === new Date().getFullYear() ? mesActual : 12
-}
-
-const aplicarFiltros = (): void => {
-    generarReporte()
 }
 
 const generarReporte = async (): Promise<void> => {
@@ -508,10 +501,8 @@ const generarReporte = async (): Promise<void> => {
 
         const response = await api.get<ReporteData>('/dimon/consultas-externas/reporte-establecimientos/', { params })
         reporteData.value = response.data
-        console.log('✅ Reporte generado:', response.data)
     } catch (error: any) {
-        console.error('❌ Error generando reporte:', error)
-        // Aquí podrías agregar notificaciones de error
+        // Error silenciado para producción
     } finally {
         loading.value = false
     }
@@ -600,13 +591,12 @@ const exportarExcel = async (): Promise<void> => {
         saveAs(blob, `reporte_establecimientos_${filtroAnio.value}_${dateStr}.xlsx`)
 
     } catch (error) {
-        console.error('Error al exportar a Excel:', error)
+        // Error silenciado para producción
     }
 }
 
 // Lifecycle
 onMounted(() => {
-    // Inicializar con el año actual
     filtroAnio.value = new Date().getFullYear()
     filtroMesFin.value = new Date().getMonth() + 1
     generarReporte()
@@ -631,5 +621,9 @@ onMounted(() => {
 
 :deep(.p-column-header-content) {
     justify-content: center;
+}
+
+* {
+    font-size: 0.80rem;
 }
 </style>

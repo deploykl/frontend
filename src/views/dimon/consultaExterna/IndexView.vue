@@ -712,41 +712,26 @@ const obtenerToken = (): string | null => {
         localStorage.getItem('access_token') ||
         localStorage.getItem('token') ||
         sessionStorage.getItem('auth_token')
-
-    if (!token) {
-        console.error('❌ No se encontró token de autenticación')
-        console.log('🔍 Contenido de localStorage:', {
-            auth_token: localStorage.getItem('auth_token'),
-            access_token: localStorage.getItem('access_token'),
-            token: localStorage.getItem('token'),
-            user_id: localStorage.getItem('user_id'),
-            is_superuser: localStorage.getItem('is_superuser')
-        })
-    } else {
-        console.log('✅ Token encontrado:', token.substring(0, 20) + '...')
-    }
-
+    
     return token
 }
 
 // 🔥 NUEVO: Método para descargar errores
+// 🔥 NUEVO: Método para descargar errores - SIN LOGS
 const descargarErrores = async (archivoUrl: string): Promise<void> => {
     if (descargandoErrores.value) return
 
     descargandoErrores.value = true
     try {
-        // Extraer el nombre del archivo de la URL
         const filename = archivoUrl.split('/').pop()
         if (!filename) {
             throw new Error('No se pudo obtener el nombre del archivo')
         }
 
-        // Llamar al endpoint de descarga
         const response = await api.get(`/dimon/consultas-externas/descargar-errores/?archivo=${filename}`, {
             responseType: 'blob'
         })
 
-        // Crear URL del blob y descargar
         const blob = new Blob([response.data], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         })
@@ -759,17 +744,12 @@ const descargarErrores = async (archivoUrl: string): Promise<void> => {
         document.body.removeChild(link)
         window.URL.revokeObjectURL(url)
 
-        console.log('✅ Archivo de errores descargado exitosamente')
-
     } catch (error: any) {
-        console.error('❌ Error descargando archivo de errores:', error)
-
         let errorMessage = 'Error al descargar el archivo de errores'
         if (error.response?.data?.error) {
             errorMessage = error.response.data.error
         }
 
-        // Mostrar notificación de error
         importResult.value = {
             ...importResult.value!,
             success: false,
@@ -780,13 +760,12 @@ const descargarErrores = async (archivoUrl: string): Promise<void> => {
     }
 }
 
-// Métodos WebSocket
+// Métodos WebSocket - SIN LOGS
 const conectarWebSocket = (): void => {
     try {
         const token = obtenerToken()
 
         if (!token) {
-            console.error('❌ No hay token disponible, no se puede conectar WebSocket')
             progresoImportacion.value.mensaje = 'Error: No estás autenticado. Recarga la página.'
             return
         }
@@ -795,74 +774,53 @@ const conectarWebSocket = (): void => {
 
         if (import.meta.env.VITE_API_URL_WS_PROGRESS) {
             wsUrl = `${import.meta.env.VITE_API_URL_WS_PROGRESS}?token=${encodeURIComponent(token)}`
-            console.log('🔗 Usando URL de variable de entorno:', wsUrl)
         } else {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
             const host = window.location.host
             wsUrl = `${protocol}//${host}/ws/import-progress/?token=${encodeURIComponent(token)}`
-            console.log('🔗 Construyendo URL manualmente:', wsUrl)
         }
-
-        console.log(`📊 Token length: ${token.length}`)
 
         websocket.value = new WebSocket(wsUrl)
 
-        console.log(`📡 Estado inmediato: ${websocket.value.readyState} (${getWebSocketState(websocket.value.readyState as WebSocketState)})`)
-
         websocket.value.onopen = () => {
-            console.log('✅ WebSocket conectado exitosamente con autenticación')
-            console.log(`📡 ReadyState: ${websocket.value?.readyState} (${getWebSocketState(websocket.value?.readyState as WebSocketState)})`)
             progresoImportacion.value.mensaje = 'Conexión establecida - Listo para importar'
         }
 
         websocket.value.onmessage = (event) => {
-            console.log('📨 Mensaje WebSocket recibido:', event.data)
             try {
                 const data = JSON.parse(event.data)
                 manejarMensajeWebSocket(data)
             } catch (error) {
-                console.error('❌ Error parseando mensaje WebSocket:', error)
+                // Silenciar error de parsing
             }
         }
 
         websocket.value.onclose = (event) => {
-            console.log('❌ WebSocket desconectado - Código:', event.code, 'Razón:', event.reason)
-            console.log(`📊 ReadyState al cerrar: ${websocket.value?.readyState} (${getWebSocketState(websocket.value?.readyState as WebSocketState)})`)
-
             if (event.code === 4001) {
-                console.log('🔐 Error de autenticación - Token inválido o expirado')
                 progresoImportacion.value.mensaje = 'Error de autenticación - Recarga la página'
             } else if (event.code === 4002) {
-                console.log('⚡ Error general del servidor')
                 progresoImportacion.value.mensaje = 'Error del servidor'
             } else if (event.code === 1006) {
-                console.log('🔌 Conexión cerrada abruptamente')
                 progresoImportacion.value.mensaje = 'Error de conexión - Intentando reconectar...'
                 setTimeout(conectarWebSocket, 2000)
             } else if (event.code !== 1000) {
                 progresoImportacion.value.mensaje = 'Conexión perdida - Reconectando...'
-                console.log('🔄 Intentando reconexión en 3 segundos...')
                 setTimeout(conectarWebSocket, 3000)
             }
         }
 
-        websocket.value.onerror = (error) => {
-            console.error('💥 Error WebSocket:', error)
+        websocket.value.onerror = () => {
             progresoImportacion.value.mensaje = 'Error de conexión WebSocket'
         }
 
     } catch (error) {
-        console.error('🚨 Error crítico conectando WebSocket:', error)
         progresoImportacion.value.mensaje = 'Error al conectar WebSocket'
     }
 }
 
 const manejarMensajeWebSocket = (data: any): void => {
-    console.log('🔄 Procesando mensaje WebSocket tipo:', data.type)
-
     switch (data.type) {
         case 'progress':
-            console.log(`📊 Progreso: ${data.porcentaje}% - ${data.mensaje}`)
             progresoImportacion.value = {
                 mostrar: true,
                 porcentaje: data.porcentaje,
@@ -878,7 +836,6 @@ const manejarMensajeWebSocket = (data: any): void => {
             break
 
         case 'complete':
-            console.log('🏁 Importación completada:', data.resultado)
             progresoImportacion.value.mostrar = false
             loading.value = false
 
@@ -895,9 +852,6 @@ const manejarMensajeWebSocket = (data: any): void => {
                 }
             }
             break
-
-        default:
-            console.log('❓ Mensaje WebSocket desconocido:', data)
     }
 }
 
@@ -936,10 +890,10 @@ const onPageChange = (event: any) => {
 }
 
 // Manejar ordenamiento
-const onSort = (event: any) => {
-    console.log('Ordenamiento:', event)
+const onSort = () => {
     cargarRegistros(paginacion.value.current_page)
 }
+
 
 const cargarMesesDisponibles = async (): Promise<void> => {
     try {
@@ -948,7 +902,7 @@ const cargarMesesDisponibles = async (): Promise<void> => {
         filtroAnio.value = null
         filtroMes.value = null
     } catch (error) {
-        console.error('Error cargando meses disponibles:', error)
+        // Silenciar error en producción
     }
 }
 
@@ -1011,7 +965,6 @@ const uploadFile = async (): Promise<void> => {
         const formData = new FormData()
         formData.append('file', file.value)
 
-        console.log('📤 Enviando archivo al servidor...')
         const response = await api.post('/dimon/consultas-externas/importar-excel/', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
@@ -1019,20 +972,15 @@ const uploadFile = async (): Promise<void> => {
             timeout: 120000
         })
 
-        console.log('✅ Respuesta del servidor:', response.data)
-
         if (response.data.websocket) {
-            console.log('🚀 Importación iniciada, esperando progreso por WebSocket...')
             progresoImportacion.value.mensaje = 'Importación iniciada - Procesando...'
         } else {
-            console.log('⚠️  El servidor no usa WebSocket, usando método tradicional')
             loading.value = false
             progresoImportacion.value.mostrar = false
             importResult.value = response.data
         }
 
     } catch (error: any) {
-        console.error('❌ Error en uploadFile:', error)
         loading.value = false
         progresoImportacion.value.mostrar = false
 
@@ -1062,8 +1010,6 @@ const cargarRegistros = async (page = 1): Promise<void> => {
         if (filtroMes.value) params.month = filtroMes.value
         if (esSuperusuario.value && filtroUsuario.value) params.user_id = filtroUsuario.value
 
-        console.log('📡 Cargando página:', page, 'con', itemsPorPagina.value, 'registros')
-
         const response = await api.get<ApiResponse>('/dimon/consultas-externas/', { params })
 
         registros.value = response.data.results
@@ -1073,10 +1019,8 @@ const cargarRegistros = async (page = 1): Promise<void> => {
             total_pages: response.data.total_pages || Math.ceil(response.data.count / itemsPorPagina.value)
         }
 
-        console.log('✅ Página cargada:', registros.value.length, 'registros de', totalRegistros.value, 'total')
-
     } catch (error) {
-        console.error('❌ Error cargando registros:', error)
+        // Silenciar error en producción
     } finally {
         loading.value = false
     }
@@ -1122,17 +1066,7 @@ const verificarPermisos = (): void => {
     try {
         esSuperusuario.value = localStorage.getItem('is_superuser') === 'true'
         esStaff.value = localStorage.getItem('is_staff') === 'true'
-
-        console.log('🔐 Permisos:', {
-            superuser: esSuperusuario.value,
-            staff: esStaff.value,
-            localStorage_is_staff: localStorage.getItem('is_staff'),
-            localStorage_is_superuser: localStorage.getItem('is_superuser')
-        })
-
-        console.log('🔘 Botón visible?:', !esStaff.value)
     } catch (error) {
-        console.error('Error leyendo localStorage:', error)
         esSuperusuario.value = false
         esStaff.value = false
     }
@@ -1145,9 +1079,7 @@ const cargarUsuariosImportadores = async (): Promise<void> => {
         loading.value = true
         const response = await api.get<Usuario[]>('/dimon/consultas-externas/usuarios-importadores/')
         usuariosImportadores.value = response.data
-        console.log('👥 Usuarios importadores cargados:', response.data)
     } catch (error) {
-        console.error('Error cargando usuarios importadores:', error)
         importResult.value = {
             success: false,
             message: 'Error al cargar la lista de usuarios importadores'
@@ -1171,23 +1103,12 @@ watch(busqueda, (newValue: string) => {
 
 // Lifecycle
 onMounted(() => {
-    console.log('🚀 Componente montado - Verificando autenticación...')
-
     const user_id = localStorage.getItem('user_id')
     const token = obtenerToken()
 
-    console.log('🔍 Estado de autenticación:', {
-        user_id: user_id,
-        token_present: !!token,
-        is_superuser: localStorage.getItem('is_superuser'),
-        is_staff: localStorage.getItem('is_staff')
-    })
-
     if (user_id && token) {
-        console.log('🔐 Usuario autenticado, conectando WebSocket...')
         conectarWebSocket()
     } else {
-        console.log('⚠️  Usuario no autenticado, WebSocket no se conectará')
         progresoImportacion.value.mensaje = 'No autenticado - Inicia sesión primero'
     }
 
@@ -1201,7 +1122,6 @@ onMounted(() => {
 
 onUnmounted(() => {
     if (websocket.value) {
-        console.log('🧹 Limpiando WebSocket...')
         websocket.value.close()
     }
 })

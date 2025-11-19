@@ -69,7 +69,7 @@
                     <!-- 🔥 NUEVO: Barra de progreso WebSocket en tiempo real -->
                     <div v-if="progresoImportacion.mostrar" class="mb-6">
                         <div
-                            class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 shadow-sm">
+                            class="bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 shadow-sm">
                             <!-- Header del progreso -->
                             <div class="flex justify-between items-center mb-3">
                                 <div class="flex items-center space-x-2">
@@ -82,10 +82,10 @@
 
                             <!-- Barra de progreso principal -->
                             <div class="w-full bg-blue-200 rounded-full h-4 mb-3 shadow-inner">
-                                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-300 ease-out shadow-sm"
+                                <div class="bg-linear-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-300 ease-out shadow-sm"
                                     :style="{ width: progresoImportacion.porcentaje + '%' }">
                                     <div
-                                        class="h-full w-full rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 animate-pulse">
+                                        class="h-full w-full rounded-full bg-linear-to-r from-blue-400 to-indigo-500 animate-pulse">
                                     </div>
                                 </div>
                             </div>
@@ -96,7 +96,7 @@
                                     <div class="text-gray-600 text-xs">Procesados</div>
                                     <div class="font-bold text-blue-700">
                                         {{ progresoImportacion.procesados.toLocaleString() }} / {{
-                                        progresoImportacion.total.toLocaleString() }}
+                                            progresoImportacion.total.toLocaleString() }}
                                     </div>
                                 </div>
                                 <div class="bg-white rounded p-2 shadow-sm border">
@@ -134,7 +134,7 @@
                             <div v-if="progresoImportacion.total_lotes > 1" class="mt-3">
                                 <div class="text-xs text-gray-600 mb-1">
                                     Progreso por lotes: {{ progresoImportacion.lote_actual }} de {{
-                                    progresoImportacion.total_lotes }}
+                                        progresoImportacion.total_lotes }}
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-2">
                                     <div class="bg-green-500 h-2 rounded-full transition-all duration-300"
@@ -148,18 +148,27 @@
                     <!-- Botones de acción -->
                     <div class="flex flex-wrap gap-3 mb-6 items-center">
                         <!-- Botón Importar Datos -->
+                        <!-- Botón Importar Datos - CORREGIDO -->
                         <button v-if="!esStaff" @click="uploadFile" :disabled="!file || loading"
-                            class="inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
+                            class="group inline-flex items-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-700 active:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 hover:-translate-y-0.5 shadow-lg hover:shadow-xl">
+                            <!-- Icono PrimeVue CORREGIDO -->
                             <i v-if="loading" class="pi pi-spin pi-spinner mr-2"></i>
-                            <i v-else class="bi bi-upload mr-2"></i>
-                            {{ loading ? 'Importando...' : 'Importar Datos' }}
+                            <i v-else
+                                class="pi pi-upload mr-2 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5"></i>
+                            <span class="transition-all duration-300 group-hover:tracking-wider">
+                                {{ loading ? 'Importando...' : 'Importar Datos' }}
+                            </span>
                         </button>
 
-                        <!-- Botón Limpiar -->
+                        <!-- Botón Limpiar - CORREGIDO -->
                         <button @click="resetForm" :disabled="loading"
-                            class="inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200">
-                            <i class="bi bi-trash mr-2"></i>
-                            Limpiar
+                            class="group inline-flex items-center px-4 py-2 bg-white border border-gray-300 rounded-md font-semibold text-xs text-gray-700 uppercase tracking-widest hover:bg-gray-50 active:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 transform hover:scale-105 active:scale-95 hover:-translate-y-0.5 shadow-md hover:shadow-lg">
+                            <!-- Icono PrimeVue CORREGIDO -->
+                            <i
+                                class="pi pi-trash mr-2 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12"></i>
+                            <span class="transition-all duration-300 group-hover:tracking-wider">
+                                Limpiar
+                            </span>
                         </button>
 
                         <!-- Filtros -->
@@ -269,63 +278,143 @@
                                 </div>
                             </template>
 
-            <div v-if="importResult.detalle_errores && importResult.detalle_errores.length > 0"
-                class="mt-3">
-                <button @click="toggleErrores"
-                    class="inline-flex items-center px-3 py-1 bg-red-100 border border-red-300 text-red-700 rounded text-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200">
-                    {{ mostrarErrores ? 'Ocultar' : 'Mostrar' }} detalles de errores ({{
-                        importResult.errores || 0 }})
-                </button>
- <transition enter-active-class="transition-all duration-300 ease-out"
-                    leave-active-class="transition-all duration-200 ease-in"
-                    enter-from-class="opacity-0 transform -translate-y-2"
-                    leave-to-class="opacity-0 transform -translate-y-2">
-                    <div v-if="mostrarErrores"
-                        class="mt-3 p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
-                        <h6 class="font-semibold mb-2 text-gray-800">Detalles completos:</h6>
-                        <ul class="space-y-1">
-                            <li v-for="(error, index) in importResult.detalle_errores" :key="index"
-                                class="flex items-start">
-                                <span
-                                    class="inline-flex items-center justify-center w-6 h-6 bg-red-100 text-red-800 rounded-full text-xs font-semibold mr-2 shrink-0">
-                                    {{ index + 1 }}
-                                </span>
-                                <span class="text-sm text-gray-700">{{ error }}</span>
-                            </li>
-                        </ul>
-                    </div>
-                </transition>
+                            <div v-if="importResult.detalle_errores && importResult.detalle_errores.length > 0"
+                                class="mt-3">
+                                <button @click="toggleErrores"
+                                    class="inline-flex items-center px-3 py-1 bg-red-100 border border-red-300 text-red-700 rounded text-sm hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500 transition-all duration-200">
+                                    {{ mostrarErrores ? 'Ocultar' : 'Mostrar' }} detalles de errores ({{
+                                        importResult.errores || 0 }})
+                                </button>
+                                <transition enter-active-class="transition-all duration-300 ease-out"
+                                    leave-active-class="transition-all duration-200 ease-in"
+                                    enter-from-class="opacity-0 transform -translate-y-2"
+                                    leave-to-class="opacity-0 transform -translate-y-2">
+                                    <div v-if="mostrarErrores"
+                                        class="mt-3 p-3 bg-white border border-gray-200 rounded-lg shadow-sm">
+                                        <h6 class="font-semibold mb-2 text-gray-800">Detalles completos:</h6>
+                                        <ul class="space-y-1">
+                                            <li v-for="(error, index) in importResult.detalle_errores" :key="index"
+                                                class="flex items-start">
+                                                <span
+                                                    class="inline-flex items-center justify-center w-6 h-6 bg-red-100 text-red-800 rounded-full text-xs font-semibold mr-2 shrink-0">
+                                                    {{ index + 1 }}
+                                                </span>
+                                                <span class="text-sm text-gray-700">{{ error }}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </transition>
 
-                                <!-- 🔥 NUEVO: Sección para descargar Excel con errores -->
-                <div v-if="importResult.archivo_errores && (importResult.errores || 0) > 0"
-                                    class="mt-4 p-4 bg-orange-50 border border-orange-200 rounded-lg">
-                                    <div class="flex items-center mb-2">
-                                        <i class="pi pi-download text-orange-600 mr-2"></i>
-                                        <span class="text-orange-800 font-semibold">Archivo de errores disponible:</span>
+                                <!-- 🔥 SECCIÓN ELEGANTE: Descarga de Excel con errores -->
+                                <div v-if="importResult.archivo_errores && (importResult.errores || 0) > 0"
+                                    class="mt-6 p-6 bg-linear-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+
+                                    <!-- Header con icono elegante -->
+                                    <div class="flex items-center mb-4">
+                                        <div
+                                            class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl shadow-sm">
+                                            <i class="pi pi-file-excel text-white text-lg"></i>
+                                        </div>
+                                        <div class="ml-4">
+                                            <h3 class="text-lg font-semibold text-amber-900">Reporte de Errores
+                                                Disponible</h3>
+                                            <p class="text-amber-700 text-sm mt-1">Descarga el detalle completo de los
+                                                errores encontrados
+                                            </p>
+                                        </div>
                                     </div>
-                                    
-                                    <div class="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-                                        
-                                     <!-- Botón para Descarga Directa -->
-<button @click="descargarErrores(importResult.archivo_errores!)"
-   :disabled="descargandoErrores"
-   class="inline-flex items-center px-4 py-2.5 bg-white border-2 border-orange-500 text-orange-700 font-medium rounded-lg hover:bg-orange-50 hover:border-orange-600 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
-   <i v-if="descargandoErrores" class="pi pi-spin pi-spinner mr-2"></i>
-   <i v-else class="pi pi-download mr-2"></i>
-   <span class="font-semibold">{{ descargandoErrores ? 'Descargando...' : 'Descarga Directa' }}</span>
-</button>
+
+                                    <!-- Contador de errores -->
+                                    <div
+                                        class="flex items-center justify-between mb-6 p-4 bg-white rounded-xl border border-amber-100 shadow-xs">
+                                        <div class="flex items-center">
+                                            <div
+                                                class="flex items-center justify-center w-10 h-10 bg-red-50 rounded-lg border border-red-200">
+                                                <i class="pi pi-exclamation-triangle text-red-500 text-sm"></i>
+                                            </div>
+                                            <div class="ml-3">
+                                                <p class="text-sm font-medium text-gray-600">Total de errores</p>
+                                                <p class="text-2xl font-bold text-red-600">{{ importResult.errores }}
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        <div class="text-right">
+                                            <p class="text-sm font-medium text-gray-600">Archivo generado</p>
+                                            <p class="text-sm text-gray-500">Ahora mismo</p>
+                                        </div>
                                     </div>
-                                    
-                                    <p class="text-orange-700 text-sm mt-2">
-                                        <i class="pi pi-info-circle mr-1"></i>
-                                        El archivo contiene información detallada de cada error, incluyendo:
-                                    </p>
-                                    <ul class="text-orange-700 text-sm mt-1 ml-4 list-disc">
-                                        <li>Número de fila en el Excel original</li>
-                                        <li>Descripción completa del error</li>
-                                        <li>Campo problemático identificado</li>
-                                        <li>Datos originales de la fila</li>
-                                    </ul>
+
+                                    <!-- Botón de descarga elegante -->
+                                    <div
+                                        class="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+                                        <div class="flex-1">
+                                            <button @click="descargarErrores(importResult.archivo_errores!)"
+                                                :disabled="descargandoErrores"
+                                                class="group relative inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border border-amber-400 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-w-[200px]">
+
+                                                <!-- Efecto de fondo animado -->
+                                                <div
+                                                    class="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10">
+                                                </div>
+
+                                                <!-- Icono y texto -->
+                                                <div class="flex items-center space-x-3">
+                                                    <div class="relative">
+                                                        <i v-if="descargandoErrores"
+                                                            class="pi pi-spin pi-spinner text-lg"></i>
+                                                        <i v-else
+                                                            class="pi pi-download text-lg transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5"></i>
+                                                    </div>
+                                                    <span
+                                                        class="text-sm tracking-wide transition-all duration-300 group-hover:tracking-wider">
+                                                        {{ descargandoErrores ? 'Preparando descarga...' : 'Descargar Reporte' }}
+                                                    </span>
+                                                </div>
+                                            </button>
+                                        </div>
+
+                                        <!-- Información adicional -->
+                                        <div
+                                            class="flex-1 text-sm text-amber-700 bg-amber-100/50 rounded-lg p-3 border border-amber-200">
+                                            <div class="flex items-start space-x-2">
+                                                <i class="pi pi-info-circle text-amber-600 mt-0.5 shrink-0"></i>
+                                                <div>
+                                                    <p class="font-medium mb-1">¿Qué incluye este reporte?</p>
+                                                    <ul class="space-y-1 text-amber-800">
+                                                        <li class="flex items-center">
+                                                            <span
+                                                                class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-2"></span>
+                                                            Número de fila exacto en el Excel
+                                                        </li>
+                                                        <li class="flex items-center">
+                                                            <span
+                                                                class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-2"></span>
+                                                            Descripción detallada del error
+                                                        </li>
+                                                        <li class="flex items-center">
+                                                            <span
+                                                                class="w-1.5 h-1.5 bg-amber-500 rounded-full mr-2"></span>
+                                                            Campo específico con problemas
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Progreso de descarga (opcional) -->
+                                    <div v-if="descargandoErrores" class="mt-4">
+                                        <div class="flex items-center justify-between text-xs text-amber-700 mb-2">
+                                            <span>Preparando archivo...</span>
+                                            <span class="font-medium">Por favor espere</span>
+                                        </div>
+                                        <div class="w-full bg-amber-200 rounded-full h-1.5">
+                                            <div
+                                                class="bg-linear-to-r from-amber-500 to-orange-500 h-1.5 rounded-full animate-pulse">
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -642,8 +731,8 @@ const obtenerToken = (): string | null => {
 
 // 🔥 NUEVO: Método para descargar errores
 const descargarErrores = async (archivoUrl: string): Promise<void> => {
-        if (descargandoErrores.value) return
-    
+    if (descargandoErrores.value) return
+
     descargandoErrores.value = true
     try {
         // Extraer el nombre del archivo de la URL
@@ -658,8 +747,8 @@ const descargarErrores = async (archivoUrl: string): Promise<void> => {
         })
 
         // Crear URL del blob y descargar
-        const blob = new Blob([response.data], { 
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' 
+        const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         })
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
@@ -674,7 +763,7 @@ const descargarErrores = async (archivoUrl: string): Promise<void> => {
 
     } catch (error: any) {
         console.error('❌ Error descargando archivo de errores:', error)
-        
+
         let errorMessage = 'Error al descargar el archivo de errores'
         if (error.response?.data?.error) {
             errorMessage = error.response.data.error
@@ -686,7 +775,7 @@ const descargarErrores = async (archivoUrl: string): Promise<void> => {
             success: false,
             message: errorMessage
         }
-    }  finally {
+    } finally {
         descargandoErrores.value = false
     }
 }
@@ -1117,3 +1206,24 @@ onUnmounted(() => {
     }
 })
 </script>
+<style scoped>
+/* Asegurar que la animación funcione */
+.pi-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Para Bootstrap Icons */
+.bi-arrow-clockwise {
+    animation: spin 1s linear infinite;
+}
+</style>
