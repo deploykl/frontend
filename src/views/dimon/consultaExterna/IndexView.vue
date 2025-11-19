@@ -69,7 +69,7 @@
                     <!-- 🔥 NUEVO: Barra de progreso WebSocket en tiempo real -->
                     <div v-if="progresoImportacion.mostrar" class="mb-6">
                         <div
-                            class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 shadow-sm">
+                            class="bg-linear-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-4 shadow-sm">
                             <!-- Header del progreso -->
                             <div class="flex justify-between items-center mb-3">
                                 <div class="flex items-center space-x-2">
@@ -82,10 +82,10 @@
 
                             <!-- Barra de progreso principal -->
                             <div class="w-full bg-blue-200 rounded-full h-4 mb-3 shadow-inner">
-                                <div class="bg-gradient-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-300 ease-out shadow-sm"
+                                <div class="bg-linear-to-r from-blue-500 to-indigo-600 h-4 rounded-full transition-all duration-300 ease-out shadow-sm"
                                     :style="{ width: progresoImportacion.porcentaje + '%' }">
                                     <div
-                                        class="h-full w-full rounded-full bg-gradient-to-r from-blue-400 to-indigo-500 animate-pulse">
+                                        class="h-full w-full rounded-full bg-linear-to-r from-blue-400 to-indigo-500 animate-pulse">
                                     </div>
                                 </div>
                             </div>
