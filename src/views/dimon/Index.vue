@@ -1,5 +1,5 @@
 <template>
-GENERAL
+DIMON
 </template>
 
 <script setup lang="ts">
