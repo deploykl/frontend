@@ -312,7 +312,7 @@
                                     <!-- Header con icono elegante -->
                                     <div class="flex items-center mb-4">
                                         <div
-                                            class="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-500 rounded-xl shadow-sm">
+                                            class="flex items-center justify-center w-12 h-12 bg-linear-to-br from-amber-500 to-orange-500 rounded-xl shadow-sm">
                                             <i class="pi pi-file-excel text-white text-lg"></i>
                                         </div>
                                         <div class="ml-4">
