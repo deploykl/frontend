@@ -3,6 +3,16 @@ import { PERMISSIONS } from "@/components/utils/permissions";
 
 const DIMON_ROUTES: RouteRecordRaw[] = [
   {
+    path: "/dimon",
+    name: "DIMON",
+    component: () => import("@/views/dimon/Index.vue"),
+    meta: {
+      ocultarMenuDash: true,
+      title: "DIMON",
+      public: true,
+    },
+  },
+  {
     path: "/dimon/tablero",
     name: "Tableros Admin",
     component: () => import("@/views/dimon/dashboard/TablerosAdmin.vue"),
@@ -82,7 +92,7 @@ const DIMON_ROUTES: RouteRecordRaw[] = [
       ocultarMenuDash: true,
     },
   },
-   {
+  {
     path: "/dimon/consulta-externa/dashboard",
     name: "dimon-consulta-externa-dashboad",
     component: () => import("@/views/dimon/consultaExterna/DashboardView.vue"),

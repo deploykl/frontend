@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
 import generalRoutes from "./generalRoutes";
 import authRoutes from "./authRoutes";
+import DIEM_ROUTES from "./diemRoutes";
 import DIMON_ROUTES from "./dimonRoutes";
 import DGOS_ROUTES from "./dgosRoutes";
 import { PERMISSIONS } from '@/components/utils/permissions';
@@ -33,6 +34,7 @@ const mainRoutes: Array<RouteRecordRaw> = [
 // Combinar todas las rutas
 const routes: Array<RouteRecordRaw> = [
   ...mainRoutes,
+  ...DIEM_ROUTES,
   ...DIMON_ROUTES,
   ...DGOS_ROUTES,
   ...generalRoutes,
