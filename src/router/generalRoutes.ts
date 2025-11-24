@@ -8,6 +8,7 @@ const generalRoutes: Array<RouteRecordRaw> = [
     meta: {
       title: "General",
       public: true,
+      ocultarMenuDash: true,
     },
   },
 ];

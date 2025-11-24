@@ -153,7 +153,7 @@
                                             <!-- Efecto de brillo en hover -->
                                             <span class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></span>
                                             <i class="pi pi-arrow-right mr-3 text-xl relative z-10 group-hover/btn:translate-x-1 transition-transform duration-300"></i>
-                                            <span class="relative z-10">{{ isAuthenticated ? 'Acceder' : 'Iniciar Sesión' }}</span>
+                                            <span class="relative z-10 cursor-pointer">{{ isAuthenticated ? 'Acceder' : 'Iniciar Sesión' }}</span>
                                         </button>
 
                                         <!-- Botón especial para módulo 4 (sin login) -->

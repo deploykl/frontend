@@ -2,6 +2,16 @@ import type { RouteRecordRaw } from "vue-router";
 import { PERMISSIONS } from "@/components/utils/permissions";
 
 const DGOS_ROUTES: RouteRecordRaw[] = [
+    {
+    path: "/dgos",
+    name: "DGOS",
+    component: () => import("@/views/dgos/Index.vue"),
+    meta: {
+      ocultarMenuDash: true,
+      title: "DGOS",
+      public: true,
+    },
+  },
   {
     path: "/dgos/dashboard/personal",
     name: "Tableros Personal DGOS",
