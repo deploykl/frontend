@@ -397,7 +397,7 @@ onUnmounted(() => {
 /* Mejoras de accesibilidad y enfoque */
 input:focus {
     outline: none;
-    ring: 2px;
+    box-shadow: 0 0 0 2px #3b82f6; /* azul estilo Tailwind ring-2 */
 }
 
 /* Transiciones suaves */

@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/20 to-cyan-50/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500 overflow-hidden">
+    <div class="min-h-screen bg-linear-to-br from-slate-50 via-blue-50/20 to-cyan-50/10 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-500 overflow-hidden">
         <!-- Header Landing Reutilizado -->
         <HeaderLanding />
 

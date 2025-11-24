@@ -351,11 +351,11 @@
                                         <div class="flex-1">
                                             <button @click="descargarErrores(importResult.archivo_errores!)"
                                                 :disabled="descargandoErrores"
-                                                class="group relative inline-flex items-center justify-center px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border border-amber-400 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-w-[200px]">
+                                                class="group relative inline-flex items-center justify-center px-6 py-3.5 bg-linear-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 border border-amber-400 text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none min-w-[200px]">
 
                                                 <!-- Efecto de fondo animado -->
                                                 <div
-                                                    class="absolute inset-0 bg-gradient-to-r from-amber-400 to-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10">
+                                                    class="absolute inset-0 bg-linear-to-r from-amber-400 to-orange-400 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10">
                                                 </div>
 
                                                 <!-- Icono y texto -->
@@ -660,7 +660,6 @@ const progresoImportacion = ref<ProgresoWebSocket>({
 })
 
 const websocket = ref<WebSocket | null>(null)
-type WebSocketState = 0 | 1 | 2 | 3
 
 // Estructura de columnas
 const columnasEstructura = ref<ColumnaEstructura[]>([
