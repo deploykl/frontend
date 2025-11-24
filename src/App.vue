@@ -8,7 +8,7 @@
       <Sidebar />
       
       <!-- Contenido principal -->
-      <main class="flex-1 transition-all duration-300 min-w-0 bg-gray-50 dark:bg-gray-900 overflow-auto" 
+      <main class="flex-1 transition-all duration-300 min-w-0 bg-gray-50 dark:bg-gray-900 overflow-auto " 
             :class="sidebarCollapsed ? 'md:ml-20' : 'md:ml-55'">
         <div class="p-6">
           <router-view />
@@ -57,3 +57,6 @@ onMounted(() => {
   }
 })
 </script>
+<style scoped>
+
+</style>

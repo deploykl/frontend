@@ -11,10 +11,17 @@
           <i class="pi pi-bars text-lg"></i>
         </button>
         
-        <!-- Logo y nombre clickable -->
+   <!-- Logo y nombre clickable -->
         <router-link to="/" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity duration-200">
           <img src="@/assets/img/home/logo.png" alt="Logo" class="h-8 w-8 object-contain" />
-          <h1 class="text-xl font-bold text-gray-800 dark:text-white">
+          
+          <!-- SID solo en móvil -->
+          <span class="text-xl font-bold text-gray-800 dark:text-white md:hidden">
+            SID
+          </span>
+          
+          <!-- Nombre completo solo en desktop -->
+          <h1 class="text-xl font-bold text-gray-800 dark:text-white hidden md:block">
             {{ projectName }}
           </h1>
         </router-link>
@@ -130,15 +137,15 @@ const userInitial = computed(() => {
 })
 
 const userName = computed(() => {
-  return userStore.userData?.username || 'Usuario'
+  return userStore.userData?.username || '-'
 })
 
 const userFullName = computed(() => {
-  return userStore.fullName || 'Nombre Completo'
+  return userStore.fullName || '-'
 })
 
 const userEmail = computed(() => {
-  return userStore.userData?.email || 'email@ejemplo.com'
+  return userStore.userData?.email || '-'
 })
 
 const toggleDropdown = () => {

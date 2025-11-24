@@ -6,6 +6,7 @@ import authRoutes from "./authRoutes";
 import DIEM_ROUTES from "./diemRoutes";
 import DIMON_ROUTES from "./dimonRoutes";
 import DGOS_ROUTES from "./dgosRoutes";
+import ERROR_ROUTES from "./errorRoutes";
 import { PERMISSIONS } from '@/components/utils/permissions';
 
 const mainRoutes: Array<RouteRecordRaw> = [
@@ -37,6 +38,7 @@ const routes: Array<RouteRecordRaw> = [
   ...DIEM_ROUTES,
   ...DIMON_ROUTES,
   ...DGOS_ROUTES,
+  ...ERROR_ROUTES,
   ...generalRoutes,
   ...authRoutes,
 ];

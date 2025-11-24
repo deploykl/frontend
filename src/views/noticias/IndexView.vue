@@ -1,178 +1,151 @@
 <template>
-    <div class="bg-gray-50 dark:bg-gray-900 py-2">
-        <!-- Header de la sección -->
-        <div class="container mx-auto px-4 mb-8">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-800 dark:text-white mb-2">
-                        Noticias
-                    </h1>
-                    <p class="text-gray-600 dark:text-gray-300">
-                        Mantente informado con las últimas actualizaciones
-                    </p>
-                </div>
-                <div class="flex items-center gap-4">
-                    <!-- Filtros -->
-                    <select
-                        class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-800 dark:text-white">
-                        <option>Todas las categorías</option>
-                        <option>Actualizaciones</option>
-                        <option>Anuncios</option>
-                        <option>Eventos</option>
-                    </select>
-
-                    <!-- Botón nueva noticia (solo admin) -->
-                    <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-                        <i class="pi pi-plus mr-2"></i>
-                        Nueva Noticia
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Grid de noticias -->
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-                <!-- Tarjeta de noticia 1 -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <div class="h-48 bg-linear-to-br from-blue-500 to-purple-600 relative">
-                        <!-- Badge de categoría -->
-                        <span
-                            class="absolute top-4 left-4 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
-                            Actualización
-                        </span>
-                        <!-- Fecha -->
-                        <span
-                            class="absolute bottom-4 right-4 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded text-xs">
-                            15 Nov 2024
-                        </span>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-3 line-clamp-2">
-                            Nueva actualización del sistema disponible
-                        </h3>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                            Hemos lanzado una nueva actualización que incluye mejoras en el rendimiento y nuevas
-                            funcionalidades...
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                                Por: Admin
-                            </span>
-                            <button
-                                class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
-                                Leer más →
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta de noticia 2 -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <div class="h-48 bg-linear-to-br from-green-500 to-teal-600 relative">
-                        <span
-                            class="absolute top-4 left-4 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
-                            Evento
-                        </span>
-                        <span
-                            class="absolute bottom-4 right-4 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded text-xs">
-                            20 Nov 2024
-                        </span>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-3 line-clamp-2">
-                            Webinar: Mejores prácticas de seguridad
-                        </h3>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                            Únete a nuestro webinar gratuito sobre las mejores prácticas de seguridad en aplicaciones
-                            web modernas...
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                                Por: Seguridad Team
-                            </span>
-                            <button
-                                class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
-                                Leer más →
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tarjeta de noticia 3 -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-                    <div class="h-48 bg-linear-to-br from-orange-500 to-red-600 relative">
-                        <span
-                            class="absolute top-4 left-4 bg-white/20 backdrop-blur-sm text-white px-3 py-1 rounded-full text-sm">
-                            Anuncio
-                        </span>
-                        <span
-                            class="absolute bottom-4 right-4 bg-black/20 backdrop-blur-sm text-white px-2 py-1 rounded text-xs">
-                            25 Nov 2024
-                        </span>
-                    </div>
-                    <div class="p-6">
-                        <h3 class="text-xl font-bold text-gray-800 dark:text-white mb-3 line-clamp-2">
-                            Mantenimiento programado este fin de semana
-                        </h3>
-                        <p class="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                            Informamos que este fin de semana realizaremos mantenimiento programado del sistema. El
-                            servicio podría...
-                        </p>
-                        <div class="flex items-center justify-between">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                                Por: Soporte
-                            </span>
-                            <button
-                                class="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium">
-                                Leer más →
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- Paginación -->
-            <div class="flex justify-center items-center gap-2 mt-12">
-                <button
-                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                    Anterior
-                </button>
-                <button class="px-4 py-2 bg-blue-600 text-white rounded-lg">1</button>
-                <button
-                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">2</button>
-                <button
-                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">3</button>
-                <button
-                    class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
-                    Siguiente
-                </button>
-            </div>
-        </div>
+  <div class="w-full bg-white rounded-xl shadow-lg border border-gray-200 p-6">
+    <!-- Header con título y descripción -->
+    <div class="text-center mb-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-3">
+        Últimas Noticias
+      </h2>
+      <p class="text-gray-600 max-w-2xl mx-auto">
+        Sigue las últimas actualizaciones y comunicados oficiales del Ministerio de Salud del Perú
+      </p>
     </div>
+
+    <!-- Contenedor horizontal con scroll -->
+    <div class="relative">
+      <!-- Flechas de navegación (opcionales) -->
+
+      <!-- Contenedor de tweets -->
+      <div 
+        ref="scrollContainer"
+        class="flex gap-6 overflow-x-auto py-4 px-2 scrollbar-thin scrollbar-thumb-blue-300 scrollbar-track-blue-50 snap-x snap-mandatory"
+      >
+        <!-- Tweet 1 -->
+        <div class="shrink-0 min-w-[300px] max-w-[550px] snap-start">
+          <div 
+            ref="tweetContainer1" 
+            class="w-full min-w-[300px] max-w-[550px] bg-gray-50 rounded-lg p-4 border border-gray-200"
+          >
+           
+          </div>
+        </div>
+
+        <!-- Tweet 2 -->
+        <div class="shrink-0 min-w-[300px] max-w-[550px] snap-start">
+          <div 
+            ref="tweetContainer2" 
+            class="w-full min-w-[300px] max-w-[550px] bg-gray-50 rounded-lg p-4 border border-gray-200"
+          >
+           
+          </div>
+        </div>
+
+        <!-- Tweet 3 -->
+        <div class="flex-shrink-0 min-w-[300px] max-w-[550px] snap-start">
+          <div 
+            ref="tweetContainer3" 
+            class="w-full min-w-[300px] max-w-[550px] bg-gray-50 rounded-lg p-4 border border-gray-200"
+          >
+           
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-// Aquí irá la lógica para cargar noticias, filtros, etc.
+import { onMounted, ref } from 'vue'
+
+// Declaración para TypeScript
+declare global {
+  interface Window {
+    twttr?: {
+      widgets: {
+        createTweet: (tweetId: string, container: HTMLElement, options?: any) => Promise<any>
+      }
+    }
+  }
+}
+
+const tweetContainer1 = ref<HTMLElement>()
+const tweetContainer2 = ref<HTMLElement>()
+const tweetContainer3 = ref<HTMLElement>()
+const scrollContainer = ref<HTMLElement>()
+
+const scrollLeft = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollBy({ left: -400, behavior: 'smooth' })
+  }
+}
+
+const scrollRight = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollBy({ left: 400, behavior: 'smooth' })
+  }
+}
+
+onMounted(() => {
+  const script = document.createElement('script')
+  script.src = 'https://platform.twitter.com/widgets.js'
+  script.async = true
+  document.head.appendChild(script)
+
+  script.onload = () => {
+    if (window.twttr) {
+      // Tweet 1
+      if (tweetContainer1.value) {
+        window.twttr.widgets.createTweet(
+          '1988759081885045127',
+          tweetContainer1.value,
+          {
+            align: 'center',
+            lang: 'es',
+            width: 550
+          }
+        )
+      }
+
+      // Tweet 2
+      if (tweetContainer2.value) {
+        window.twttr.widgets.createTweet(
+          '1984088720887128284',
+          tweetContainer2.value,
+          {
+            align: 'center',
+            lang: 'es',
+            width: 550
+          }
+        )
+      }
+
+      // Tweet 3
+      if (tweetContainer3.value) {
+        window.twttr.widgets.createTweet(
+          '1958540152399139154',
+          tweetContainer3.value,
+          {
+            align: 'center',
+            lang: 'es',
+            width: 550
+          }
+        )
+      }
+    }
+  }
+})
 </script>
 
 <style scoped>
-.line-clamp-2 {
-    display: -webkit-box;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+/* Forzar el tamaño del iframe de Twitter */
+::v-deep .twitter-tweet {
+  width: 100% !important;
+  max-width: 550px !important;
+  min-width: 300px !important;
 }
 
-.line-clamp-3 {
-    display: -webkit-box;
-    line-clamp: 3;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+::v-deep iframe[data-tweet-id] {
+  width: 100% !important;
+  max-width: 550px !important;
+  min-width: 300px !important;
 }
 </style>

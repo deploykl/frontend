@@ -8,8 +8,22 @@ const ERROR_ROUTES: RouteRecordRaw[] = [
     component: () => import('@/views/errors/UnauthorizedView.vue'),
     meta: {
       title: 'No Autorizado',
-      ocultarMenuDash: true
+      ocultarMenuDash: true,
+      ocultarEnSidebar: true // ← AGREGAR ESTA LÍNEA
+
     }
+  },
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("@/views/errors/NotFoundView.vue"), // Crea esta vista
+    meta: {
+      title: "Página no encontrada",
+      public: true,
+      ocultarMenuDash: true,
+      ocultarEnSidebar: true // ← AGREGAR ESTA LÍNEA
+
+    },
   },
   //{
   //  path: '/forbidden',

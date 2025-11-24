@@ -10,6 +10,10 @@ interface MenuItem {
   isSubmenu?: boolean;
   submenu?: MenuItem[];
   isOpen?: boolean;
+  meta?: { // ← AGREGAR ESTA PROPIEDAD
+    ocultarEnSidebar?: boolean;
+    [key: string]: any;
+  };
 }
 
 // ORDEN ESPECÍFICO PARA RUTAS DIMON (grupos e items individuales)
@@ -133,6 +137,9 @@ export const generateMenuFromRoutes = (
         icon: getAutoIcon(route.meta.title as string, fullPath),
         path: fullPath,
         requiredModule: route.meta.requiredModule as string,
+          meta: { // ← AGREGAR ESTA LÍNEA PARA COPIAR EL META
+          ...route.meta
+        }
       };
 
       allItems.push(menuItem);

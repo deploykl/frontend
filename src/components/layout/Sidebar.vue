@@ -283,18 +283,23 @@ const hasModuleAccessComputed = (moduleNames?: string): boolean => {
   return hasModuleAccess(moduleNames, userModulos.value, isSuperuser.value)
 }
 
-// ✅ GENERAR MENÚ AUTOMÁTICAMENTE DESDE LAS RUTAS
+// GENERAR MENÚ AUTOMÁTICAMENTE DESDE LAS RUTAS
 const allMenuItems = computed(() => {
   return generateMenuFromRoutes(router.getRoutes());
 })
 
-// ✅ FILTRAR ITEMS POR PERMISOS
+// FILTRAR ITEMS POR PERMISOS Y OCULTAR EN SIDEBAR
 const filteredMenuItems = computed(() => {
   const result = [];
   let lastHeader: any = null;
   let headerHasVisibleItems = false;
 
   for (const item of allMenuItems.value) {
+    // 🔥 FILTRAR RUTAS QUE DEBEN OCULTARSE EN SIDEBAR
+    if (item.meta?.ocultarEnSidebar) {
+      continue; // Saltar esta ruta completamente
+    }
+
     if (item.isHeader) {
       lastHeader = item;
       headerHasVisibleItems = false;
@@ -312,7 +317,7 @@ const filteredMenuItems = computed(() => {
         // Si tiene submenú, filtrar también los subitems
         if (item.submenu) {
           item.submenu = item.submenu.filter(subItem =>
-            hasModuleAccessComputed(subItem.requiredModule)
+            hasModuleAccessComputed(subItem.requiredModule) && !subItem.meta?.ocultarEnSidebar
           );
           // Solo agregar si tiene subitems visibles
           if (item.submenu.length > 0) {
