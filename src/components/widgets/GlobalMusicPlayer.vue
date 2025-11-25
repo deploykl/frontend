@@ -1,329 +1,412 @@
 <template>
-  <!-- Botón flotante de música -->
-  <div 
-    class="music-floating-btn" 
-    v-if="!showMusicPanel" 
-    @click="handleMusicButtonClick"
-    :class="{ 'pulse-animation': isPlaying }"
-  >
-    <i :class="isPlaying ? 'pi pi-pause' : 'pi pi-volume-up'"></i>
-  </div>
+    <!-- Botón flotante para abrir el panel de música -->
+    <button v-if="!showMusicPanel" @click="toggleMusicPanel"
+        class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 group">
+        <i class="pi pi-play text-white text-xl"></i>
+        <span v-if="currentTrack" class="absolute -top-1 -right-1 w-5 h-5 bg-cyan-400 rounded-full animate-pulse"></span>
+    </button>
 
-  <!-- Panel de controles -->
-  <div class="music-player-panel" v-if="showMusicPanel">
-    <div class="panel-header">
-      <span class="panel-title">Reproductor de Música</span>
-      <button class="close-btn" @click="hideMusicPanel">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
+    <!-- Panel de música flotante -->
+    <div v-if="showMusicPanel"
+        class="fixed bottom-6 right-6 z-50 w-80 bg-slate-900/95 glass-effect rounded-2xl shadow-2xl overflow-hidden animate-fade-in border border-slate-700/50">
+        <!-- Header del panel -->
+        <div class="flex justify-between items-center p-4 border-b border-slate-700/50">
+            <h2 class="text-lg font-semibold text-cyan-100">Reproductor</h2>
+            <button @click="hideMusicPanel"
+                class="w-8 h-8 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors text-cyan-100 hover:text-white">
+                <i class="pi pi-times"></i>
+            </button>
+        </div>
 
-    <div class="panel-content">
-      <button class="playback-btn" @click="handlePlaybackClick">
-        <i :class="isPlaying ? 'pi pi-pause' : 'pi pi-play'"></i>
-      </button>
-      
-      <div class="track-info">
-        <span class="status-text">
-          {{ isPlaying ? 'Reproduciendo' : 'Pausado' }}
-        </span>
-        <small class="track-name">{{ currentTrackName }}</small>
-      </div>
-      
-      <!-- Botón para forzar activación si es necesario -->
-      <button v-if="!audioActivated" class="activate-btn" @click="forceAudioActivation">
-        🔇 Activar Audio
-      </button>
-    </div>
+        <!-- Información de la canción actual -->
+        <div class="p-4">
+            <div class="flex items-center space-x-4">
+                <div class="relative">
+                    <img :src="currentTrack?.cover || '/default-cover.jpg'" :alt="currentTrack?.title"
+                        class="w-16 h-16 rounded-xl object-cover shadow-lg border border-slate-600/50"
+                        :class="{ 'animate-spin-slow': isPlaying }" />
+                    <div v-if="!currentTrack"
+                        class="w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center border border-slate-600/50">
+                        <i class="pi pi-music text-white text-lg"></i>
+                    </div>
+                </div>
+                <div class="flex-1 min-w-0">
+                    <h3 class="font-medium truncate text-cyan-50">
+                        {{ currentTrack?.title || 'Selecciona una canción' }}
+                    </h3>
+                    <p class="text-sm text-cyan-200/70 truncate">
+                        {{ currentTrack?.artist || 'Artista' }}
+                    </p>
+                </div>
+            </div>
 
-    <div class="volume-container">
-      <i class="pi pi-volume-down volume-icon"></i>
-      <input 
-        type="range" 
-        class="volume-slider" 
-        min="0" 
-        max="1" 
-        step="0.1" 
-        :value="volume"
-        @input="adjustVolume(($event.target as HTMLInputElement).value)"
-      >
-      <i class="pi pi-volume-up volume-icon"></i>
+            <!-- Barra de progreso -->
+            <div class="mt-4">
+                <div class="flex justify-between text-xs text-cyan-200/60 mb-1">
+                    <span>{{ formatTime(currentTime) }}</span>
+                    <span>{{ formatTime(currentTrack?.duration || 0) }}</span>
+                </div>
+                <input type="range" :value="currentTime" :max="currentTrack?.duration || 0"
+                    @input="seekTo(($event.target as HTMLInputElement).valueAsNumber)" 
+                    class="music-progress w-full" />
+            </div>
+
+            <!-- Controles principales -->
+            <div class="flex items-center justify-between mt-6">
+                <!-- Botón de repetición -->
+                <button @click="toggleRepeat"
+                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors group"
+                    :class="{
+                        'text-cyan-400': repeatMode !== 'none',
+                        'text-cyan-200/60': repeatMode === 'none'
+                    }">
+                    <i class="pi text-sm transition-transform group-hover:scale-110" :class="{
+                        'pi-repeat': repeatMode === 'all',
+                        'pi-repeat-1': repeatMode === 'one'
+                    }"></i>
+                </button>
+
+                <!-- Botón anterior -->
+                <button @click="playPreviousTrack"
+                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors text-cyan-100 hover:text-white group"
+                    :disabled="!currentTrack">
+                    <i class="pi pi-step-backward group-hover:scale-110 transition-transform"></i>
+                </button>
+
+                <!-- Botón play/pause -->
+                <button @click="togglePlayback"
+                    class="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-lg">
+                    <i class="text-white text-lg transition-transform" :class="isPlaying ? 'pi pi-pause' : 'pi pi-play'"></i>
+                </button>
+
+                <!-- Botón siguiente -->
+                <button @click="playNextTrack"
+                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors text-cyan-100 hover:text-white group"
+                    :disabled="!currentTrack">
+                    <i class="pi pi-step-forward group-hover:scale-110 transition-transform"></i>
+                </button>
+
+                <!-- Botón shuffle -->
+                <button @click="toggleShuffle"
+                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors group"
+                    :class="{
+                        'text-cyan-400': isShuffled,
+                        'text-cyan-200/60': !isShuffled
+                    }">
+                    <i class="pi pi-random group-hover:scale-110 transition-transform"></i>
+                </button>
+            </div>
+
+            <!-- Control de volumen -->
+            <div class="flex items-center space-x-3 mt-4">
+                <i class="pi pi-volume-up text-cyan-200/60 text-sm"></i>
+                <input type="range" :value="volume" min="0" max="1" step="0.01"
+                    @input="adjustVolume(($event.target as HTMLInputElement).value)" 
+                    class="volume-slider flex-1" />
+                <span class="text-xs text-cyan-200/60 w-10">
+                    {{ Math.round(volume * 100) }}%
+                </span>
+            </div>
+        </div>
+
+        <!-- Lista de canciones -->
+        <div class="border-t border-slate-700/50 max-h-60 overflow-y-auto scrollbar-hide">
+            <div class="p-2">
+                <div class="flex justify-between items-center mb-3 px-2">
+                    <h3 class="font-medium text-sm text-cyan-100">Lista de reproducción</h3>
+                    <span class="text-xs text-cyan-200/60">{{ tracks.length }} canciones</span>
+                </div>
+
+                <!-- Canciones -->
+                <div v-for="track in tracks" :key="track.id" @click="playTrack(track)"
+                    class="flex items-center space-x-3 p-2 rounded-lg hover:bg-slate-700/30 cursor-pointer transition-colors group animate-slide-up border border-transparent hover:border-slate-600/30"
+                    :class="{
+                        'bg-cyan-500/10 border-cyan-400/30': currentTrack?.id === track.id
+                    }">
+                    <div class="relative">
+                        <img :src="track.cover || '/default-cover.jpg'" :alt="track.title"
+                            class="w-10 h-10 rounded-lg object-cover border border-slate-600/50" />
+                        <div v-if="currentTrack?.id === track.id && isPlaying"
+                            class="absolute inset-0 bg-cyan-500/20 rounded-lg flex items-center justify-center">
+                            <div class="flex space-x-1">
+                                <div class="w-1 h-3 bg-cyan-400 rounded-full animate-bounce-slow"></div>
+                                <div class="w-1 h-3 bg-cyan-400 rounded-full animate-bounce-slow"
+                                    style="animation-delay: 0.1s"></div>
+                                <div class="w-1 h-3 bg-cyan-400 rounded-full animate-bounce-slow"
+                                    style="animation-delay: 0.2s"></div>
+                            </div>
+                        </div>
+                        <div v-else-if="currentTrack?.id === track.id"
+                            class="absolute inset-0 bg-cyan-500/10 rounded-lg flex items-center justify-center">
+                            <i class="pi pi-play text-cyan-400 text-xs"></i>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium truncate" :class="{
+                            'text-cyan-400': currentTrack?.id === track.id,
+                            'text-cyan-100': currentTrack?.id !== track.id
+                        }">
+                            {{ track.title }}
+                        </p>
+                        <p class="text-xs text-cyan-200/70 truncate">{{ track.artist }}</p>
+                    </div>
+
+                    <div class="flex items-center space-x-2">
+                        <span class="text-xs text-cyan-200/60">
+                            {{ formatTime(track.duration) }}
+                        </span>
+                        <button @click.stop="addToQueue(track)"
+                            class="w-6 h-6 opacity-0 group-hover:opacity-100 hover:bg-cyan-500/20 rounded flex items-center justify-center transition-all text-cyan-200/70 hover:text-cyan-400"
+                            title="Añadir a la cola">
+                            <i class="pi pi-plus text-xs"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cola de reproducción -->
+        <div v-if="trackQueue.length > 0" class="border-t border-slate-700/50 p-4">
+            <div class="flex justify-between items-center mb-2">
+                <h3 class="font-medium text-sm text-cyan-100">Siguiente en cola</h3>
+                <button @click="clearQueue" class="text-xs text-cyan-200/60 hover:text-cyan-400 transition-colors">
+                    Limpiar
+                </button>
+            </div>
+            <div class="space-y-2 max-h-32 overflow-y-auto scrollbar-hide">
+                <div v-for="(track, index) in trackQueue" :key="track.id"
+                    class="flex items-center space-x-2 p-2 rounded-lg hover:bg-slate-700/30 text-sm transition-colors group border border-transparent hover:border-slate-600/30">
+                    <span class="text-xs text-cyan-200/60 w-4">{{ index + 1 }}</span>
+                    <img :src="track.cover || '/default-cover.jpg'" :alt="track.title"
+                        class="w-8 h-8 rounded-lg object-cover border border-slate-600/50" />
+                    <div class="flex-1 min-w-0">
+                        <p class="truncate text-cyan-100">{{ track.title }}</p>
+                        <p class="text-xs text-cyan-200/70 truncate">{{ track.artist }}</p>
+                    </div>
+                    <button @click="removeFromQueue(track.id)"
+                        class="w-6 h-6 opacity-0 group-hover:opacity-100 hover:bg-cyan-500/20 rounded flex items-center justify-center transition-colors text-cyan-200/60 hover:text-cyan-400">
+                        <i class="pi pi-times text-xs"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 </template>
 
 <script setup lang="ts">
 import { useMusicStore } from '@/stores/general/musicStore'
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 
+// Store de música
 const musicStore = useMusicStore()
-const { isPlaying, showMusicPanel, volume, currentTrack } = storeToRefs(musicStore)
-const { togglePlayback, adjustVolume, toggleMusicPanel, hideMusicPanel, activateAudioGlobally, initAudioPlayer } = musicStore
 
-// Computed para mostrar nombre del track
-const currentTrackName = computed(() => {
-  if (!currentTrack.value) return 'Seleccionando canción...'
-  const trackName = currentTrack.value.split('/').pop() || 'Canción actual'
-  return trackName.replace('.ogg', '').replace(/%20/g, ' ')
-})
+// Destructurar el store
+const {
+    isPlaying,
+    currentTrack,
+    currentTime,
+    trackHistory,
+    trackQueue,
+    showMusicPanel,
+    volume,
+    isMuted,
+    isShuffled,
+    repeatMode,
+    tracks
+} = storeToRefs(musicStore)
 
-// Referencia para controlar si ya se activó
-const audioActivated = ref(false)
+// Métodos del store
+const {
+    togglePlayback,
+    playNextTrack,
+    playPreviousTrack,
+    toggleShuffle,
+    toggleRepeat,
+    seekTo,
+    adjustVolume,
+    toggleMusicPanel,
+    hideMusicPanel,
+    addToQueue,
+    removeFromQueue,
+    clearQueue,
+    playTrack,
+    initAudioPlayer,
+    activateAudioGlobally
+} = musicStore
 
-// Función para activar audio
-const handleGlobalClick = () => {
-  if (!audioActivated.value) {
-    console.log('🎵 Click global detectado, activando audio...')
-    forceAudioActivation()
-  }
+// Formatear tiempo (segundos a MM:SS)
+const formatTime = (seconds: number): string => {
+    if (!seconds || isNaN(seconds)) return '0:00'
+
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-// Función para forzar activación de audio
-const forceAudioActivation = () => {
-  console.log('🎵 Forzando activación de audio...')
-  initAudioPlayer()
-  activateAudioGlobally()
-  audioActivated.value = true
-}
-
-// Manejar click en el botón de música
-const handleMusicButtonClick = () => {
-  console.log('🎵 Click en botón de música')
-  forceAudioActivation()
-  toggleMusicPanel()
-}
-
-// Manejar click en reproducción
-const handlePlaybackClick = () => {
-  console.log('🎵 Click en botón de reproducción')
-  forceAudioActivation()
-  togglePlayback()
-}
-
-// Configurar event listeners globales
+// Listeners globales para activar audio
 const setupGlobalListeners = () => {
-  console.log('🎵 Configurando listeners globales...')
-  
-  // Agregar múltiples eventos para capturar cualquier interacción
-  document.addEventListener('click', handleGlobalClick)
-  document.addEventListener('mousedown', handleGlobalClick)
-  document.addEventListener('touchstart', handleGlobalClick)
-  document.addEventListener('keydown', handleGlobalClick)
-  document.addEventListener('mousemove', handleGlobalClick)
-  
-  console.log('🎵 Listeners globales configurados')
+    console.log('🎵 Configurando listeners globales...')
+    document.addEventListener('click', handleGlobalClick)
+    document.addEventListener('keydown', handleGlobalClick)
+    document.addEventListener('touchstart', handleGlobalClick)
 }
 
-// Remover listeners
 const removeGlobalListeners = () => {
-  document.removeEventListener('click', handleGlobalClick)
-  document.removeEventListener('mousedown', handleGlobalClick)
-  document.removeEventListener('touchstart', handleGlobalClick)
-  document.removeEventListener('keydown', handleGlobalClick)
-  document.removeEventListener('mousemove', handleGlobalClick)
+    document.removeEventListener('click', handleGlobalClick)
+    document.removeEventListener('keydown', handleGlobalClick)
+    document.removeEventListener('touchstart', handleGlobalClick)
 }
 
+const handleGlobalClick = () => {
+    activateAudioGlobally()
+}
+
+// Inicialización
 onMounted(() => {
-  console.log('🎵 Montando GlobalMusicPlayer...')
-  // Inicializar el reproductor inmediatamente
-  initAudioPlayer()
-  // Configurar listeners después de un breve delay
-  setTimeout(() => {
-    setupGlobalListeners()
-  }, 1000)
+    console.log('🎵 Montando MusicPlayer...')
+    initAudioPlayer()
+    setTimeout(() => {
+        setupGlobalListeners()
+    }, 1000)
 })
 
 onUnmounted(() => {
-  removeGlobalListeners()
+    removeGlobalListeners()
 })
 </script>
 
 <style scoped>
-.music-floating-btn {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 50px;
-  height: 50px;
-  background: #54bef0;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  z-index: 10000;
-  transition: all 0.3s ease;
-  border: 2px solid white;
-  color: white;
-  font-size: 1.2rem;
+.glass-effect {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(148, 163, 184, 0.2);
 }
 
-.music-floating-btn:hover {
-  transform: scale(1.1);
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.3);
-  background: #3b82f6;
+.music-progress {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 10px;
+    background: rgba(148, 163, 184, 0.2);
+    outline: none;
+    transition: all 0.2s ease;
 }
 
-.music-floating-btn.pulse-animation {
-  animation: pulse 2s infinite;
+.music-progress:hover {
+    background: rgba(148, 163, 184, 0.3);
 }
 
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(84, 190, 240, 0.7); }
-  70% { box-shadow: 0 0 0 10px rgba(84, 190, 240, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(84, 190, 240, 0); }
+.music-progress::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #22d3ee;
+    cursor: pointer;
+    box-shadow: 0 0 10px rgba(34, 211, 238, 0.5);
+    transition: all 0.2s ease;
 }
 
-.music-player-panel {
-  position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 320px;
-  background: white;
-  border-radius: 12px;
-  padding: 0;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-  z-index: 10000;
-  transition: all 0.3s ease;
-  border: 1px solid #eaeaea;
-}
-
-.panel-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 15px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  background: #f8fafc;
-}
-
-.panel-title {
-  font-weight: 600;
-  color: #333;
-  font-size: 0.9rem;
-}
-
-.panel-content {
-  display: flex;
-  align-items: center;
-  padding: 20px;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.track-info {
-  flex-grow: 1;
-  display: flex;
-  flex-direction: column;
-  min-width: 120px;
-}
-
-.status-text {
-  font-weight: 500;
-  color: #333;
-  font-size: 0.85rem;
-}
-
-.track-name {
-  color: #666;
-  font-size: 0.75rem;
-  margin-top: 2px;
-  word-break: break-word;
-}
-
-.playback-btn {
-  width: 45px;
-  height: 45px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 2px solid #3b82f6;
-  color: #3b82f6;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1rem;
-}
-
-.playback-btn:hover {
-  background: #3b82f6;
-  color: white;
-  transform: scale(1.05);
-}
-
-.activate-btn {
-  padding: 6px 12px;
-  background: #ef4444;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.activate-btn:hover {
-  background: #dc2626;
-  transform: scale(1.05);
-}
-
-.close-btn {
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: 1px solid #9ca3af;
-  color: #9ca3af;
-  background: transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.close-btn:hover {
-  background: #9ca3af;
-  color: white;
-}
-
-.volume-container {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 15px 20px;
-  border-top: 1px solid #f0f0f0;
-}
-
-.volume-icon {
-  color: #3b82f6;
-  font-size: 0.875rem;
+.music-progress::-webkit-slider-thumb:hover {
+    background: #06b6d4;
+    transform: scale(1.1);
 }
 
 .volume-slider {
-  flex: 1;
-  height: 6px;
-  background: #e5e7eb;
-  border-radius: 8px;
-  appearance: none;
-  cursor: pointer;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 4px;
+    border-radius: 10px;
+    background: rgba(148, 163, 184, 0.2);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.volume-slider:hover {
+    background: rgba(148, 163, 184, 0.3);
 }
 
 .volume-slider::-webkit-slider-thumb {
-  appearance: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  background: #3b82f6;
-  cursor: pointer;
-  transition: all 0.2s ease;
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: #22d3ee;
+    cursor: pointer;
+    transition: all 0.2s ease;
 }
 
 .volume-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.2);
-  background: #2563eb;
+    background: #06b6d4;
+    transform: scale(1.1);
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+.animate-spin-slow {
+    animation: spin 8s linear infinite;
+}
+
+.animate-bounce-slow {
+    animation: bounce 1.5s infinite;
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+}
+
+.animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-4px);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(8px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 </style>
