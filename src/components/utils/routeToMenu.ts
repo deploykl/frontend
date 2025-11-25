@@ -18,7 +18,7 @@ interface MenuItem {
 
 // ORDEN ESPECÍFICO PARA RUTAS DIMON (grupos e items individuales)
 const DIMON_ORDER = [
-  "SGD DIMON", // Grupo SGD (que contiene SGD - DIMON1, etc.)
+  "Reporte SGD DIMON", // Grupo SGD (que contiene SGD - DIMON1, etc.)
   "Tableros Admin", // Item individual
   "Tableros Monitor", // Item individual
   "SGD", // Grupo SGD (que contiene SGD - DIMON1, etc.)
@@ -96,7 +96,6 @@ export const generateMenuFromRoutes = (
 ): MenuItem[] => {
   const allItems: MenuItem[] = [];
   const addedPaths = new Set<string>();
-  const sectionItems = new Map<string, MenuItem>();
 
   // Función recursiva para procesar rutas
   const processRoute = (route: RouteRecordRaw, parentPath: string = "") => {
@@ -105,27 +104,6 @@ export const generateMenuFromRoutes = (
 
     if (route.meta?.public || route.meta?.hideLayout || !route.meta?.title) {
       return;
-    }
-
-    // Determinar la sección basada en el path
-    let sectionTitle = "GENERAL";
-    for (const [pathPrefix, section] of Object.entries(routeSections)) {
-      if (section && fullPath.startsWith(pathPrefix)) {
-        sectionTitle = section.title;
-        break;
-      }
-    }
-
-    // Guardar la sección si no existe
-    if (!sectionItems.has(sectionTitle)) {
-      const sectionConfig = Object.values(routeSections).find(
-        (s) => s?.title === sectionTitle
-      );
-      sectionItems.set(sectionTitle, {
-        title: sectionTitle,
-        isHeader: true,
-        requiredModule: sectionConfig?.requiredModule,
-      });
     }
 
     // Crear y agregar el ítem del menú
@@ -154,203 +132,111 @@ export const generateMenuFromRoutes = (
   // Procesar todas las rutas
   routes.forEach((route) => processRoute(route));
 
-  // Agrupar items en submenús CON ORDEN ESPECÍFICO Y AGRUPACIÓN
+  // 🔥 NUEVA LÓGICA SIMPLIFICADA
   const groupedItems: MenuItem[] = [];
-  const sectionGroups = new Map<string, MenuItem[]>();
 
-  // Agrupar items por sección
-  allItems.forEach((item) => {
-    let itemSection = "GENERAL";
-    for (const [pathPrefix, sectionConfig] of Object.entries(routeSections)) {
-      if (sectionConfig && item.path && item.path.startsWith(pathPrefix)) {
-        itemSection = sectionConfig.title;
-        break;
-      }
-    }
-
-    if (!sectionGroups.has(itemSection)) {
-      sectionGroups.set(itemSection, []);
-    }
-    sectionGroups.get(itemSection)!.push(item);
-  });
-
-  // Procesar cada sección
+  // Crear secciones en orden fijo
   SECTION_ORDER.forEach((sectionTitle) => {
-    const section = sectionItems.get(sectionTitle);
-    if (section) {
-      groupedItems.push(section);
+    // Agregar header de sección
+    const sectionConfig = Object.values(routeSections).find(
+      (s) => s?.title === sectionTitle
+    );
+    
+    if (sectionConfig) {
+      groupedItems.push({
+        title: sectionTitle,
+        isHeader: true,
+        requiredModule: sectionConfig.requiredModule,
+      });
+    }
 
-      const sectionItemsList = sectionGroups.get(sectionTitle) || [];
+    // Filtrar items de esta sección
+    const sectionItems = allItems.filter((item) => {
+      if (!item.path) return false;
+      
+      for (const [pathPrefix, section] of Object.entries(routeSections)) {
+        if (section?.title === sectionTitle && item.path.startsWith(pathPrefix)) {
+          return true;
+        }
+      }
+      return false;
+    });
 
-      // 🔥 LÓGICA ESPECIAL PARA SECCIÓN DIMON
-      if (sectionTitle === "DIMON") {
-        // 1. Primero agrupar items por título base (para mantener submenús)
-        const titleGroups = new Map<string, MenuItem[]>();
+    // 🔥 ORDEN ESPECIAL PARA CADA SECCIÓN
+    if (sectionTitle === "DIMON") {
+      // Lógica especial para DIMON
+      const dimonGroups = new Map<string, MenuItem[]>();
+      
+      sectionItems.forEach((item) => {
+        const baseTitle = item.title.includes(" - ") 
+          ? item.title.split(" - ")[0] 
+          : item.title;
+          
+        if (baseTitle && !dimonGroups.has(baseTitle)) {
+          dimonGroups.set(baseTitle, []);
+        }
+        if (baseTitle) {
+          dimonGroups.get(baseTitle)!.push(item);
+        }
+      });
 
-        sectionItemsList.forEach((item) => {
-          // Extraer la parte antes del " - " como grupo
-          const baseTitle =
-            item.title && item.title.includes(" - ")
-              ? item.title.split(" - ")[0]
-              : item.title;
-
-          const safeBaseTitle = baseTitle || item.title;
-
-          if (!titleGroups.has(safeBaseTitle)) {
-            titleGroups.set(safeBaseTitle, []);
-          }
-          titleGroups.get(safeBaseTitle)!.push(item);
-        });
-
-        // 2. Aplicar orden específico a DIMON
-        const orderedDimonItems: MenuItem[] = [];
-
-        DIMON_ORDER.forEach((orderedTitle) => {
-          if (titleGroups.has(orderedTitle)) {
-            const items = titleGroups.get(orderedTitle)!;
-
-            if (items.length > 1) {
-              // Crear submenu para items agrupados
-              const firstItemPath = items[0]?.path || "";
-              const submenuItem: MenuItem = {
-                title: orderedTitle,
-                icon: getAutoIcon(orderedTitle, firstItemPath),
-                isSubmenu: true,
-                isOpen: false,
-                submenu: items.map((item) => ({
-                  ...item,
-                  title:
-                    item.title && item.title.includes(" - ")
-                      ? item.title.replace(`${orderedTitle} - `, "")
-                      : item.title,
-                  isSubmenu: false,
-                })),
-              };
-              orderedDimonItems.push(submenuItem);
-            } else {
-              // Agregar item individual
-              orderedDimonItems.push(...items);
-            }
-
-            // Eliminar del mapa para no procesarlo de nuevo
-            titleGroups.delete(orderedTitle);
-          }
-        });
-
-        // 3. Agregar cualquier grupo restante que no esté en DIMON_ORDER
-        titleGroups.forEach((items, baseTitle) => {
+      // Aplicar orden específico de DIMON
+      DIMON_ORDER.forEach((orderedTitle) => {
+        if (dimonGroups.has(orderedTitle)) {
+          const items = dimonGroups.get(orderedTitle)!;
           if (items.length > 1) {
-            const firstItemPath = items[0]?.path || "";
-            const submenuItem: MenuItem = {
-              title: baseTitle,
-              icon: getAutoIcon(baseTitle, firstItemPath),
+            groupedItems.push({
+              title: orderedTitle,
+              icon: getAutoIcon(orderedTitle, items[0]?.path || ""),
               isSubmenu: true,
               isOpen: false,
-              submenu: items.map((item) => ({
+              submenu: items.map(item => ({
                 ...item,
-                title:
-                  item.title && item.title.includes(" - ")
-                    ? item.title.replace(`${baseTitle} - `, "")
-                    : item.title,
-                isSubmenu: false,
-              })),
-            };
-            orderedDimonItems.push(submenuItem);
-          } else {
-            orderedDimonItems.push(...items);
-          }
-        });
-
-        groupedItems.push(...orderedDimonItems);
-      } 
-      // 🔥 NUEVA LÓGICA PARA ORDEN ALFABÉTICO EN DGOS
-      else if (sectionTitle === "DGOS") {
-        // Ordenar alfabéticamente todos los items de DGOS
-        const sortedDGOSItems = sectionItemsList.sort((a, b) => 
-          a.title.localeCompare(b.title)
-        );
-
-        // Agrupar items que tengan el mismo título base (para submenús)
-        const titleGroups = new Map<string, MenuItem[]>();
-
-        sortedDGOSItems.forEach((item) => {
-          const baseTitle = item.title && item.title.includes(" - ")
-            ? item.title.split(" - ")[0]
-            : item.title;
-
-          const safeBaseTitle = baseTitle || item.title;
-
-          if (!titleGroups.has(safeBaseTitle)) {
-            titleGroups.set(safeBaseTitle, []);
-          }
-          titleGroups.get(safeBaseTitle)!.push(item);
-        });
-
-        // Crear estructura manteniendo el orden alfabético
-        titleGroups.forEach((items, baseTitle) => {
-          if (items.length > 1) {
-            const firstItemPath = items[0]?.path || "";
-            const submenuItem: MenuItem = {
-              title: baseTitle,
-              icon: getAutoIcon(baseTitle, firstItemPath),
-              isSubmenu: true,
-              isOpen: false,
-              submenu: items.map((item) => ({
-                ...item,
-                title: item.title && item.title.includes(" - ")
-                  ? item.title.replace(`${baseTitle} - `, "")
-                  : item.title,
-                isSubmenu: false,
-              })),
-            };
-            groupedItems.push(submenuItem);
+                title: item.title.includes(" - ") 
+                  ? item.title.replace(`${orderedTitle} - `, "") 
+                  : item.title
+              }))
+            });
           } else {
             groupedItems.push(...items);
           }
-        });
-      }
-      else {
-        // Lógica original para otras secciones (GENERAL, Principal, DIEM, ADMIN)
-        const titleGroups = new Map<string, MenuItem[]>();
+          dimonGroups.delete(orderedTitle);
+        }
+      });
 
-        sectionItemsList.forEach((item) => {
-          const baseTitle =
-            item.title && item.title.includes(" - ")
-              ? item.title.split(" - ")[0]
-              : item.title;
+      // Agregar el resto
+      dimonGroups.forEach((items, baseTitle) => {
+        if (items.length > 1) {
+          groupedItems.push({
+            title: baseTitle,
+            icon: getAutoIcon(baseTitle, items[0]?.path || ""),
+            isSubmenu: true,
+            isOpen: false,
+            submenu: items.map(item => ({
+              ...item,
+              title: item.title.includes(" - ") 
+                ? item.title.replace(`${baseTitle} - `, "") 
+                : item.title
+            }))
+          });
+        } else {
+          groupedItems.push(...items);
+        }
+      });
 
-          const safeBaseTitle = baseTitle || item.title;
+    } else if (sectionTitle === "DGOS") {
+      // 🔥 ORDEN ALFABÉTICO SIMPLE PARA DGOS
+      const sortedItems = sectionItems.sort((a, b) => 
+        a.title.localeCompare(b.title)
+      );
+      groupedItems.push(...sortedItems);
 
-          if (!titleGroups.has(safeBaseTitle)) {
-            titleGroups.set(safeBaseTitle, []);
-          }
-          titleGroups.get(safeBaseTitle)!.push(item);
-        });
-
-        // Crear estructura de menú con submenús
-        titleGroups.forEach((items, baseTitle) => {
-          if (items.length > 1) {
-            const firstItemPath = items[0]?.path || "";
-            const submenuItem: MenuItem = {
-              title: baseTitle,
-              icon: getAutoIcon(baseTitle, firstItemPath),
-              isSubmenu: true,
-              isOpen: false,
-              submenu: items.map((item) => ({
-                ...item,
-                title:
-                  item.title && item.title.includes(" - ")
-                    ? item.title.replace(`${baseTitle} - `, "")
-                    : item.title,
-                isSubmenu: false,
-              })),
-            };
-            groupedItems.push(submenuItem);
-          } else {
-            groupedItems.push(...items);
-          }
-        });
-      }
+    } else {
+      // Orden alfabético para otras secciones
+      const sortedItems = sectionItems.sort((a, b) => 
+        a.title.localeCompare(b.title)
+      );
+      groupedItems.push(...sortedItems);
     }
   });
 
