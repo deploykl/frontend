@@ -45,7 +45,7 @@ const DIMON_ROUTES: RouteRecordRaw[] = [
     name: "dimon-sgd",
     component: () => import("@/views/dashboard/Powerbi_SGD_DIMON.vue"),
     meta: {
-      title: "Dashboard SGD DIMON",
+      title: "Reporte SGD DIMON",
       requiresAuth: true,
       requiredModule: [
         PERMISSIONS.ADMIN_DIMON,

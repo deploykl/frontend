@@ -11,7 +11,7 @@
       <div class="absolute bottom-0 left-0 w-full h-32 bg-linear-to-t from-blue-100/20 to-transparent dark:from-blue-900/10"></div>
     </div>
 
-    <div class="relative z-10 container mx-auto px-4 py-6">
+    <div class="relative z-10 container mx-auto px-4 py-2">
       <!-- Header elegante -->
       <div class="text-center mb-8">
         <div class="relative inline-flex flex-col items-center">
@@ -128,7 +128,7 @@
                   v-for="persona in mainStore.cumpleanosDelMesActual"
                   :key="persona.id"
                   class="group p-4 rounded-xl border border-slate-200/60 dark:border-slate-600/60 bg-white/50 dark:bg-slate-700/30 backdrop-blur-sm transition-all duration-300 hover:shadow-md hover:border-cyan-300/50 dark:hover:border-cyan-500/30 hover:translate-y-[-2px]"
-                  :class="persona.dias_para_cumple === 0 && showCelebration ? 'ring-2 ring-amber-400/50 bg-gradient-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20' : ''"
+                  :class="persona.dias_para_cumple === 0 && showCelebration ? 'ring-2 ring-amber-400/50 bg-linear-to-br from-amber-50 to-yellow-50 dark:from-amber-900/20 dark:to-yellow-900/20' : ''"
                 >
                   <div class="flex items-center space-x-4">
                     <!-- Día con efecto neumórfico -->
@@ -177,13 +177,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Footer minimalista -->
-      <div class="text-center mt-6">
-        <p class="text-slate-500 dark:text-slate-500 text-sm">
-          {{ mainStore.cumpleanosDelMesActual.length }} cumpleaños en {{ nombreMesActual }}
-        </p>
       </div>
     </div>
   </div>

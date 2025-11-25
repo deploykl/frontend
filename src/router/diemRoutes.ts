@@ -12,6 +12,19 @@ const DIEM_ROUTES: RouteRecordRaw[] = [
       public: true,
     },
   },
+  {
+    path: "/diem/sgd",
+    name: "diem-sgd",
+    component: () => import("@/views/dashboard/Powerbi_SGD_DIEM.vue"),
+    meta: {
+      title: "Reporte SGD DIEM",
+      requiresAuth: true,
+      requiredModule: [
+        PERMISSIONS.ADMIN_DIEM,
+        PERMISSIONS.SGD_GENERAL,
+      ],
+    },
+  },
  
 ];
 
