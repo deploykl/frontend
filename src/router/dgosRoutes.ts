@@ -15,7 +15,7 @@ const DGOS_ROUTES: RouteRecordRaw[] = [
   {
     path: "/dgos/dashboard/personal",
     name: "Tableros Personal DGOS",
-    component: () => import("@/views/dgos/dashboard/Powerbi_Personal.vue"),
+    component: () => import("@/views/dashboard/Powerbi_Personal.vue"),
     meta: {
       title: "Dashboard Personal",
       requiresAuth: true,

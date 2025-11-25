@@ -39,7 +39,7 @@ const getAutoIcon = (title: string, path: string): string => {
   if (lowerTitle.includes("personal")) return "pi pi-users";
   if (lowerTitle.includes("reporte")) return "pi pi-eye";
   if (lowerTitle.includes("consulta")) return "pi pi-eye";
-  if (lowerTitle.includes("anexo")) return "bi bi-telephone-forward-fill";
+  if (lowerTitle.includes("anexos")) return "pi pi-phone";
   if (lowerTitle.includes("cumpleaños")) return "pi pi-gift";
   if (lowerTitle.includes("patrimonio")) return "pi pi-building";
   if (lowerTitle.includes("token")) return "pi pi-key";
@@ -64,8 +64,8 @@ const routeSections: Record<
 > = {
   "/dashboard": { title: "Principal", requiredModule: PERMISSIONS.SUPER_USER },
   "/noticias": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
-  "/main/birthday": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
-  "/main/anexos": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
+  "/general/birthday": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
+  "/general/anexos": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
   "/dgos": {
     title: "DGOS",
     requiredModule: `${PERMISSIONS.PERSONAL}, ${PERMISSIONS.PERSONAL_LECTURA}`,

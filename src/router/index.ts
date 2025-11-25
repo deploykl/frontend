@@ -1,7 +1,7 @@
 // router/index.ts
 import { createRouter, createWebHistory } from "vue-router";
 import type { RouteRecordRaw } from "vue-router";
-import generalRoutes from "./generalRoutes";
+import GENERAL_ROUTES from "./generalRoutes";
 import authRoutes from "./authRoutes";
 import DIEM_ROUTES from "./diemRoutes";
 import DIMON_ROUTES from "./dimonRoutes";
@@ -39,7 +39,7 @@ const routes: Array<RouteRecordRaw> = [
   ...DIMON_ROUTES,
   ...DGOS_ROUTES,
   ...ERROR_ROUTES,
-  ...generalRoutes,
+  ...GENERAL_ROUTES,
   ...authRoutes,
 ];
 
