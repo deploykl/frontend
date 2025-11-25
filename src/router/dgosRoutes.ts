@@ -42,6 +42,16 @@ const DGOS_ROUTES: RouteRecordRaw[] = [
       requiredModule: [PERMISSIONS.PERSONAL],
     },
   },
+   {
+    path: "/dgos/planeamiento/dashboard",
+    name: "POI",
+    component: () => import("@/views/dashboard/PowerBi_Presupuesto.vue"),
+    meta: {
+      title: "Dashboard POI",
+      requiresAuth: true,
+      requiredModule: [PERMISSIONS.SGD_GENERAL],
+    },
+  },
 ];
 
 export default DGOS_ROUTES;

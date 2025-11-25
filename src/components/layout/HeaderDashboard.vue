@@ -3,28 +3,38 @@
     class="header fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-gray-900/95 border-b border-gray-200 dark:border-gray-700 shadow-sm backdrop-blur-md transition-colors duration-300">
     <div class="max-w-full mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
 
-     <!-- Logo y toggle sidebar -->
+      <!-- Logo y toggle sidebar -->
       <div class="flex items-center gap-4">
         <!-- Toggle Mobile Sidebar (SOLO EN MOBILE) -->
         <button @click="toggleMobileSidebar"
           class="p-2 rounded-lg bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300 transition-all duration-200 md:hidden">
           <i class="pi pi-bars text-lg"></i>
         </button>
-        
-   <!-- Logo y nombre clickable -->
-        <router-link to="/" class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity duration-200">
+
+        <!-- Logo y nombre clickable -->
+        <router-link to="/"
+          class="flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity duration-200">
           <img src="@/assets/img/home/logo.png" alt="Logo" class="h-8 w-8 object-contain" />
-          
+
           <!-- SID solo en móvil -->
           <span class="text-xl font-bold text-gray-800 dark:text-white md:hidden">
             SID
           </span>
-          
           <!-- Nombre completo solo en desktop -->
           <h1 class="text-xl font-bold text-gray-800 dark:text-white hidden md:block">
             {{ projectName }}
           </h1>
         </router-link>
+        <!-- Connection Manager -->
+        <ConnectionManager v-slot="connection">
+          <div class="connection-indicators flex items-center gap-2">
+            <NetworkStatusIndicator :isOnline="connection.isOnline" :isMobile="isMobile"
+              :lastNetworkCheck="connection.lastNetworkChange" :isCheckingNetwork="connection.isCheckingNetwork"
+              @force-check="connection.checkNetworkConnection" />
+            <ApiStatusIndicator :isApiConnected="connection.isApiConnected" :isCheckingApi="connection.isCheckingApi"
+              :isMobile="isMobile" :checkApiConnection="connection.checkApiConnection" />
+          </div>
+        </ConnectionManager>
       </div>
 
       <!-- Contenedor unificado para DarkModeToggle y Menú de usuario -->
@@ -119,6 +129,10 @@ import { useUIStore } from '@/stores/sidebar/uiStore'
 import { useUserStore } from '@/stores/userStore'
 import { useAuthStore } from '@/stores/auth/authStore'
 import DarkModeToggle from '@/components/DarkModeToggle.vue'
+import ConnectionManager from '@/components/connection/ConnectionManager.vue'
+import NetworkStatusIndicator from '@/components/connection/NetworkStatusIndicator.vue'
+import ApiStatusIndicator from '@/components/connection/ApiStatusIndicator.vue'
+
 const projectName = import.meta.env.VITE_PROJECT_NAME_EXTEND
 
 const router = useRouter()
@@ -130,6 +144,10 @@ const dropdownOpen = ref(false)
 const isLoggingOut = ref(false)
 const isLoggingOutAll = ref(false)
 
+// ✅ AGREGAR ESTA PROPIEDAD FALTANTE
+const isMobile = computed(() => {
+  return window.innerWidth < 768
+})
 // Computed properties para datos del usuario
 const userInitial = computed(() => {
   const username = userStore.userData?.username || 'U'

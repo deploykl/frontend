@@ -54,6 +54,7 @@ const DIMON_ROUTES: RouteRecordRaw[] = [
       ],
     },
   },
+  /*
   {
     path: "/dimon/dashboard/sgd1",
     name: "dimon-sgd1",
@@ -82,6 +83,7 @@ const DIMON_ROUTES: RouteRecordRaw[] = [
       ],
     },
   },
+  */
   {
     path: "/dimon/consulta-externa/login",
     name: "dimon-consulta-externa-login",

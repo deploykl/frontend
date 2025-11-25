@@ -13,7 +13,7 @@
         <div class="p-6">
           <router-view />
         </div>
-        
+        <OnlineStatus />
         <!-- Footer -->
         <Footer />
       </main>
@@ -39,6 +39,7 @@ import Footer from './components/layout/Footer.vue'
 import HeaderDashboard from './components/layout/HeaderDashboard.vue'
 import Sidebar from './components/layout/Sidebar.vue'
 import Toast from '@/components/utils/Toast.vue' // Ajusta la ruta según tu estructura
+import OnlineStatus from '@/components/ui/status/OnlineStatus.vue' // Ajusta la ruta según tu estructura
 
 const uiStore = useUIStore()
 const themeStore = useThemeStore()

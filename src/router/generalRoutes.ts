@@ -1,4 +1,5 @@
 import type { RouteRecordRaw } from "vue-router";
+import { PERMISSIONS } from "@/components/utils/permissions";
 
 const GENERAL_ROUTES: Array<RouteRecordRaw> = [
   {
@@ -11,6 +12,16 @@ const GENERAL_ROUTES: Array<RouteRecordRaw> = [
       ocultarMenuDash: true,
     },
   },
+  {
+      path: "/dgos/general/dashboard",
+      name: "Reporte-SGD-General",
+      component: () => import("@/views/dashboard/Powerbi_SGD_GENERAL.vue"),
+      meta: {
+        title: "Reporte SGD General",
+        requiresAuth: true,
+        requiredModule: [PERMISSIONS.SGD_GENERAL],
+      },
+    },
   {
     path: "/general/anexos",
     name: "Anexos",
