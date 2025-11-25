@@ -10,7 +10,7 @@ interface MenuItem {
   isSubmenu?: boolean;
   submenu?: MenuItem[];
   isOpen?: boolean;
-  meta?: { // ← AGREGAR ESTA PROPIEDAD
+  meta?: {
     ocultarEnSidebar?: boolean;
     [key: string]: any;
   };
@@ -137,7 +137,7 @@ export const generateMenuFromRoutes = (
         icon: getAutoIcon(route.meta.title as string, fullPath),
         path: fullPath,
         requiredModule: route.meta.requiredModule as string,
-          meta: { // ← AGREGAR ESTA LÍNEA PARA COPIAR EL META
+        meta: {
           ...route.meta
         }
       };
@@ -262,8 +262,55 @@ export const generateMenuFromRoutes = (
         });
 
         groupedItems.push(...orderedDimonItems);
-      } else {
-        // Lógica original para otras secciones
+      } 
+      // 🔥 NUEVA LÓGICA PARA ORDEN ALFABÉTICO EN DGOS
+      else if (sectionTitle === "DGOS") {
+        // Ordenar alfabéticamente todos los items de DGOS
+        const sortedDGOSItems = sectionItemsList.sort((a, b) => 
+          a.title.localeCompare(b.title)
+        );
+
+        // Agrupar items que tengan el mismo título base (para submenús)
+        const titleGroups = new Map<string, MenuItem[]>();
+
+        sortedDGOSItems.forEach((item) => {
+          const baseTitle = item.title && item.title.includes(" - ")
+            ? item.title.split(" - ")[0]
+            : item.title;
+
+          const safeBaseTitle = baseTitle || item.title;
+
+          if (!titleGroups.has(safeBaseTitle)) {
+            titleGroups.set(safeBaseTitle, []);
+          }
+          titleGroups.get(safeBaseTitle)!.push(item);
+        });
+
+        // Crear estructura manteniendo el orden alfabético
+        titleGroups.forEach((items, baseTitle) => {
+          if (items.length > 1) {
+            const firstItemPath = items[0]?.path || "";
+            const submenuItem: MenuItem = {
+              title: baseTitle,
+              icon: getAutoIcon(baseTitle, firstItemPath),
+              isSubmenu: true,
+              isOpen: false,
+              submenu: items.map((item) => ({
+                ...item,
+                title: item.title && item.title.includes(" - ")
+                  ? item.title.replace(`${baseTitle} - `, "")
+                  : item.title,
+                isSubmenu: false,
+              })),
+            };
+            groupedItems.push(submenuItem);
+          } else {
+            groupedItems.push(...items);
+          }
+        });
+      }
+      else {
+        // Lógica original para otras secciones (GENERAL, Principal, DIEM, ADMIN)
         const titleGroups = new Map<string, MenuItem[]>();
 
         sectionItemsList.forEach((item) => {
