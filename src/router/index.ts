@@ -7,16 +7,17 @@ import DIEM_ROUTES from "./diemRoutes";
 import DIMON_ROUTES from "./dimonRoutes";
 import DGOS_ROUTES from "./dgosRoutes";
 import ERROR_ROUTES from "./errorRoutes";
-import { PERMISSIONS } from '@/components/utils/permissions';
+import { PERMISSIONS } from "@/components/utils/permissions";
 
 const mainRoutes: Array<RouteRecordRaw> = [
   {
     path: "/",
     name: "Home",
     component: () => import("@/views/HomeView.vue"),
-    meta: { 
+    meta: {
       ocultarMenuDash: true,
-      public: true
+      public: true,
+      requiresAuth: false, // ← Explícitamente no requiere auth
     },
   },
   {
@@ -25,9 +26,8 @@ const mainRoutes: Array<RouteRecordRaw> = [
     component: () => import("@/views/noticias/IndexView.vue"),
     meta: {
       title: "Noticias",
-            requiresAuth: true,
+      requiresAuth: true,
       requiredModule: [PERMISSIONS.GENERAL],
-
     },
   },
 ];
@@ -80,7 +80,7 @@ router.beforeEach(async (to, _from, next) => {
   }
 
   const isAuthenticated = localStorage.getItem("auth_token");
-  const requiresPasswordChange = 
+  const requiresPasswordChange =
     localStorage.getItem("requires_password_change") === "true";
 
   console.log(
@@ -124,13 +124,19 @@ router.beforeEach(async (to, _from, next) => {
   }
 
   // 🔹 SEXTO: Si intenta acceder a change-password sin necesitarlo
-  if (to.name === "change-password" && !requiresPasswordChange && isAuthenticated) {
+  if (
+    to.name === "change-password" &&
+    !requiresPasswordChange &&
+    isAuthenticated
+  ) {
     return next("/noticias");
   }
 
   // 🔹 SÉPTIMO: Verificación de permisos por módulos (solo si está autenticado)
   if (to.meta?.requiresAuth && isAuthenticated) {
-    const userModulos = JSON.parse(localStorage.getItem("user_modulos") || "[]");
+    const userModulos = JSON.parse(
+      localStorage.getItem("user_modulos") || "[]"
+    );
     const isSuperuser = localStorage.getItem("is_superuser") === "true";
 
     // 1. Si es superusuario, permite acceso a todo
@@ -140,7 +146,10 @@ router.beforeEach(async (to, _from, next) => {
     }
 
     // 2. Verificación de módulos
-    const requiredModule = to.meta.requiredModule as string | string[] | undefined;
+    const requiredModule = to.meta.requiredModule as
+      | string
+      | string[]
+      | undefined;
     if (requiredModule !== undefined) {
       const hasAccess = hasModuleAccess(requiredModule, userModulos);
 
