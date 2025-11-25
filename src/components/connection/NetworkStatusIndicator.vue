@@ -1,26 +1,46 @@
 <template>
   <div 
-    class="network-status-indicator"
-    :class="statusClass"
-    :title="tooltipText"
-    @click="forceNetworkCheck"
+    :class="containerClasses" 
+    :title="tooltipText" 
+    @click="handleClick" 
+    class="group relative"
   >
-    <i :class="iconClass"></i>
-    <span v-if="!isMobile" class="status-text">{{ statusText }}</span>
-    <span v-if="showLastCheck && lastNetworkCheck" class="last-check">
-      {{ formattedLastCheck }}
-    </span>
+    <!-- Efecto de pulso para estado online -->
+    <div 
+      v-if="isOnline && !isCheckingNetwork"
+      class="absolute inset-0 rounded-full animate-ping opacity-20"
+      :class="pulseColor"
+    ></div>
+
+    <!-- Partícula de clic -->
+    <div 
+      v-if="showClickEffect" 
+      class="absolute inset-0 rounded-full bg-current animate-ping"
+    ></div>
+
+    <div class="relative flex items-center gap-2 z-10">
+      <i :class="iconClass" class="transition-all duration-200"></i>
+      <span class="font-medium text-sm hidden sm:block">  <!-- ✅ AGREGADO hidden sm:block -->
+        {{ statusText }}
+      </span>
+      <span 
+        v-if="showLastCheck && lastNetworkCheck" 
+        class="text-xs opacity-80 ml-1 hidden sm:block"  
+      >
+        {{ formattedLastCheck }}
+      </span>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 interface Props {
   isOnline: boolean
   isMobile: boolean
   showLastCheck?: boolean
-  lastNetworkCheck: number | null  // ✅ Cambiar a number | null
+  lastNetworkCheck: number | null
   isCheckingNetwork: boolean
 }
 
@@ -32,24 +52,46 @@ const emit = defineEmits<{
   forceCheck: []
 }>()
 
-const forceNetworkCheck = () => {
-  emit('forceCheck')
-}
+const showClickEffect = ref(false)
 
-const statusClass = computed(() => ({
-  'online': props.isOnline,
-  'offline': !props.isOnline,
-  'checking': props.isCheckingNetwork,
-  'clickable': true
-}))
+// Colores para efectos
+const pulseColor = computed(() => props.isOnline ? 'bg-green-400 dark:bg-green-500' : '')
 
-const iconClass = computed(() => ({
-  'pi': true,
-  'pi-wifi': props.isOnline && !props.isCheckingNetwork,
-  'pi-wifi-off': !props.isOnline && !props.isCheckingNetwork,  // ✅ Cambiar a icono de PrimeVue
-  'pi-spinner pi-spin': props.isCheckingNetwork
-}))
+// Clases del contenedor
+const containerClasses = computed(() => {
+  const base = 'flex items-center cursor-pointer transition-all duration-200 relative overflow-hidden rounded-xl border'
+  const mobile = 'p-2 w-9 h-9 justify-center shadow-sm dark:shadow-none'
+  const desktop = 'py-2 px-3 text-sm shadow-sm dark:shadow-none'
 
+  if (props.isMobile) {
+    if (props.isCheckingNetwork) {
+      return `${base} ${mobile} bg-yellow-100 dark:bg-yellow-900/40 text-yellow-700 dark:text-yellow-300 border-yellow-300 dark:border-yellow-700`
+    }
+    if (props.isOnline) {
+      return `${base} ${mobile} bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300 border-green-300 dark:border-green-700`
+    }
+    return `${base} ${mobile} bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300 border-red-300 dark:border-red-700`
+  }
+
+  // Desktop
+  if (props.isCheckingNetwork) {
+    return `${base} ${desktop} bg-yellow-50 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 border-yellow-200 dark:border-yellow-700`
+  }
+  if (props.isOnline) {
+    return `${base} ${desktop} bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 border-green-200 dark:border-green-700`
+  }
+  return `${base} ${desktop} bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-300 border-red-200 dark:border-red-700`
+})
+
+// Iconos
+const iconClass = computed(() => {
+  const base = 'pi text-sm'
+  if (props.isCheckingNetwork) return `${base} pi-spinner pi-spin text-yellow-600 dark:text-yellow-400`
+  if (props.isOnline) return `${base} pi-wifi text-green-600 dark:text-green-400`
+  return `${base} pi-wifi-off text-red-600 dark:text-red-400`
+})
+
+// Textos
 const statusText = computed(() => {
   if (props.isCheckingNetwork) return 'Verificando...'
   return props.isOnline ? 'Online' : 'Offline'
@@ -71,59 +113,10 @@ const formattedLastCheck = computed(() => {
   if (diff < 3600) return `Hace ${Math.floor(diff/60)}m`
   return `Hace ${Math.floor(diff/3600)}h`
 })
+
+const handleClick = () => {
+  showClickEffect.value = true
+  setTimeout(() => showClickEffect.value = false, 400)
+  emit('forceCheck')
+}
 </script>
-
-<style scoped>
-.network-status-indicator {
-  padding: 0.35rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: all 0.3s ease;
-  cursor: pointer;
-}
-
-.network-status-indicator.online {
-  background-color: rgba(40, 167, 69, 0.15);
-  color: #28a745;
-  border: 1px solid #28a745;
-}
-
-.network-status-indicator.offline {
-  background-color: rgba(220, 53, 69, 0.15);
-  color: #dc3545;
-  border: 1px solid #dc3545;
-}
-
-.network-status-indicator.checking {
-  background-color: rgba(255, 193, 7, 0.15);
-  color: #ffc107;
-  border: 1px solid #ffc107;
-}
-
-.status-text {
-  font-weight: 500;
-}
-
-.last-check {
-  font-size: 0.7rem;
-  opacity: 0.8;
-  margin-left: 0.3rem;
-}
-
-@media (max-width: 768px) {
-  .network-status-indicator {
-    padding: 0.25rem;
-    width: 30px;
-    height: 30px;
-    justify-content: center;
-    border-radius: 50%;
-  }
-
-  .status-text, .last-check {
-    display: none;
-  }
-}
-</style>

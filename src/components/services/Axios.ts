@@ -60,7 +60,24 @@ class ApiService {
         const originalRequest = error.config as InternalAxiosRequestConfig & {
           _isRetry?: boolean;
         };
+        // ✅ NUEVO: Detectar errores de conexión
+        if (!error.response) {
+          console.error("Error de conexión con el backend");
+          // Emitir evento global para notificar a los componentes
+          window.dispatchEvent(
+            new CustomEvent("api-connection-changed", {
+              detail: { connected: false },
+            })
+          );
+          return this.handleConnectionError();
+        }
 
+        // ✅ NUEVO: Emitir evento cuando la conexión se restablece
+        window.dispatchEvent(
+          new CustomEvent("api-connection-changed", {
+            detail: { connected: true },
+          })
+        );
         if (!error.response) {
           return this.handleConnectionError();
         }
@@ -227,7 +244,9 @@ export const api = new Proxy({} as AxiosInstance, {
   get(_, prop) {
     if (!_api) {
       if (!apiInstance) {
-        throw new Error("ApiService not initialized. Call initializeApi first.");
+        throw new Error(
+          "ApiService not initialized. Call initializeApi first."
+        );
       }
       _api = apiInstance.getInstance();
     }
