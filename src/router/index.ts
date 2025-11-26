@@ -7,6 +7,7 @@ import DIEM_ROUTES from "./diemRoutes";
 import DIMON_ROUTES from "./dimonRoutes";
 import DGOS_ROUTES from "./dgosRoutes";
 import ERROR_ROUTES from "./errorRoutes";
+import ADMIN_ROUTES from "./adminRoutes";
 import { PERMISSIONS } from "@/components/utils/permissions";
 
 const mainRoutes: Array<RouteRecordRaw> = [
@@ -35,6 +36,7 @@ const mainRoutes: Array<RouteRecordRaw> = [
 // Combinar todas las rutas
 const routes: Array<RouteRecordRaw> = [
   ...mainRoutes,
+  ...ADMIN_ROUTES,
   ...DIEM_ROUTES,
   ...DIMON_ROUTES,
   ...DGOS_ROUTES,
