@@ -95,8 +95,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
     },
     {
       id: '4',
-      title: 'Armonía Natural',
-      artist: 'Artista 4',
+      title: 'Te Amo',
+      artist: 'Manuel Mijares',
       url: new URL('/src/assets/audios/playlist/song4.ogg', import.meta.url).href,
       duration: 0,
       cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
@@ -114,6 +114,30 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       title: 'Juro que te amo',
       artist: 'Los terricolas',
       url: new URL('/src/assets/audios/playlist/song6.ogg', import.meta.url).href,
+      duration: 0,
+      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    },
+     {
+      id: '7',
+      title: 'Over at the Frankenstein Place',
+      artist: 'Richard O"Brien',
+      url: new URL('/src/assets/audios/playlist/song7.ogg', import.meta.url).href,
+      duration: 0,
+      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    },
+    {
+      id: '8',
+      title: 'Emotion',
+      artist: 'Samantha Sang',
+      url: new URL('/src/assets/audios/playlist/song8.ogg', import.meta.url).href,
+      duration: 0,
+      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    },
+    {
+      id: '9',
+      title: 'La Isla Bonita',
+      artist: 'Madonna',
+      url: new URL('/src/assets/audios/playlist/song9.ogg', import.meta.url).href,
       duration: 0,
       cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
     }
