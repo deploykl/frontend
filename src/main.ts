@@ -59,6 +59,7 @@ const pinia = createPinia();
 import "@/assets/css/main.css";
 import "@/assets/css/font.css";
 import "primeicons/primeicons.css";
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 initializeApi(router);
 

@@ -1,14 +1,15 @@
 <template>
     <!-- Botón flotante para abrir el panel de música -->
     <button v-if="!showMusicPanel" @click="toggleMusicPanel"
-        class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 group">
+        class="fixed bottom-6 right-6 z-50 w-14 h-14 bg-linear-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-full shadow-xl flex items-center justify-center transition-all duration-300 hover:scale-110 group">
         <i class="pi pi-play text-white text-xl"></i>
-        <span v-if="currentTrack" class="absolute -top-1 -right-1 w-5 h-5 bg-cyan-400 rounded-full animate-pulse"></span>
+        <span v-if="currentTrack"
+            class="absolute -top-1 -right-1 w-5 h-5 bg-cyan-400 rounded-full animate-pulse"></span>
     </button>
 
     <!-- Panel de música flotante -->
     <div v-if="showMusicPanel"
-        class="fixed bottom-6 right-6 z-50 w-80 bg-slate-900/95 glass-effect rounded-2xl shadow-2xl overflow-hidden animate-fade-in border border-slate-700/50">
+        class="fixed bottom-6 right-6 z-50 w-80 bg-slate-900/95 glass-effect rounded-2xl shadow-2xl animate-fade-in border border-slate-700/50">
         <!-- Header del panel -->
         <div class="flex justify-between items-center p-4 border-b border-slate-700/50">
             <h2 class="text-lg font-semibold text-cyan-100">Reproductor</h2>
@@ -23,10 +24,10 @@
             <div class="flex items-center space-x-4">
                 <div class="relative">
                     <img :src="currentTrack?.cover || '/default-cover.jpg'" :alt="currentTrack?.title"
-                        class="w-16 h-16 rounded-xl object-cover shadow-lg border border-slate-600/50"
+                        class="w-16 h-16 rounded-full object-cover shadow-lg border border-slate-600/50"
                         :class="{ 'animate-spin-slow': isPlaying }" />
                     <div v-if="!currentTrack"
-                        class="w-16 h-16 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center border border-slate-600/50">
+                        class="w-16 h-16 rounded-xl bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center border border-slate-600/50">
                         <i class="pi pi-music text-white text-lg"></i>
                     </div>
                 </div>
@@ -47,62 +48,96 @@
                     <span>{{ formatTime(currentTrack?.duration || 0) }}</span>
                 </div>
                 <input type="range" :value="currentTime" :max="currentTrack?.duration || 0"
-                    @input="seekTo(($event.target as HTMLInputElement).valueAsNumber)" 
-                    class="music-progress w-full" />
+                    @input="seekTo(($event.target as HTMLInputElement).valueAsNumber)" class="music-progress w-full" />
             </div>
 
             <!-- Controles principales -->
-            <div class="flex items-center justify-between mt-6">
+            <div class="flex items-center justify-center gap-4 mt-6">
                 <!-- Botón de repetición -->
-                <button @click="toggleRepeat"
-                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors group"
-                    :class="{
-                        'text-cyan-400': repeatMode !== 'none',
-                        'text-cyan-200/60': repeatMode === 'none'
-                    }">
-                    <i class="pi text-sm transition-transform group-hover:scale-110" :class="{
-                        'pi-repeat': repeatMode === 'all',
-                        'pi-repeat-1': repeatMode === 'one'
-                    }"></i>
-                </button>
+                <div class="relative group/tooltip">
+                    <button @click="toggleRepeat"
+                        class="w-8 h-8 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors group"
+                        :class="{
+                            'text-cyan-400': repeatMode !== 'none',
+                            'text-cyan-200/60': repeatMode === 'none'
+                        }">
+                        <i class="text-xs transition-transform group-hover:scale-110" :class="{
+                            'bi bi-arrow-repeat': repeatMode === 'all',
+                            'bi bi-arrow-clockwise': repeatMode === 'one',
+                            'bi bi-arrow-repeat text-cyan-200/60': repeatMode === 'none'
+                        }"></i>
+                    </button>
+                    <div
+                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-slate-800 text-cyan-100 text-xs px-2 py-1 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+                        {{
+                            repeatMode === 'none' ? 'Repetición desactivada' :
+                                repeatMode === 'one' ? 'Repetir una canción' :
+                                    'Repetir toda la lista'
+                        }}
+                    </div>
+                </div>
 
                 <!-- Botón anterior -->
-                <button @click="playPreviousTrack"
-                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors text-cyan-100 hover:text-white group"
-                    :disabled="!currentTrack">
-                    <i class="pi pi-step-backward group-hover:scale-110 transition-transform"></i>
-                </button>
+                <div class="relative group/tooltip">
+                    <button @click="playPreviousTrack"
+                        class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors text-cyan-100 hover:text-white group"
+                        :disabled="!currentTrack && trackHistory.length === 0">
+                        <i class="bi bi-skip-start-fill group-hover:scale-110 transition-transform"></i>
+                    </button>
+                    <div
+                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-slate-800 text-cyan-100 text-xs px-2 py-1 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+                        Canción anterior
+                    </div>
+                </div>
 
                 <!-- Botón play/pause -->
-                <button @click="togglePlayback"
-                    class="w-12 h-12 bg-gradient-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-lg">
-                    <i class="text-white text-lg transition-transform" :class="isPlaying ? 'pi pi-pause' : 'pi pi-play'"></i>
-                </button>
+                <div class="relative group/tooltip">
+                    <button @click="togglePlayback"
+                        class="w-12 h-12 bg-linear-to-br from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 rounded-full flex items-center justify-center transition-all duration-200 hover:scale-105 shadow-lg">
+                        <i class="text-white text-lg transition-transform"
+                            :class="isPlaying ? 'bi bi-pause-circle-fill' : 'bi bi-play-circle-fill'"></i>
+                    </button>
+                    <div
+                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-slate-800 text-cyan-100 text-xs px-2 py-1 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+                        {{ isPlaying ? 'Pausar' : 'Reproducir' }}
+                    </div>
+                </div>
 
                 <!-- Botón siguiente -->
-                <button @click="playNextTrack"
-                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors text-cyan-100 hover:text-white group"
-                    :disabled="!currentTrack">
-                    <i class="pi pi-step-forward group-hover:scale-110 transition-transform"></i>
-                </button>
+                <div class="relative group/tooltip">
+                    <button @click="playNextTrack"
+                        class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors text-cyan-100 hover:text-white group"
+                        :disabled="!currentTrack">
+                        <i class="bi bi-skip-end-fill group-hover:scale-110 transition-transform"></i>
+                    </button>
+                    <div
+                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-slate-800 text-cyan-100 text-xs px-2 py-1 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+                        Siguiente canción
+                    </div>
+                </div>
 
                 <!-- Botón shuffle -->
-                <button @click="toggleShuffle"
-                    class="w-10 h-10 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors group"
-                    :class="{
-                        'text-cyan-400': isShuffled,
-                        'text-cyan-200/60': !isShuffled
-                    }">
-                    <i class="pi pi-random group-hover:scale-110 transition-transform"></i>
-                </button>
+                <div class="relative group/tooltip">
+                    <button @click="toggleShuffle"
+                        class="w-8 h-8 rounded-full hover:bg-slate-700/50 flex items-center justify-center transition-colors group"
+                        :class="{
+                            'text-cyan-400': isShuffled,
+                            'text-cyan-200/60': !isShuffled
+                        }">
+                        <i class="bi bi-shuffle text-xs group-hover:scale-110 transition-transform"></i>
+                    </button>
+                    <div
+                        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-slate-800 text-cyan-100 text-xs px-2 py-1 rounded-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-50">
+                        {{ isShuffled ? 'Modo aleatorio activado' : 'Modo aleatorio desactivado' }}
+                    </div>
+                </div>
             </div>
 
             <!-- Control de volumen -->
             <div class="flex items-center space-x-3 mt-4">
                 <i class="pi pi-volume-up text-cyan-200/60 text-sm"></i>
                 <input type="range" :value="volume" min="0" max="1" step="0.01"
-                    @input="adjustVolume(($event.target as HTMLInputElement).value)" 
-                    class="volume-slider flex-1" />
+                    @input="adjustVolume(($event.target as HTMLInputElement).value)" class="volume-slider flex-1" />
                 <span class="text-xs text-cyan-200/60 w-10">
                     {{ Math.round(volume * 100) }}%
                 </span>
@@ -114,7 +149,11 @@
             <div class="p-2">
                 <div class="flex justify-between items-center mb-3 px-2">
                     <h3 class="font-medium text-sm text-cyan-100">Lista de reproducción</h3>
-                    <span class="text-xs text-cyan-200/60">{{ tracks.length }} canciones</span>
+                    <button @click="playRandomTrack"
+                        class="text-xs text-cyan-200/60 hover:text-cyan-400 transition-colors flex items-center gap-1">
+                        <i class="bi bi-shuffle text-xs"></i>
+                        Aleatorio
+                    </button>
                 </div>
 
                 <!-- Canciones -->
@@ -211,7 +250,6 @@ const {
     trackQueue,
     showMusicPanel,
     volume,
-    isMuted,
     isShuffled,
     repeatMode,
     tracks
@@ -233,7 +271,8 @@ const {
     clearQueue,
     playTrack,
     initAudioPlayer,
-    activateAudioGlobally
+    activateAudioGlobally,
+    playRandomTrack // Usamos la nueva función del store
 } = musicStore
 
 // Formatear tiempo (segundos a MM:SS)
@@ -278,6 +317,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Tus estilos CSS permanecen iguales */
 .glass-effect {
     background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
@@ -374,15 +414,19 @@ onUnmounted(() => {
     from {
         transform: rotate(0deg);
     }
+
     to {
         transform: rotate(360deg);
     }
 }
 
 @keyframes bounce {
-    0%, 100% {
+
+    0%,
+    100% {
         transform: translateY(0);
     }
+
     50% {
         transform: translateY(-4px);
     }
@@ -393,6 +437,7 @@ onUnmounted(() => {
         opacity: 0;
         transform: translateY(20px) scale(0.95);
     }
+
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -404,6 +449,7 @@ onUnmounted(() => {
         transform: translateY(8px);
         opacity: 0;
     }
+
     to {
         transform: translateY(0);
         opacity: 1;
