@@ -25,6 +25,11 @@
             {{ projectName }}
           </h1>
         </router-link>
+        
+      </div>
+
+      <!-- Contenedor unificado para DarkModeToggle y Menú de usuario -->
+      <div class="flex items-center gap-4">
         <!-- Connection Manager -->
         <ConnectionManager v-slot="connection">
           <div class="connection-indicators flex items-center gap-2">
@@ -35,10 +40,6 @@
               :isMobile="isMobile" :checkApiConnection="connection.checkApiConnection" />
           </div>
         </ConnectionManager>
-      </div>
-
-      <!-- Contenedor unificado para DarkModeToggle y Menú de usuario -->
-      <div class="flex items-center gap-4">
         <!-- Dark Mode Toggle -->
         <DarkModeToggle />
 
