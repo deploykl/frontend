@@ -18,10 +18,10 @@
         
         <!-- ESTADO: REPRODUCIENDO - Ondas de sonido mejoradas -->
         <div v-if="isPlaying && currentTrack" class="flex space-x-1 relative z-10">
-            <div class="w-1.5 h-4 bg-white rounded-full animate-wave" style="animation-delay: 0ms"></div>
-            <div class="w-1.5 h-4 bg-white rounded-full animate-wave" style="animation-delay: 150ms"></div>
-            <div class="w-1.5 h-4 bg-white rounded-full animate-wave" style="animation-delay: 300ms"></div>
-            <div class="w-1.5 h-4 bg-white rounded-full animate-wave" style="animation-delay: 450ms"></div>
+            <div class="w-1.5 h-3 bg-white rounded-full animate-wave" style="animation-delay: 0ms"></div>
+            <div class="w-1.5 h-3 bg-white rounded-full animate-wave" style="animation-delay: 150ms"></div>
+            <div class="w-1.5 h-3 bg-white rounded-full animate-wave" style="animation-delay: 300ms"></div>
+            <div class="w-1.5 h-3 bg-white rounded-full animate-wave" style="animation-delay: 450ms"></div>
         </div>
         
         <!-- ESTADO: PAUSADO CON CANCIÓN - Icono play -->
@@ -64,22 +64,27 @@
         <!-- Información de la canción actual -->
         <div class="p-4 relative z-10">
             <div class="flex items-center space-x-4">
-                <div class="relative">
-                    <!-- Portada de álbum con efecto de rotación y sombra -->
-                    <div class="relative rounded-xl overflow-hidden shadow-lg album-cover-glow">
-                        <img :src="currentTrack?.cover || '/default-cover.jpg'" :alt="currentTrack?.title"
-                            class="w-16 h-16 object-cover transition-all duration-500"
-                            :class="{ 'animate-spin-slow': isPlaying }" />
-                        <div v-if="!currentTrack"
-                            class="w-16 h-16 bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
-                            <i class="pi pi-music text-white text-lg"></i>
-                        </div>
-                        <!-- Superposición de efecto de vinilo -->
-                        <div v-if="currentTrack && isPlaying" class="absolute inset-0 rounded-full border-8 border-slate-900/30 pointer-events-none"></div>
-                    </div>
-                    <!-- Efecto de onda que se expande desde la portada -->
-                    <div v-if="isPlaying && currentTrack" class="absolute -inset-2 border-2 border-cyan-400/30 rounded-xl animate-ping-slow pointer-events-none"></div>
-                </div>
+               <div class="relative">
+    <!-- Portada de álbum CORREGIDA -->
+    <div class="relative rounded-xl overflow-hidden shadow-lg album-cover-glow w-16 h-16 shrink-0">
+        <!-- MOSTRAR IMAGEN solo si hay currentTrack -->
+        <img v-if="currentTrack" :src="currentTrack.cover" :alt="currentTrack.title"
+            class="w-full h-full object-cover transition-all duration-500"
+            :class="{ 'animate-spin-slow': isPlaying }" />
+        
+        <!-- MOSTRAR ICONO DE MÚSICA solo si NO hay currentTrack -->
+        <div v-else
+            class="w-full h-full bg-linear-to-br from-cyan-500 to-blue-600 flex items-center justify-center">
+            <i class="pi pi-music text-white text-lg"></i>
+        </div>
+        
+        <!-- Superposición de efecto de vinilo -->
+        <div v-if="currentTrack && isPlaying" class="absolute inset-0 rounded-full border-8 border-slate-900/30 pointer-events-none"></div>
+    </div>
+    
+    <!-- Efecto de onda que se expande desde la portada -->
+    <div v-if="isPlaying && currentTrack" class="absolute -inset-2 border-2 border-cyan-400/30 rounded-xl animate-ping-slow pointer-events-none"></div>
+</div>
                 <div class="flex-1 min-w-0">
                     <h3 class="font-medium truncate text-cyan-50 drop-shadow-sm transition-all duration-300"
                         :class="{ 'animate-text-pulse': isPlaying }">

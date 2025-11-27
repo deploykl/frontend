@@ -8,7 +8,6 @@ import PrimeVue from 'primevue/config';
 
 import "primeicons/primeicons.css";
 import Aura from '@primeuix/themes/aura';
-
 import ToastService from "primevue/toastservice";
 import ConfirmationService from "primevue/confirmationservice";
 import FloatLabel from "primevue/floatlabel";

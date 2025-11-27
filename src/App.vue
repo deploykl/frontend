@@ -26,7 +26,8 @@
     <GlobalMusicPlayer />
 
     <!-- Componente Toast global -->
-    <Toast ref="toastRef" />
+    <Toast position="top-right" :closeButton="false" infoIcon="pi pi-info-circle" warnIcon="pi pi-exclamation-triangle"
+      errorIcon="pi pi-times-circle" successIcon="pi pi-check-circle" />
   </div>
 </template>
 
@@ -40,7 +41,7 @@ import GlobalMusicPlayer from '@/components/widgets/GlobalMusicPlayer.vue'
 import Footer from './components/layout/Footer.vue'
 import HeaderDashboard from './components/layout/HeaderDashboard.vue'
 import Sidebar from './components/layout/Sidebar.vue'
-import Toast from '@/components/utils/Toast.vue' // Ajusta la ruta según tu estructura
+import Toast from 'primevue/toast' // ← IMPORTAR DE PRIMEVUE
 import OnlineStatus from '@/components/ui/status/OnlineStatus.vue' // Ajusta la ruta según tu estructura
 
 const uiStore = useUIStore()
@@ -57,8 +58,7 @@ const toastRef = ref()
 // Inicializar el theme cuando se monta la app
 onMounted(() => {
   themeStore.initializeTheme()
-
-  // Conectar el store con el componente Toast
+  
   if (toastRef.value) {
     errorStore.setToastComponent(toastRef.value)
   }
