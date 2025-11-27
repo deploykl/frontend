@@ -1,4 +1,4 @@
-// stores/general/musicStore.ts - VERSIÓN COMPLETA OPTIMIZADA
+// stores/general/musicStore.ts - VERSIÓN COMPLETA CORREGIDA
 import { defineStore } from 'pinia'
 import { ref, type Ref } from 'vue'
 
@@ -9,6 +9,7 @@ export interface Track {
   url: string
   duration: number
   cover?: string
+  durationLoaded?: boolean
 }
 
 interface MusicStore {
@@ -53,6 +54,8 @@ interface MusicStore {
   playRandomTrack: () => Promise<void>
   loadTracks: () => Promise<void>
   releaseMemory: () => void
+  initializeAllDurations: () => Promise<void>
+  loadTrackDuration: (track: Track) => Promise<void>
 }
 
 export const useMusicStore = defineStore('music', (): MusicStore => {
@@ -69,21 +72,128 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
   const isShuffled = ref<boolean>(false)
   const repeatMode = ref<'none' | 'one' | 'all'>('none')
   const allowedRoutes = ref<string[]>(['/', '/dg', '/dimon', '/diem', '/main'])
-
-  // ✅ OPTIMIZACIÓN: Tracks vacíos inicialmente - lazy loading
   const tracks = ref<Track[]>([])
 
-  // ✅ OPTIMIZACIÓN: Cache de duraciones
+  // Cache de duraciones
   const durationCache = ref<Map<string, number>>(new Map())
+  const preloadAudios: HTMLAudioElement[] = []
+  const MAX_CONCURRENT_PRELOADS = 3
 
-  // ✅ OPTIMIZACIÓN: Instancia única para obtener duraciones
-  const durationAudio = new Audio()
-  let isDurationAudioBusy = false
+  // Función optimizada para obtener duración
+  const getRealDuration = async (url: string): Promise<number> => {
+    if (durationCache.value.has(url)) {
+      return durationCache.value.get(url)!
+    }
 
-  // ✅ OPTIMIZACIÓN: Cargar tracks solo cuando se necesiten
-  const loadTracks = async (): Promise<void> => {
-    if (tracks.value.length > 0) return // Ya cargados
+    return new Promise((resolve) => {
+      const audio = new Audio()
+      preloadAudios.push(audio)
+
+      const cleanup = () => {
+        audio.removeEventListener('loadedmetadata', handleLoadedMetadata)
+        audio.removeEventListener('error', handleError)
+        audio.src = ''
+        
+        setTimeout(() => {
+          const index = preloadAudios.indexOf(audio)
+          if (index > -1) {
+            preloadAudios.splice(index, 1)
+          }
+        }, 1000)
+      }
+
+      const handleLoadedMetadata = () => {
+        const duration = audio.duration && !isNaN(audio.duration) ? Math.floor(audio.duration) : 0
+        durationCache.value.set(url, duration)
+        cleanup()
+        resolve(duration)
+      }
+
+      const handleError = () => {
+        console.warn(`No se pudo cargar la duración de: ${url}`)
+        durationCache.value.set(url, 0)
+        cleanup()
+        resolve(0)
+      }
+
+      audio.addEventListener('loadedmetadata', handleLoadedMetadata)
+      audio.addEventListener('error', handleError)
+      audio.src = url
+      audio.preload = 'metadata'
+      
+      // Timeout de seguridad
+      setTimeout(() => {
+        if (!durationCache.value.has(url)) {
+          console.warn(`Timeout cargando duración: ${url}`)
+          durationCache.value.set(url, 0)
+          cleanup()
+          resolve(0)
+        }
+      }, 10000)
+    })
+  }
+
+  // Cargar duración de un track individual
+const loadTrackDuration = async (track: Track): Promise<void> => {
+  if (track.durationLoaded || track.duration > 0) {
+    return
+  }
+
+  try {
+    const realDuration = await getRealDuration(track.url)
     
+    const trackIndex = tracks.value.findIndex(t => t.id === track.id)
+    if (trackIndex !== -1) {
+      const updatedTracks = [...tracks.value]
+      const existingTrack = updatedTracks[trackIndex]
+      
+      if (existingTrack) { // ✅ Verificar que existe
+        updatedTracks[trackIndex] = {
+          ...existingTrack, // ✅ TypeScript sabe que existe
+          duration: realDuration,
+          durationLoaded: true
+        }
+        tracks.value = updatedTracks
+      }
+    }
+  } catch (error) {
+    console.warn(`Error cargando duración para ${track.title}:`, error)
+  }
+}
+
+  // Inicializar todas las duraciones de forma eficiente
+  const initializeAllDurations = async (): Promise<void> => {
+    if (tracks.value.length === 0) return
+
+    console.log('🔄 Inicializando duraciones de tracks...')
+    
+    const tracksNeedingDuration = tracks.value.filter(track => 
+      !track.durationLoaded && track.duration === 0
+    )
+
+    console.log(`📊 ${tracksNeedingDuration.length} tracks necesitan duración`)
+
+    const batchSize = MAX_CONCURRENT_PRELOADS
+    for (let i = 0; i < tracksNeedingDuration.length; i += batchSize) {
+      const batch = tracksNeedingDuration.slice(i, i + batchSize)
+      
+      await Promise.allSettled(
+        batch.map(track => loadTrackDuration(track))
+      )
+      
+      console.log(`✅ Lote ${Math.floor(i/batchSize) + 1} completado`)
+      
+      if (i + batchSize < tracksNeedingDuration.length) {
+        await new Promise(resolve => setTimeout(resolve, 500))
+      }
+    }
+    
+    console.log('🎉 Todas las duraciones inicializadas')
+  }
+
+  const loadTracks = async (): Promise<void> => {
+    if (tracks.value.length > 0) return
+
     const trackList: Track[] = [
       {
         id: '1',
@@ -91,7 +201,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Artista 1',
         url: new URL('/src/assets/audios/playlist/song1.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '2',
@@ -99,7 +210,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Artista 2',
         url: new URL('/src/assets/audios/playlist/song2.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '3',
@@ -107,7 +219,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Artista 3',
         url: new URL('/src/assets/audios/playlist/song3.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '4',
@@ -115,7 +228,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Manuel Mijares',
         url: new URL('/src/assets/audios/playlist/song4.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '5',
@@ -123,7 +237,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Artista 5',
         url: new URL('/src/assets/audios/playlist/song5.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '6',
@@ -131,7 +246,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Los terricolas',
         url: new URL('/src/assets/audios/playlist/song6.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '7',
@@ -139,7 +255,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Richard O\'Brien',
         url: new URL('/src/assets/audios/playlist/song7.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '8',
@@ -147,7 +264,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Samantha Sang',
         url: new URL('/src/assets/audios/playlist/song8.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '9',
@@ -155,7 +273,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Madonna',
         url: new URL('/src/assets/audios/playlist/song9.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '10',
@@ -163,7 +282,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Joan Sebastian',
         url: new URL('/src/assets/audios/playlist/song10.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '11',
@@ -171,7 +291,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'Camilo, Pedro Capó',
         url: new URL('/src/assets/audios/playlist/song11.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '12',
@@ -179,7 +300,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'The Bangles',
         url: new URL('/src/assets/audios/playlist/song12.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       },
       {
         id: '13',
@@ -187,89 +309,17 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         artist: 'YG Marley',
         url: new URL('/src/assets/audios/playlist/song13.ogg', import.meta.url).href,
         duration: 0,
-        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
       }
     ]
 
     tracks.value = trackList
     
-    // ✅ OPTIMIZACIÓN: Cargar duraciones en segundo plano sin bloquear
-    setTimeout(() => {
-      initializeTrackDurations().catch(console.error)
+    // INICIAR CARGA DE DURACIONES EN SEGUNDO PLANO
+    setTimeout(async () => {
+      await initializeAllDurations()
     }, 1000)
-  }
-
-  // ✅ OPTIMIZACIÓN: Obtener duración con cache y instancia única
-  const getRealDuration = async (url: string): Promise<number> => {
-    if (durationCache.value.has(url)) {
-      return durationCache.value.get(url)!
-    }
-
-    if (isDurationAudioBusy) {
-      return 0
-    }
-
-    return new Promise((resolve) => {
-      isDurationAudioBusy = true
-      
-      const handleLoadedMetadata = () => {
-        const duration = durationAudio.duration || 0
-        const roundedDuration = Math.floor(duration)
-        durationCache.value.set(url, roundedDuration)
-        cleanup()
-        resolve(roundedDuration)
-      }
-      
-      const handleError = () => {
-        console.warn(`No se pudo cargar la duración de: ${url}`)
-        durationCache.value.set(url, 0)
-        cleanup()
-        resolve(0)
-      }
-      
-      const cleanup = () => {
-        durationAudio.removeEventListener('loadedmetadata', handleLoadedMetadata)
-        durationAudio.removeEventListener('error', handleError)
-        durationAudio.src = ''
-        isDurationAudioBusy = false
-      }
-      
-      durationAudio.addEventListener('loadedmetadata', handleLoadedMetadata)
-      durationAudio.addEventListener('error', handleError)
-      durationAudio.src = url
-    })
-  }
-
-  // ✅ OPTIMIZACIÓN: Carga progresiva de duraciones
-  const initializeTrackDurations = async (): Promise<void> => {
-    const updatedTracks = [...tracks.value]
-    
-    const batchSize = 3
-    for (let i = 0; i < updatedTracks.length; i += batchSize) {
-      const batch = updatedTracks.slice(i, i + batchSize)
-      
-      await Promise.allSettled(
-        batch.map(async (track) => {
-          if (!track) return
-          
-          try {
-            const realDuration = await getRealDuration(track.url)
-            if (realDuration > 0) {
-              track.duration = realDuration
-            }
-          } catch (error) {
-            console.warn(`Error obteniendo duración para ${track.title}:`, error)
-          }
-        })
-      )
-      
-      // Actualizar progresivamente
-      tracks.value = [...updatedTracks]
-      
-      if (i + batchSize < updatedTracks.length) {
-        await new Promise(resolve => setTimeout(resolve, 100))
-      }
-    }
   }
 
   const isRouteAllowed = (routePath: string): boolean => {
@@ -287,7 +337,6 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       initAudioPlayer()
     }
     
-    // ✅ Asegurar que los tracks estén cargados
     if (tracks.value.length === 0) {
       loadTracks()
     }
@@ -314,7 +363,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       audioPlayer.value = new Audio()
       audioPlayer.value.volume = volume.value
       audioPlayer.value.muted = true
-      audioPlayer.value.preload = 'metadata' // ✅ Solo metadatos
+      audioPlayer.value.preload = 'metadata'
       
       audioPlayer.value.addEventListener('ended', handleTrackEnd)
       audioPlayer.value.addEventListener('timeupdate', updateCurrentTime)
@@ -346,7 +395,6 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
         }
         currentTrack.value = updatedTrack
         
-        // Actualizar en la lista principal
         const trackIndex = tracks.value.findIndex(t => t.id === currentTrack.value?.id)
         if (trackIndex !== -1) {
           const updatedTracks = [...tracks.value]
@@ -455,9 +503,19 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
   }
 
   const playTrack = async (track: Track): Promise<void> => {
-    // ✅ Asegurar que los tracks estén cargados
     if (tracks.value.length === 0) {
       await loadTracks()
+    }
+
+    // ✅ CORRECCIÓN: Asegurar que el track tenga duración antes de reproducir
+    if (!track.durationLoaded && track.duration === 0) {
+      await loadTrackDuration(track)
+      
+      // Actualizar el track con la duración real
+      const updatedTrack = tracks.value.find(t => t.id === track.id)
+      if (updatedTrack) {
+        track = updatedTrack
+      }
     }
 
     if (currentTrack.value && currentTrack.value.id !== track.id) {
@@ -489,7 +547,6 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       isMuted.value = false
       
       try {
-        // ✅ OPTIMIZACIÓN: Precargar solo cuando sea necesario
         if (audioPlayer.value.readyState < 2) {
           await audioPlayer.value.load()
         }
@@ -506,7 +563,6 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
   }
 
   const playRandomTrack = async (): Promise<void> => {
-    // ✅ Asegurar que los tracks estén cargados
     if (tracks.value.length === 0) {
       await loadTracks()
     }
@@ -599,14 +655,12 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
     trackQueue.value = []
   }
 
-  // ✅ NUEVO: Liberar memoria cuando no se usa
   const releaseMemory = (): void => {
     if (!isPlaying.value && audioPlayer.value) {
       audioPlayer.value.src = ''
       audioPlayer.value.load()
     }
     
-    // Limpiar cache si es muy grande
     if (durationCache.value.size > 50) {
       durationCache.value.clear()
     }
@@ -624,6 +678,12 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
     }
     
     durationCache.value.clear()
+    
+    // Limpiar preload audios
+    preloadAudios.forEach(audio => {
+      audio.src = ''
+    })
+    preloadAudios.length = 0
   }
 
   return {
@@ -665,6 +725,8 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
     getRealDuration,
     playRandomTrack,
     loadTracks,
-    releaseMemory
+    releaseMemory,
+    initializeAllDurations,
+    loadTrackDuration
   }
 })

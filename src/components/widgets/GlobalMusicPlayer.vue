@@ -276,7 +276,8 @@ const {
     initAudioPlayer,
     activateAudioGlobally,
     playRandomTrack,
-    loadTracks // ✅ CRÍTICO: Este método debe estar incluido
+    loadTracks,
+    initializeAllDurations // ✅ NUEVO: Método para inicializar duraciones
 } = musicStore
 
 // Formatear tiempo (segundos a MM:SS)
@@ -305,7 +306,7 @@ const handleGlobalClick = () => {
     activateAudioGlobally()
 }
 
-// ✅ CORRECCIÓN: Inicialización con carga de tracks
+// ✅ CORRECCIÓN MEJORADA: Inicialización con carga de tracks y duraciones
 onMounted(async () => {
     console.log('🎵 Montando MusicPlayer...')
     
@@ -313,14 +314,19 @@ onMounted(async () => {
         // 1. Inicializar reproductor
         initAudioPlayer()
         
-        // 2. ✅ CARGAR TRACKS (ESTO ES LO QUE FALTABA)
+        // 2. Cargar tracks
         console.log('🔄 Cargando tracks...')
         await loadTracks()
         console.log('✅ Tracks cargados:', tracks.value.length)
         
+        // 3. ✅ FORZAR INICIALIZACIÓN DE DURACIONES
+        console.log('🔄 Inicializando duraciones...')
+        await initializeAllDurations()
+        console.log('✅ Duraciones inicializadas')
+        
         isLoading.value = false
         
-        // 3. Configurar listeners
+        // 4. Configurar listeners
         setTimeout(() => {
             setupGlobalListeners()
         }, 1000)
