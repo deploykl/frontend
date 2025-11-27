@@ -1,7 +1,17 @@
 <template>
     <!-- Botón flotante mejorado para abrir el panel de música -->
     <button v-if="!showMusicPanel" @click="toggleMusicPanel"
-        class="fixed bottom-6 right-6 z-50 w-16 h-16 bg-linear-to-br from-cyan-500 via-blue-500 to-purple-600 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-700 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 group music-button-float">
+        class="cursor-pointer fixed bottom-6 right-6 z-50 w-16 h-16 bg-linear-to-br from-cyan-500 via-blue-500 to-purple-600 hover:from-cyan-600 hover:via-blue-600 hover:to-purple-700 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 group music-button-float">
+        
+        <!-- Efectos de onda pulsantes alrededor del botón - CUANDO ESTÁ REPRODUCIENDO -->
+        <div v-if="isPlaying && currentTrack" class="absolute -inset-4 border-2 border-cyan-400/30 rounded-full animate-ping-slow"></div>
+        <div v-if="isPlaying && currentTrack" class="absolute -inset-6 border-2 border-cyan-400/20 rounded-full animate-ping-slow" style="animation-delay: 0.5s"></div>
+        <div v-if="isPlaying && currentTrack" class="absolute -inset-8 border-2 border-cyan-400/10 rounded-full animate-ping-slow" style="animation-delay: 1s"></div>
+        
+        <!-- Efectos de onda pulsantes alrededor del botón - CUANDO ESTÁ EN PAUSA -->
+        <div v-if="!isPlaying && currentTrack" class="absolute -inset-4 border-2 border-blue-400/20 rounded-full animate-ping-slow"></div>
+        <div v-if="!isPlaying && currentTrack" class="absolute -inset-6 border-2 border-blue-400/15 rounded-full animate-ping-slow" style="animation-delay: 0.5s"></div>
+        <div v-if="!isPlaying && currentTrack" class="absolute -inset-8 border-2 border-blue-400/10 rounded-full animate-ping-slow" style="animation-delay: 1s"></div>
         
         <!-- Efecto de pulso sutil de fondo -->
         <div class="absolute inset-0 rounded-full bg-linear-to-br from-cyan-400 to-blue-500 opacity-20 animate-pulse-slow"></div>
@@ -14,22 +24,20 @@
             <div class="w-1.5 h-4 bg-white rounded-full animate-wave" style="animation-delay: 450ms"></div>
         </div>
         
-        <!-- ESTADO: PAUSADO CON CANCIÓN - Icono play con efecto de onda circular -->
+        <!-- ESTADO: PAUSADO CON CANCIÓN - Icono play -->
         <div v-else-if="!isPlaying && currentTrack" class="relative z-10">
-            <i class="pi pi-play text-white text-xl transition-all duration-300 group-hover:scale-110"></i>
-            <div class="absolute -inset-2 border-2 border-cyan-300/70 border-t-transparent rounded-full animate-spin-slow opacity-70"></div>
-            <div class="absolute -inset-3 border-2 border-cyan-200/40 border-b-transparent rounded-full animate-spin-slow-reverse opacity-50"></div>
+            <i class="bi bi-play-circle-fill text-white text-xl transition-all duration-300 group-hover:scale-110"></i>
         </div>
         
         <!-- ESTADO: SIN CANCIÓN - Icono musical con efecto sutil -->
         <div v-else class="relative z-10">
-            <i class="bi bi-play-circle text-white text-xl transition-all duration-300 group-hover:scale-110"></i>
-            <div class="absolute -inset-1 bg-white/20 rounded-full animate-ping-slow"></div>
+            <i class="bi bi-play-circle-fill text-white text-xl transition-all duration-300 group-hover:scale-110"></i>
+            <div class="absolute -inset-1 bg-white/20 rounded-full animate-ping-slow opacity-50"></div>
         </div>
         
         <!-- Indicador de notificación cuando hay una canción cargada -->
         <span v-if="currentTrack && !isPlaying"
-            class="absolute -top-1 -right-1 w-4 h-4 bg-linear-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse border border-white"></span>
+            class="absolute -top-1 -right-1 w-4 h-4 bg-linear-to-r from-cyan-400 to-blue-500 rounded-full animate-pulse border border-white z-20"></span>
             
         <!-- Efecto de brillo al hacer hover -->
         <div class="absolute inset-0 rounded-full bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
