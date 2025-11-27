@@ -157,6 +157,24 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       duration: 0,
     cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     }
+    ,
+     {
+      id: '12',
+      title: 'Manic Monday',
+      artist: 'The Bangles',
+      url: new URL('/src/assets/audios/playlist/song12.ogg', import.meta.url).href,
+      duration: 0,
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+    }
+    ,
+     {
+      id: '13',
+      title: 'Praise Jah in the Moonlight',
+      artist: 'YG Marley',
+      url: new URL('/src/assets/audios/playlist/song13.ogg', import.meta.url).href,
+      duration: 0,
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+    }
   ])
 
   // Función para obtener la duración real del audio
