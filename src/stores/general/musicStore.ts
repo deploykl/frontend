@@ -75,7 +75,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Artista 1',
       url: new URL('/src/assets/audios/playlist/song1.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
     {
       id: '2',
@@ -83,7 +83,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Artista 2',
       url: new URL('/src/assets/audios/playlist/song2.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
     {
       id: '3',
@@ -91,7 +91,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Artista 3',
       url: new URL('/src/assets/audios/playlist/song3.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
     {
       id: '4',
@@ -99,7 +99,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Manuel Mijares',
       url: new URL('/src/assets/audios/playlist/song4.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
     {
       id: '5',
@@ -107,7 +107,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Artista 5',
       url: new URL('/src/assets/audios/playlist/song5.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
     {
       id: '6',
@@ -115,7 +115,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Los terricolas',
       url: new URL('/src/assets/audios/playlist/song6.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
      {
       id: '7',
@@ -123,7 +123,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Richard O"Brien',
       url: new URL('/src/assets/audios/playlist/song7.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
     {
       id: '8',
@@ -131,7 +131,7 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Samantha Sang',
       url: new URL('/src/assets/audios/playlist/song8.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     },
     {
       id: '9',
@@ -139,7 +139,23 @@ export const useMusicStore = defineStore('music', (): MusicStore => {
       artist: 'Madonna',
       url: new URL('/src/assets/audios/playlist/song9.ogg', import.meta.url).href,
       duration: 0,
-      cover: 'https://pics.craiyon.com/2023-06-10/824095a92e854b7bbec3d39728b2e0b6.webp'
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+    },
+     {
+      id: '10',
+      title: 'Más allá del sol',
+      artist: 'Joan Sebastian',
+      url: new URL('/src/assets/audios/playlist/song10.ogg', import.meta.url).href,
+      duration: 0,
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
+    },
+     {
+      id: '11',
+      title: 'Tutu',
+      artist: 'Camilo, Pedro Capó',
+      url: new URL('/src/assets/audios/playlist/song11.ogg', import.meta.url).href,
+      duration: 0,
+    cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href
     }
   ])
 
