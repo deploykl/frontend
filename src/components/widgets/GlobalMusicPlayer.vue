@@ -236,10 +236,13 @@
 <script setup lang="ts">
 import { useMusicStore } from '@/stores/general/musicStore'
 import { storeToRefs } from 'pinia'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 // Store de música
 const musicStore = useMusicStore()
+
+// Estado local para loading
+const isLoading = ref(true)
 
 // Destructurar el store
 const {
@@ -272,7 +275,8 @@ const {
     playTrack,
     initAudioPlayer,
     activateAudioGlobally,
-    playRandomTrack // Usamos la nueva función del store
+    playRandomTrack,
+    loadTracks // ✅ CRÍTICO: Este método debe estar incluido
 } = musicStore
 
 // Formatear tiempo (segundos a MM:SS)
@@ -286,7 +290,6 @@ const formatTime = (seconds: number): string => {
 
 // Listeners globales para activar audio
 const setupGlobalListeners = () => {
-    console.log('🎵 Configurando listeners globales...')
     document.addEventListener('click', handleGlobalClick)
     document.addEventListener('keydown', handleGlobalClick)
     document.addEventListener('touchstart', handleGlobalClick)
@@ -302,13 +305,30 @@ const handleGlobalClick = () => {
     activateAudioGlobally()
 }
 
-// Inicialización
-onMounted(() => {
+// ✅ CORRECCIÓN: Inicialización con carga de tracks
+onMounted(async () => {
     console.log('🎵 Montando MusicPlayer...')
-    initAudioPlayer()
-    setTimeout(() => {
-        setupGlobalListeners()
-    }, 1000)
+    
+    try {
+        // 1. Inicializar reproductor
+        initAudioPlayer()
+        
+        // 2. ✅ CARGAR TRACKS (ESTO ES LO QUE FALTABA)
+        console.log('🔄 Cargando tracks...')
+        await loadTracks()
+        console.log('✅ Tracks cargados:', tracks.value.length)
+        
+        isLoading.value = false
+        
+        // 3. Configurar listeners
+        setTimeout(() => {
+            setupGlobalListeners()
+        }, 1000)
+        
+    } catch (error) {
+        console.error('❌ Error inicializando reproductor:', error)
+        isLoading.value = false
+    }
 })
 
 onUnmounted(() => {
