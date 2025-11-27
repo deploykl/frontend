@@ -1,85 +1,117 @@
 <template>
-  <Dialog :visible="visible" @update:visible="$emit('update:visible', $event)" modal
-    header="Estadísticas de Módulos y Usuarios" :style="{ width: '80vw', maxWidth: '1200px' }"
-    :contentStyle="{ height: '70vh' }">
-    <div v-if="loading" class="text-center p-5">
+  <Dialog 
+    :visible="visible" 
+    @update:visible="$emit('update:visible', $event)" 
+    modal
+    header="Estadísticas de Módulos y Usuarios" 
+    :style="{ width: '80vw', maxWidth: '1200px' }"
+    :contentStyle="{ height: '70vh' }"
+  >
+    <div v-if="loading" class="flex flex-col items-center justify-center p-5">
       <ProgressSpinner />
       <p class="mt-3">Cargando estadísticas...</p>
     </div>
 
-    <div v-else-if="error" class="p-3 text-center text-danger">
-      <i class="pi pi-exclamation-triangle me-2"></i>
+    <div v-else-if="error" class="p-3 text-center text-red-500">
+      <i class="pi pi-exclamation-triangle mr-2"></i>
       {{ error }}
     </div>
 
-    <div v-else class="modulos-stats-container">
+    <div v-else class="flex flex-col h-full">
       <!-- Filtros y resumen general -->
-      <div class="mb-4 p-3 bg-light rounded">
-        <div class="d-flex justify-content-between align-items-center flex-wrap">
-          <h5 class="mb-0">Resumen General</h5>
-          <div>
-            <span class="badge bg-primary me-2">Total Módulos: {{ totalModulos }}</span>
-            <span class="badge bg-success">Total Usuarios Activos: {{ totalUsuarios }}</span>
+      <div class="mb-4 p-3 bg-gray-100 rounded-lg">
+        <div class="flex justify-between items-center flex-wrap">
+          <h5 class="m-0 font-semibold">Resumen General</h5>
+          <div class="flex gap-2">
+            <span class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">
+              Total Módulos: {{ totalModulos }}
+            </span>
+            <span class="bg-green-500 text-white px-3 py-1 rounded-full text-sm">
+              Total Usuarios Activos: {{ totalUsuarios }}
+            </span>
           </div>
         </div>
       </div>
 
       <!-- Gráficos principales -->
-      <div class="row mb-4">
-        <div class="col-md-6 mb-3">
-          <div class="card h-100">
-            <div class="card-header bg-transparent">
-              <h6 class="mb-0">Usuarios por Módulo</h6>
-            </div>
-            <div class="card-body">
-              <BarChart :data="barChartData" height="250px" :index-axis="'y'" :colors="barChartColors" />
-            </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+        <div class="border border-gray-200 rounded-lg shadow-sm h-full">
+          <div class="bg-transparent border-b border-gray-200 px-4 py-3">
+            <h6 class="m-0 font-semibold">Usuarios por Módulo</h6>
+          </div>
+          <div class="p-4">
+            <BarChart 
+              :data="barChartData" 
+              height="250px" 
+              :index-axis="'y'" 
+              :colors="barChartColors" 
+            />
           </div>
         </div>
 
-        <div class="col-md-6 mb-3">
-          <div class="card h-100">
-            <div class="card-header bg-transparent">
-              <h6 class="mb-0">Distribución de Usuarios</h6>
-            </div>
-            <div class="card-body">
-              <DoughnutChart :data="doughnutChartData" height="250px" />
-            </div>
+        <div class="border border-gray-200 rounded-lg shadow-sm h-full">
+          <div class="bg-transparent border-b border-gray-200 px-4 py-3">
+            <h6 class="m-0 font-semibold">Distribución de Usuarios</h6>
+          </div>
+          <div class="p-4">
+            <DoughnutChart 
+              :data="doughnutChartData" 
+              height="250px" 
+            />
           </div>
         </div>
       </div>
 
       <!-- Tabla detallada -->
-      <div class="card">
-        <div class="card-header bg-transparent d-flex justify-content-between align-items-center">
-          <h6 class="mb-0">Detalle por Módulo</h6>
-          <InputText v-model="filterText" placeholder="Buscar módulo..." class="p-inputtext-sm" />
+      <div class="border border-gray-200 rounded-lg shadow-sm flex-1">
+        <div class="bg-transparent border-b border-gray-200 px-4 py-3 flex justify-between items-center">
+          <h6 class="m-0 font-semibold">Detalle por Módulo</h6>
+          <InputText 
+            v-model="filterText" 
+            placeholder="Buscar módulo..." 
+            class="p-inputtext-sm w-64"
+          />
         </div>
-        <div class="card-body p-0">
-          <DataTable :value="filteredModulos" scrollable scrollHeight="flex" class="p-datatable-sm" :rowHover="true" sortField="total_usuarios" :sortOrder="-1">
-            <Column field="modulo.codename" header="Módulo" :sortable="true" >
+        <div class="p-0">
+          <DataTable 
+            :value="filteredModulos" 
+            scrollable 
+            scrollHeight="flex" 
+            class="p-datatable-sm" 
+            :rowHover="true" 
+            sortField="total_usuarios" 
+            :sortOrder="-1"
+          >
+            <Column field="modulo.codename" header="Módulo" :sortable="true">
               <template #body="{ data }">
-                <strong>{{ data.modulo.codename }}</strong>
-                <br>
-                <small class="text-muted">{{ data.modulo.description }}</small>
+                <strong class="block">{{ data.modulo.codename }}</strong>
+                <small class="text-gray-500 text-sm">{{ data.modulo.description }}</small>
               </template>
             </Column>
             <Column field="total_usuarios" header="Usuarios" :sortable="true">
               <template #body="{ data }">
-                <span class="badge" :class="data.total_usuarios > 0 ? 'bg-success' : 'bg-secondary'">
+                <span 
+                  class="px-3 py-1 rounded-full text-sm text-white" 
+                  :class="data.total_usuarios > 0 ? 'bg-green-500' : 'bg-gray-500'"
+                >
                   {{ data.total_usuarios }}
                 </span>
               </template>
             </Column>
             <Column header="Acciones">
               <template #body="{ data }">
-                <Button v-if="data.total_usuarios > 0" icon="pi pi-list" class="p-button-sm p-button-text p-button-info"
-                  @click="toggleUserList(data)" v-tooltip.top="'Ver usuarios'" />
+                <Button 
+                  v-if="data.total_usuarios > 0" 
+                  icon="pi pi-list" 
+                  class="p-button-sm p-button-text p-button-info"
+                  @click="toggleUserList(data)" 
+                  v-tooltip.top="'Ver usuarios'" 
+                />
               </template>
             </Column>
 
             <template #empty>
-              <div class="p-3 text-center text-muted">
+              <div class="p-3 text-center text-gray-500">
                 No se encontraron módulos con usuarios
               </div>
             </template>
@@ -88,11 +120,17 @@
       </div>
 
       <!-- Dialog para mostrar usuarios de un módulo -->
-      <Dialog v-model:visible="showUserDialog"
+      <Dialog 
+        v-model:visible="showUserDialog"
         :header="selectedModule ? `Usuarios en ${selectedModule.modulo.codename}` : 'Usuarios'"
-        :style="{ width: '60vw' }">
-        <DataTable :value="selectedModule ? selectedModule.usuarios : []" class="p-datatable-sm" scrollable
-          scrollHeight="300px">
+        :style="{ width: '60vw' }"
+      >
+        <DataTable 
+          :value="selectedModule ? selectedModule.usuarios : []" 
+          class="p-datatable-sm" 
+          scrollable
+          scrollHeight="300px"
+        >
           <Column field="nombre" header="Nombre">
             <template #body="{ data }">
               {{ data.nombre }} {{ data.apellido }}
@@ -110,7 +148,12 @@
     </div>
 
     <template #footer>
-      <Button label="Cerrar" icon="pi pi-times" @click="$emit('update:visible', false)" class="p-button-text" />
+      <Button 
+        label="Cerrar" 
+        icon="pi pi-times" 
+        @click="$emit('update:visible', false)" 
+        class="p-button-text" 
+      />
     </template>
   </Dialog>
 </template>
