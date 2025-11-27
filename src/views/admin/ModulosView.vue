@@ -129,7 +129,7 @@
 import { ref, onMounted, nextTick } from 'vue'
 import DataTableWrapper from '@/components/ui/DataTableWrapper.vue';
 import { usePersonalStore } from '@/stores/dgos/personalStore';
-import { useModuloStore } from '@/stores/superuser/moduloStore';
+import { useModuloStore } from '@/stores/admin/moduloStore';
 import FloatInput from '@/components/widgets/FloatInput.vue';
 import ModalBase from '@/components/ui/ModalBase.vue';
 import { useToast } from 'primevue/usetoast';

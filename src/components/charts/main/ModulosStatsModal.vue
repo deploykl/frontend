@@ -117,7 +117,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import { useModuloStore } from '@/stores/superuser/moduloStore'
+import { useModuloStore } from '@/stores/admin/moduloStore'
 import DoughnutChart from '@/components/charts/layout/DoughnutChart.vue';
 import BarChart from '@/components/charts/layout/BarChart.vue';
 import { formatDate } from '@/components/utils/format'
