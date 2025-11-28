@@ -1,5 +1,5 @@
 <template>
-        <!-- Estado de carga -->
+    <!-- Estado de carga inicial -->
     <div v-if="!isAppReady" class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-all duration-800">
         <div class="text-center space-y-6">
             <!-- Logo animado -->
@@ -12,7 +12,7 @@
             
             <!-- Texto de carga -->
             <div class="space-y-2">
-                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Cargando Sistema</h2>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Cargando Login</h2>
                 <p class="text-gray-600 dark:text-gray-400 text-sm">Inicializando componentes...</p>
             </div>
             
@@ -22,7 +22,17 @@
             </div>
         </div>
     </div>
-    <div v-else
+
+    <!-- Loading Screen después del login -->
+<LoadingScreen 
+    v-if="showLoadingScreen"
+    :show="true"
+    :duration="6000"
+    @complete="handleLoadingComplete"
+/>
+
+    <!-- Contenido principal del login -->
+    <div v-else-if="isAppReady"
         class="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 flex items-center justify-center p-4">
         <!-- Fondo GIF mejorado -->
         <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 dark:opacity-10"
@@ -228,6 +238,13 @@
             </div>
         </div>
     </div>
+     <!-- BOTÓN DE PRUEBA - Solo para desarrollo -->
+        <button 
+            @click="testLoadingScreen"
+            class="fixed top-4 right-4 z-50 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
+        >
+            🎨 Probar LoadingScreen
+        </button>
 </template>
 
 <script setup lang="ts">
@@ -237,16 +254,25 @@ import { useAuthStore } from "@/stores/auth/authStore";
 import { useErrorStore } from "@/stores/errors/errorStore";
 import TwoFactorAuth from "@/components/security/TwoFactorAuth.vue";
 import DarkModeToggle from '@/components/DarkModeToggle.vue'
+import LoadingScreen from '@/components/ui/LoadingScreen.vue'; // Ajusta la ruta
 
 // Router y stores
 const router = useRouter();
 const authStore = useAuthStore();
 const errorStore = useErrorStore();
 
+// Estados reactivos
+const isAppReady = ref(false);
+const showLoadingScreen = ref(false);
+
 // Constantes de entorno
 const projectName = import.meta.env.VITE_PROJECT_NAME || "Sistema";
 const version = import.meta.env.VITE_VERSION || "1.0.0";
 
+const testLoadingScreen = (): void => {
+    console.log('🧪 Probando LoadingScreen...');
+    showLoadingScreen.value = true;
+};
 /**
  * Maneja el proceso de login
  */
@@ -266,8 +292,10 @@ const handleLogin = async (): Promise<void> => {
         // Ejecutar login
         await authStore.login(router);
 
-        // Mensaje de éxito
-        errorStore.showMessage('Inicio de sesión exitoso', 'success', 3000);
+        // ✅ MOSTRAR LOADING SCREEN Y NO REDIRIGIR INMEDIATAMENTE
+        showLoadingScreen.value = true;
+
+        // ❌ ELIMINAR cualquier redirección automática del authStore.login()
 
     } catch (error: any) {
         console.error('❌ Error en login:', error);
@@ -289,6 +317,23 @@ const handleLogin = async (): Promise<void> => {
 };
 
 /**
+ * Maneja la finalización del loading screen
+ */
+const handleLoadingComplete = (): void => {
+    // Redirigir después de que el loading termine
+    const redirectPath = localStorage.getItem("redirectAfterLogin");
+    if (redirectPath) {
+        localStorage.removeItem("redirectAfterLogin");
+        router.push(redirectPath);
+    } else {
+        router.push("/noticias");
+    }
+    
+    // Mostrar mensaje de éxito
+    errorStore.showMessage('Inicio de sesión exitoso', 'success', 3000);
+};
+
+/**
  * Maneja el éxito de la autenticación 2FA
  */
 const handle2FASuccess = (data: any): void => {
@@ -296,14 +341,8 @@ const handle2FASuccess = (data: any): void => {
         authStore.handle2FASuccess(data);
 
         if (authStore.twoFAMode !== "setup") {
-            // Redirigir después de verificación 2FA exitosa
-            const redirectPath = localStorage.getItem("redirectAfterLogin");
-            if (redirectPath) {
-                localStorage.removeItem("redirectAfterLogin");
-                router.push(redirectPath);
-            } else {
-                router.push("/noticias");
-            }
+            // Mostrar loading screen en lugar de redirigir inmediatamente
+            showLoadingScreen.value = true;
         } else {
             // Mensaje de éxito para configuración 2FA
             errorStore.showMessage("2FA configurado correctamente", "success");
@@ -338,14 +377,14 @@ const cleanup = (): void => {
         authStore.countdownInterval = null;
     }
 };
-const isAppReady = ref(false);
 
 // Lifecycle hooks
 onMounted(() => {
-     // Simular tiempo de carga inicial
+    // Simular tiempo de carga inicial
     setTimeout(() => {
         isAppReady.value = true;
-    }, 800); // Ajusta este tiempo según necesites
+    }, 800);
+
     // Verificar si hay bloqueos existentes al cargar el componente
     authStore.checkExistingBlock().catch(error => {
         console.error('Error al verificar bloqueo:', error);

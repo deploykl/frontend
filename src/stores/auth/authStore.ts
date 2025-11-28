@@ -322,23 +322,6 @@ export const useAuthStore = defineStore("auth", () => {
     localStorage.setItem("is_2fa_enabled", is_2fa_enabled ? "true" : "false");
     localStorage.removeItem("requires_password_change");
 
-    const redirectPath = localStorage.getItem("redirectAfterLogin");
-    
-    if (router) {
-      if (redirectPath) {
-        localStorage.removeItem("redirectAfterLogin");
-        router.push(redirectPath);
-      } else {
-        router.push("/noticias");
-      }
-    } else {
-      if (redirectPath) {
-        localStorage.removeItem("redirectAfterLogin");
-        window.location.href = redirectPath;
-      } else {
-        window.location.href = "/noticias";
-      }
-    }
   };
 
   const handleLoginError = (error: any) => {
