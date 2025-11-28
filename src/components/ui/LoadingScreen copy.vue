@@ -1,42 +1,27 @@
 <template>
     <transition name="fade" @after-leave="handleAnimationComplete">
-        <div v-if="internalShow"
-            class="fixed inset-0 z-9999 flex items-center justify-center bg-linear-to-br from-slate-900 to-indigo-900">
+        <div v-if="internalShow" class="fixed inset-0 z-9999 flex items-center justify-center bg-linear-to-br from-slate-900 to-indigo-900">
+            <!-- Canvas para el efecto Matrix -->
+            <canvas 
+                ref="matrixCanvas" 
+                class="absolute inset-0 w-full h-full pointer-events-none"
+                :style="{ opacity: 0.7 }"
+            ></canvas>
+
             <!-- Fondo animado MEJORADO -->
             <div class="absolute inset-0 overflow-hidden">
-                <div
-                    class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow">
-                </div>
-                <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse-slow"
-                    style="animation-delay: 2s;"></div>
-                <div class="absolute top-1/4 left-1/4 w-60 h-60 bg-cyan-500/5 rounded-full blur-3xl animate-pulse-slow"
-                    style="animation-delay: 4s;"></div>
-            </div>
-
-            <!-- EFECTO MATRIX - Partículas cayendo como código -->
-            <div class="absolute inset-0 pointer-events-none overflow-hidden matrix-container">
-                <div v-for="(column, colIndex) in matrixColumns" :key="colIndex" class="absolute matrix-column"
-                    :style="{ left: `${column.position}%` }">
-                    <div v-for="particle in column.particles" :key="particle.id"
-                        class="matrix-character text-green-400 font-mono text-xs opacity-80 absolute" :style="{
-                            top: `${particle.position}%`,
-                            animationDelay: `${particle.delay}s`,
-                            animationDuration: `${particle.speed}s`
-                        }">
-                        {{ particle.char }}
-                    </div>
-                </div>
+                <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+                <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
+                <div class="absolute top-1/4 left-1/4 w-60 h-60 bg-cyan-500/5 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 4s;"></div>
             </div>
 
             <!-- Contenido principal -->
             <div class="relative z-10 text-center text-white space-y-8">
                 <!-- Logo animado -->
                 <div class="relative mx-auto w-32 h-32">
-                    <div class="absolute inset-0 bg-blue-400/20 rounded-3xl transform rotate-45 animate-ping-slow">
-                    </div>
-                    <div
-                        class="absolute inset-2 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                        <i class="pi pi-shield text-blue-300 text-4xl animate-pulse"></i>
+                    <div class="absolute inset-0 bg-blue-400/20 rounded-3xl transform rotate-45 animate-ping-slow"></div>
+                    <div class="absolute inset-2 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/20 flex items-center justify-center">
+                        <i class="bi bi-shield-check text-blue-300 text-4xl animate-pulse"></i>
                     </div>
                 </div>
 
@@ -54,10 +39,10 @@
                 <div class="w-64 mx-auto space-y-4">
                     <!-- Barra de progreso -->
                     <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div class="h-full bg-linear-to-r from-blue-400 to-cyan-400 rounded-full transition-all duration-100 ease-linear"
-                            :style="{ width: progressWidth + '%' }"></div>
+                        <div class="h-full bg-linear-to-r from-blue-400 to-cyan-400 rounded-full transition-all duration-100 ease-linear" 
+                             :style="{ width: progressWidth + '%' }"></div>
                     </div>
-
+                    
                     <!-- Contador -->
                     <div class="flex justify-between items-center text-sm text-blue-200">
                         <span>Inicializando...</span>
@@ -71,18 +56,15 @@
                         <i class="pi pi-check-circle text-green-400 text-base"></i>
                         <span>Credenciales verificadas</span>
                     </div>
-                    <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger"
-                        style="animation-delay: 0.5s;">
+                    <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger" style="animation-delay: 0.5s;">
                         <i class="pi pi-cog animate-spin text-blue-300 text-base"></i>
                         <span>Cargando módulos del sistema</span>
                     </div>
-                    <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger"
-                        style="animation-delay: 1s;">
+                    <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger" style="animation-delay: 1s;">
                         <i class="pi pi-database text-cyan-400 text-base"></i>
                         <span>Conectando con base de datos</span>
                     </div>
-                    <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger"
-                        style="animation-delay: 1.5s;">
+                    <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger" style="animation-delay: 1.5s;">
                         <i class="pi pi-lock text-amber-400 text-base"></i>
                         <span>Estableciendo conexión segura</span>
                     </div>
@@ -93,7 +75,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onUnmounted, computed, onMounted } from 'vue'
+import { ref, watch, onUnmounted, computed, onMounted, nextTick } from 'vue'
 
 interface Props {
     show: boolean
@@ -101,7 +83,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    duration: 5000
+    duration: 6000
 })
 
 const emit = defineEmits<{
@@ -111,49 +93,11 @@ const emit = defineEmits<{
 const countdown = ref(Math.ceil(props.duration / 1000))
 const internalShow = ref(false)
 const elapsedTime = ref(0)
+const matrixCanvas = ref<HTMLCanvasElement | null>(null)
 
-// Sistema Matrix
-const matrixColumns = ref<Array<{
-    position: number
-    particles: Array<{
-        id: number
-        position: number
-        delay: number
-        speed: number
-        char: string
-    }>
-}>>([])
-
-// Caracteres para el efecto Matrix (código binario y símbolos)
-const matrixChars = ['0', '1', '⎨', '⎬', '⎫', '⎭', '⌇', '‖', '│', '║', '▌', '▐', '░', '▒', '▓']
-
-const initializeMatrix = () => {
-    const columns = []
-    const columnCount = 30 // Número de columnas de código
-
-    for (let i = 0; i < columnCount; i++) {
-        const particles = []
-        const particleCount = 15 + Math.floor(Math.random() * 10) // Partículas por columna
-
-        for (let j = 0; j < particleCount; j++) {
-            particles.push({
-                id: i * 100 + j,
-                position: -20 - (j * 8), // Comienzan arriba y espaciadas
-                delay: Math.random() * 5, // Delay aleatorio
-                speed: 3 + Math.random() * 4, // Velocidad variable
-                char: matrixChars[Math.floor(Math.random() * matrixChars.length)] as string
-            })
-        }
-
-        columns.push({
-            position: (i / columnCount) * 100,
-            particles
-        })
-    }
-
-    matrixColumns.value = columns
-}
-
+// Variables para el efecto Matrix
+let matrixInterval: number | null = null
+let columns: number[] = []
 let countdownInterval: number | null = null
 let startTime: number = 0
 
@@ -163,16 +107,75 @@ const progressWidth = computed(() => {
     return Math.min((elapsedTime.value / props.duration) * 100, 100)
 })
 
+// Función del efecto Matrix
+const initializeMatrix = () => {
+    if (!matrixCanvas.value) return
+    
+    const canvas = matrixCanvas.value
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+
+    // Configurar canvas para pantalla completa
+    canvas.height = window.innerHeight
+    canvas.width = window.innerWidth
+
+    // Configurar estilo del texto
+    ctx.font = '14px "Courier New", monospace'
+    ctx.textBaseline = 'top'
+
+    // Inicializar columnas
+    columns = []
+    for (let i = 0; i < 256; i++) {
+        columns[i] = 1
+    }
+
+    // Limpiar intervalo anterior si existe
+    if (matrixInterval) {
+        clearInterval(matrixInterval)
+    }
+
+    // Ejecutar efecto Matrix
+    matrixInterval = window.setInterval(() => {
+        if (!ctx) return
+
+        // Oscurecer ligeramente el canvas
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+        
+        // Color azul cyan para el texto (en lugar del verde original)
+        ctx.fillStyle = '#00ffff'
+        
+        // Para cada columna
+        columns.forEach((value, index) => {
+            // Carácter aleatorio en el rango de ideogramas CJK
+            const character = String.fromCharCode(
+                0x30A0 + Math.random() * 96 // Rango diferente para más variedad
+            )
+            
+            // Dibujar el carácter
+            ctx.fillText(
+                character, // texto
+                index * 10, // x
+                value // y
+            )
+            
+            // Desplazar hacia abajo el carácter
+            // Resetear aleatoriamente cuando llega al fondo
+            columns[index] = value > 758 + Math.random() * 1e4 ? 0 : value + 10
+        })
+    }, 33) // ~30 fps
+}
+
 const startCountdown = () => {
     console.log('🚀 LoadingScreen iniciando countdown...', props.duration, 'ms')
     startTime = Date.now()
     elapsedTime.value = 0
-
+    
     countdownInterval = window.setInterval(() => {
         const currentTime = Date.now()
         elapsedTime.value = currentTime - startTime
         countdown.value = Math.ceil((props.duration - elapsedTime.value) / 1000)
-
+        
         if (elapsedTime.value >= props.duration) {
             console.log('✅ Countdown completado, cerrando LoadingScreen...')
             cleanup()
@@ -187,9 +190,14 @@ const handleAnimationComplete = () => {
 }
 
 const cleanup = () => {
+    // Limpiar intervalos
     if (countdownInterval) {
         clearInterval(countdownInterval)
         countdownInterval = null
+    }
+    if (matrixInterval) {
+        clearInterval(matrixInterval)
+        matrixInterval = null
     }
     elapsedTime.value = 0
 }
@@ -200,25 +208,34 @@ watch(() => props.show, (newVal) => {
     if (newVal) {
         internalShow.value = true
         countdown.value = Math.ceil(props.duration / 1000)
-        // Inicializar efecto Matrix
-        initializeMatrix()
-        // Pequeño delay para asegurar que la animación se renderice
-        setTimeout(() => {
-            startCountdown()
-        }, 100)
+        
+        // Inicializar Matrix después de que el DOM se actualice
+        nextTick(() => {
+            setTimeout(() => {
+                initializeMatrix()
+                startCountdown()
+            }, 100)
+        })
     } else {
         internalShow.value = false
         cleanup()
     }
 }, { immediate: true })
 
+// Manejar resize de ventana
+const handleResize = () => {
+    if (internalShow.value && matrixCanvas.value) {
+        initializeMatrix()
+    }
+}
+
 onMounted(() => {
-    // Inicializar Matrix por si acaso
-    initializeMatrix()
+    window.addEventListener('resize', handleResize)
 })
 
 onUnmounted(() => {
     cleanup()
+    window.removeEventListener('resize', handleResize)
 })
 </script>
 
@@ -229,12 +246,10 @@ onUnmounted(() => {
         opacity: 0;
         transform: scale(0.3) translateY(100px);
     }
-
     50% {
         opacity: 1;
         transform: scale(1.05) translateY(-10px);
     }
-
     100% {
         opacity: 1;
         transform: scale(1) translateY(0);
@@ -242,90 +257,14 @@ onUnmounted(() => {
 }
 
 @keyframes ping-slow {
-
-    0%,
-    100% {
+    0%, 100% {
         transform: scale(1) rotate(45deg);
         opacity: 1;
     }
-
     50% {
         transform: scale(1.2) rotate(45deg);
         opacity: 0.5;
     }
-}
-
-/* EFECTO MATRIX - Código cayendo */
-@keyframes matrix-fall {
-    0% {
-        transform: translateY(-100px);
-        opacity: 0;
-        text-shadow: 0 0 8px #00ffff, 0 0 16px #00ffff;
-    }
-
-    5% {
-        opacity: 1;
-        text-shadow: 0 0 8px #00ffff, 0 0 16px #00ffff, 0 0 24px #00ffff;
-    }
-
-    90% {
-        opacity: 0.7;
-        text-shadow: 0 0 4px #00ffff, 0 0 8px #00ffff;
-    }
-
-    100% {
-        transform: translateY(100vh);
-        opacity: 0;
-        text-shadow: 0 0 2px #00ffff;
-    }
-}
-
-/* Efecto de brillo para los caracteres del Matrix */
-@keyframes matrix-glow {
-
-    0%,
-    100% {
-        opacity: 0.4;
-        text-shadow: 0 0 4px #00ffff;
-    }
-
-    50% {
-        opacity: 1;
-        text-shadow: 0 0 8px #00ffff, 0 0 16px #00ffff, 0 0 20px #00ffff;
-    }
-}
-
-.matrix-container {
-    background: linear-gradient(to bottom,
-            transparent 0%,
-            rgba(0, 50, 100, 0.1) 20%,
-            rgba(0, 80, 160, 0.2) 50%,
-            rgba(0, 50, 100, 0.1) 80%,
-            transparent 100%);
-}
-
-.matrix-column {
-    animation: matrix-glow 3s ease-in-out infinite;
-}
-
-.matrix-character {
-    animation: matrix-fall linear infinite;
-    font-family: 'Courier New', monospace;
-    font-weight: bold;
-    color: #00ffff;
-    text-shadow: 0 0 8px #00ffff;
-    will-change: transform, opacity;
-}
-
-/* Efecto de desvanecimiento suave para las columnas */
-.matrix-column:nth-child(odd) .matrix-character {
-    color: #00b3b3;
-    text-shadow: 0 0 6px #00b3b3;
-}
-
-.matrix-column:nth-child(3n) .matrix-character {
-    color: #008080;
-    text-shadow: 0 0 4px #008080;
 }
 
 @keyframes fade-in {
@@ -333,7 +272,6 @@ onUnmounted(() => {
         opacity: 0;
         transform: translateY(20px);
     }
-
     to {
         opacity: 1;
         transform: translateY(0);
@@ -345,7 +283,6 @@ onUnmounted(() => {
         opacity: 0;
         transform: translateX(-20px);
     }
-
     100% {
         opacity: 1;
         transform: translateX(0);

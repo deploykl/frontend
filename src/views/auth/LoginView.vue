@@ -24,12 +24,13 @@
     </div>
 
     <!-- Loading Screen después del login - SOLO CUANDO NO HAY 2FA -->
-    <LoadingScreen 
-        v-if="showLoadingScreen && !authStore.show2FA"
-        :show="true"
-        :duration="6000"
-        @complete="handleLoadingComplete"
-    />
+<LoadingScreen 
+    v-if="showLoadingScreen && !authStore.show2FA"
+    :show="true"
+    :duration="6000"
+    :theme="currentTheme" 
+    @complete="handleLoadingComplete"
+/>
 
     <!-- Contenido principal del login -->
     <div v-else-if="isAppReady"
@@ -243,7 +244,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from "vue";
+import { onMounted, onUnmounted, ref, computed } from "vue";  
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth/authStore";
 import { useErrorStore } from "@/stores/errors/errorStore";
@@ -265,9 +266,10 @@ const showLoadingScreen = ref(false);
 const projectName = import.meta.env.VITE_PROJECT_NAME || "Sistema";
 const version = import.meta.env.VITE_VERSION || "1.0.0";
 
-/**
- * Maneja el proceso de login
- */
+const currentTheme = computed(() => {
+    // Verificar si el elemento html tiene la clase 'dark'
+    return document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+});
 const handleLogin = async (): Promise<void> => {
     if (authStore.isBlocked) {
         errorStore.showMessage('La cuenta está bloqueada temporalmente', 'warning');

@@ -1,27 +1,38 @@
 <template>
     <transition name="fade" @after-leave="handleAnimationComplete">
-        <div v-if="internalShow" class="fixed inset-0 z-9999 flex items-center justify-center bg-linear-to-br from-slate-900 to-indigo-900">
+        <div v-if="internalShow" 
+             class="fixed inset-0 z-9999 flex items-center justify-center"
+             :class="themeClasses.background">
             <!-- Canvas para el efecto Matrix -->
             <canvas 
                 ref="matrixCanvas" 
                 class="absolute inset-0 w-full h-full pointer-events-none"
-                :style="{ opacity: 0.7 }"
+                :style="{ opacity: theme === 'dark' ? 0.7 : 0.5 }"
             ></canvas>
 
             <!-- Fondo animado MEJORADO -->
             <div class="absolute inset-0 overflow-hidden">
-                <div class="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
-                <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 2s;"></div>
-                <div class="absolute top-1/4 left-1/4 w-60 h-60 bg-cyan-500/5 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 4s;"></div>
+                <div class="absolute -top-40 -right-40 w-80 h-80 rounded-full blur-3xl animate-pulse-slow"
+                     :class="themeClasses.orb1"></div>
+                <div class="absolute -bottom-40 -left-40 w-80 h-80 rounded-full blur-3xl animate-pulse-slow" 
+                     :class="themeClasses.orb2"
+                     style="animation-delay: 2s;"></div>
+                <div class="absolute top-1/4 left-1/4 w-60 h-60 rounded-full blur-3xl animate-pulse-slow" 
+                     :class="themeClasses.orb3"
+                     style="animation-delay: 4s;"></div>
             </div>
 
             <!-- Contenido principal -->
-            <div class="relative z-10 text-center text-white space-y-8">
+            <div class="relative z-10 text-center space-y-8"
+                 :class="themeClasses.text">
                 <!-- Logo animado -->
                 <div class="relative mx-auto w-32 h-32">
-                    <div class="absolute inset-0 bg-blue-400/20 rounded-3xl transform rotate-45 animate-ping-slow"></div>
-                    <div class="absolute inset-2 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                        <i class="bi bi-shield-check text-blue-300 text-4xl animate-pulse"></i>
+                    <div class="absolute inset-0 rounded-3xl transform rotate-45 animate-ping-slow"
+                         :class="themeClasses.logoBg"></div>
+                    <div class="absolute inset-2 rounded-2xl backdrop-blur-sm border flex items-center justify-center"
+                         :class="themeClasses.logoBorder">
+                        <i class="bi bi-shield-check text-4xl animate-pulse"
+                           :class="themeClasses.logoIcon"></i>
                     </div>
                 </div>
 
@@ -30,7 +41,8 @@
                     <h1 class="text-4xl md:text-5xl font-black tracking-tight animate-bounce-in">
                         INGRESANDO AL SISTEMA
                     </h1>
-                    <p class="text-xl text-blue-200 font-light animate-fade-in-delay">
+                    <p class="text-xl font-light animate-fade-in-delay"
+                       :class="themeClasses.subtitle">
                         Preparando tu experiencia personalizada
                     </p>
                 </div>
@@ -38,34 +50,42 @@
                 <!-- Indicador de progreso -->
                 <div class="w-64 mx-auto space-y-4">
                     <!-- Barra de progreso -->
-                    <div class="w-full h-2 bg-white/10 rounded-full overflow-hidden">
-                        <div class="h-full bg-linear-to-r from-blue-400 to-cyan-400 rounded-full transition-all duration-100 ease-linear" 
+                    <div class="w-full h-2 rounded-full overflow-hidden"
+                         :class="themeClasses.progressBg">
+                        <div class="h-full rounded-full transition-all duration-100 ease-linear" 
+                             :class="themeClasses.progressBar"
                              :style="{ width: progressWidth + '%' }"></div>
                     </div>
                     
                     <!-- Contador -->
-                    <div class="flex justify-between items-center text-sm text-blue-200">
+                    <div class="flex justify-between items-center text-sm"
+                         :class="themeClasses.counter">
                         <span>Inicializando...</span>
-                        <span class="font-mono font-bold text-cyan-300">{{ countdown }}s</span>
+                        <span class="font-mono font-bold">{{ countdown }}s</span>
                     </div>
                 </div>
 
                 <!-- Mensajes de estado -->
-                <div class="space-y-2 text-blue-200 text-sm">
+                <div class="space-y-2 text-sm"
+                     :class="themeClasses.status">
                     <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger">
-                        <i class="pi pi-check-circle text-green-400 text-base"></i>
+                        <i class="pi pi-check-circle text-base"
+                           :class="themeClasses.statusIcon1"></i>
                         <span>Credenciales verificadas</span>
                     </div>
                     <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger" style="animation-delay: 0.5s;">
-                        <i class="pi pi-cog animate-spin text-blue-300 text-base"></i>
+                        <i class="pi pi-cog animate-spin text-base"
+                           :class="themeClasses.statusIcon2"></i>
                         <span>Cargando módulos del sistema</span>
                     </div>
                     <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger" style="animation-delay: 1s;">
-                        <i class="pi pi-database text-cyan-400 text-base"></i>
+                        <i class="pi pi-database text-base"
+                           :class="themeClasses.statusIcon3"></i>
                         <span>Conectando con base de datos</span>
                     </div>
                     <div class="flex items-center justify-center space-x-2 animate-fade-in-stagger" style="animation-delay: 1.5s;">
-                        <i class="pi pi-lock text-amber-400 text-base"></i>
+                        <i class="pi pi-lock text-base"
+                           :class="themeClasses.statusIcon4"></i>
                         <span>Estableciendo conexión segura</span>
                     </div>
                 </div>
@@ -80,10 +100,12 @@ import { ref, watch, onUnmounted, computed, onMounted, nextTick } from 'vue'
 interface Props {
     show: boolean
     duration?: number
+    theme?: 'dark' | 'light' // Nueva prop para el tema
 }
 
 const props = withDefaults(defineProps<Props>(), {
-    duration: 6000
+    duration: 6000,
+    theme: 'dark'
 })
 
 const emit = defineEmits<{
@@ -107,7 +129,52 @@ const progressWidth = computed(() => {
     return Math.min((elapsedTime.value / props.duration) * 100, 100)
 })
 
-// Función del efecto Matrix
+// Clases dinámicas según el tema
+const themeClasses = computed(() => {
+    if (props.theme === 'light') {
+        return {
+            background: 'bg-linear-to-br from-slate-100 to-blue-50',
+            text: 'text-slate-800',
+            subtitle: 'text-blue-600',
+            orb1: 'bg-blue-200/40',
+            orb2: 'bg-indigo-200/40',
+            orb3: 'bg-cyan-100/30',
+            logoBg: 'bg-blue-300/30',
+            logoBorder: 'bg-white/80 border-slate-200',
+            logoIcon: 'text-blue-500',
+            progressBg: 'bg-slate-200',
+            progressBar: 'bg-linear-to-r from-blue-500 to-cyan-500',
+            counter: 'text-slate-600',
+            status: 'text-slate-700',
+            statusIcon1: 'text-green-500',
+            statusIcon2: 'text-blue-500',
+            statusIcon3: 'text-cyan-500',
+            statusIcon4: 'text-amber-500'
+        }
+    } else {
+        return {
+            background: 'bg-linear-to-br from-slate-900 to-indigo-900',
+            text: 'text-white',
+            subtitle: 'text-blue-200',
+            orb1: 'bg-blue-500/10',
+            orb2: 'bg-indigo-500/10',
+            orb3: 'bg-cyan-500/5',
+            logoBg: 'bg-blue-400/20',
+            logoBorder: 'bg-white/5 border-white/20',
+            logoIcon: 'text-blue-300',
+            progressBg: 'bg-white/10',
+            progressBar: 'bg-linear-to-r from-blue-400 to-cyan-400',
+            counter: 'text-blue-200',
+            status: 'text-blue-200',
+            statusIcon1: 'text-green-400',
+            statusIcon2: 'text-blue-300',
+            statusIcon3: 'text-cyan-400',
+            statusIcon4: 'text-amber-400'
+        }
+    }
+})
+
+// Función del efecto Matrix adaptada al tema
 const initializeMatrix = () => {
     if (!matrixCanvas.value) return
     
@@ -134,16 +201,16 @@ const initializeMatrix = () => {
         clearInterval(matrixInterval)
     }
 
-    // Ejecutar efecto Matrix
+    // Ejecutar efecto Matrix con colores según el tema
     matrixInterval = window.setInterval(() => {
         if (!ctx) return
 
         // Oscurecer ligeramente el canvas
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'
+        ctx.fillStyle = props.theme === 'dark' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
         
-        // Color azul cyan para el texto (en lugar del verde original)
-        ctx.fillStyle = '#00ffff'
+        // Color según el tema
+        ctx.fillStyle = props.theme === 'dark' ? '#00ffff' : '#0066cc'
         
         // Para cada columna
         columns.forEach((value, index) => {
@@ -221,6 +288,13 @@ watch(() => props.show, (newVal) => {
         cleanup()
     }
 }, { immediate: true })
+
+// Observar cambios en el tema para reiniciar el efecto Matrix
+watch(() => props.theme, () => {
+    if (internalShow.value) {
+        initializeMatrix()
+    }
+})
 
 // Manejar resize de ventana
 const handleResize = () => {
