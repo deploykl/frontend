@@ -6,450 +6,420 @@
             @confirm="handleSubmit">
             <template #content>
                 <form @submit.prevent="handleSubmit" class="needs-validation" novalidate>
-                    <!-- Pestañas para organizar la información -->
-                    <div class="mb-5">
-                        <ul class="nav nav-tabs" id="personalTabs" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="basic-tab" data-bs-toggle="tab"
-                                    data-bs-target="#basic" type="button" role="tab" aria-controls="basic"
-                                    aria-selected="true">Información General</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="contract-tab" data-bs-toggle="tab"
-                                    data-bs-target="#contract" type="button" role="tab" aria-controls="contract"
-                                    aria-selected="false">Datos Laborales</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="emergency-tab" data-bs-toggle="tab"
-                                    data-bs-target="#emergency" type="button" role="tab" aria-controls="emergency"
-                                    aria-selected="false">Emergencia</button>
-                            </li>
-                        </ul>
+                    <!-- Pestañas PrimeVue CORREGIDAS -->
+                    <div class="mb-4">
+                        <!-- CAMBIO AQUÍ: Usar Tabs en lugar de TabView -->
+                        <Tabs value="0" class="custom-tabs">
+                            <TabList>
+                                <Tab value="0">Información General</Tab>
+                                <Tab value="1">Datos Laborales</Tab>
+                                <Tab value="2">Emergencia</Tab>
+                            </TabList>
+                            <TabPanels>
+    <!-- Información General -->
+    <TabPanel value="0">
+        <div class="grid grid-cols-4 gap-4 mt-3">
+            <!-- Columna 1 -->
+            <div class="space-y-3">
+                <!-- Nombre -->
+                <div class="h-20">
+                    <FloatInput id="nombre" label="Nombres" v-model="form.nombre" icon="pi pi-user"
+                        :errors="errors" :invalid="!!errors.nombre" size="small" required
+                        @input="convertToUppercase('nombre')" />
+                </div>
+                <!-- Email -->
+                <div class="h-20">
+                    <FloatInput id="email" label="Email Institucional" v-model="form.email"
+                        type="email" icon="pi pi-envelope" :invalid="!!errors.email"
+                        :errors="errors" size="small" />
+                </div>
+                <!-- Fecha de Nacimiento -->
+                <div class="h-20">
+                    <FloatLabel>
+                        <label for="fecha_nac" class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                            <i class="pi pi-calendar mr-2"></i>
+                            Fecha de Nacimiento
+                        </label>
+                        <DatePicker v-model="form.fecha_nac" id="fecha_nac" :showIcon="true"
+                            class="w-full" size="small" :class="{ 'p-invalid': !!errors.fecha_nac }"
+                            inputId="fecha_nac" :showClear="true" />
+                    </FloatLabel>
+                    <div v-if="errors.fecha_nac" class="p-error text-sm mt-1">
+                        {{ errors.fecha_nac[0] }}
                     </div>
-
-                    <div class="tab-content" id="personalTabsContent">
-                        <!-- Pestaña de Información Básica -->
-                        <div class="tab-pane fade show active" id="basic" role="tabpanel" aria-labelledby="basic-tab">
-                            <div class="row g-3">
-                                <!-- Columna 1 -->
-                                <div class="col-md-3">
-
-                                    <!-- Nombre -->
-                                    <div class="mb-3">
-                                        <FloatInput id="nombre" label="Nombres" v-model="form.nombre" icon="pi pi-user"
-                                            :errors="errors" :invalid="!!errors.nombre" size="small" required
-                                            @input="convertToUppercase('nombre')" />
-                                    </div>
-                                    <!-- Email -->
-                                    <div class="mb-3">
-                                        <FloatInput id="email" label="Email Institucional" v-model="form.email"
-                                            type="email" icon="pi pi-envelope" :invalid="!!errors.email"
-                                            :errors="errors" size="small" />
-                                    </div>
-
-                                    <div class="mb-3">
-                                        <FloatLabel>
-                                            <label for="fecha_nac" class="form-label" style="font-size: 0.8rem;">
-                                                <i class="pi pi-calendar me-2"></i>
-                                                Fecha de Nacimiento
-                                            </label>
-                                            <DatePicker v-model="form.fecha_nac" id="fecha_nac" :showIcon="false"
-                                                class="w-100" size="small" :class="{ 'is-invalid': !!errors.fecha_nac }"
-                                                inputId="fecha_nac" :showClear="true" />
-                                        </FloatLabel>
-
-                                        <div v-if="errors.fecha_nac" class="invalid-feedback d-block">
-                                            {{ errors.fecha_nac[0] }}
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- Columna 2 -->
-                                <div class="col-md-3">
-                                    <!-- Apellido -->
-                                    <div class="mb-3">
-                                        <FloatInput id="apellido" label="Apellidos" v-model="form.apellido"
-                                            icon="pi pi-user" :invalid="!!errors.apellido" :errors="errors" size="small"
-                                            required @input="convertToUppercase('apellido')" />
-                                    </div>
-
-                                    <!-- Email personal -->
-                                    <div class="mb-3">
-                                        <FloatInput id="email_per" label="Email Personal" v-model="form.email_per"
-                                            type="email" icon="pi pi-envelope" :invalid="!!errors.email_per"
-                                            :errors="errors" size="small" />
-                                    </div>
-                                    <!-- Sexo -->
-                                    <div class="mb-5">
-                                        <Dropdown id="sexo" v-model="form.sexo" :options="sexoOptions"
-                                            optionLabel="label" optionValue="value" placeholder="Seleccionar género"
-                                            :class="{ 'p-invalid': !!errors.sexo }" class="w-100" size="small"
-                                            :showClear="true">
-                                            <template #option="slotProps">
-                                                <div class="flex align-items-center">
-                                                    <i :class="slotProps.option.value === 'M' ? 'pi pi-mars text-primary' : 'pi pi-venus text-danger'"
-                                                        style="font-size: 1rem; margin-right: 8px;"></i>
-                                                    <span>{{ slotProps.option.label }}</span>
-                                                </div>
-                                            </template>
-                                            <template #value="slotProps">
-                                                <div v-if="slotProps.value" class="flex align-items-center">
-                                                    <i :class="slotProps.value === 'M' ? 'pi pi-mars text-primary' : 'pi pi-venus text-danger'"
-                                                        style="font-size: 1rem; margin-right: 8px;"></i>
-                                                    <span>{{ slotProps.value === 'M' ? 'Masculino' : 'Femenino'
-                                                        }}</span>
-                                                </div>
-                                                <span v-else>
-                                                    {{ slotProps.placeholder }}
-                                                </span>
-                                            </template>
-                                        </Dropdown>
-                                        <small v-if="errors.sexo" class="p-error">
-                                            {{ errors.sexo[0] }}
-                                        </small>
-                                    </div>
-
-
-                                </div>
-                                <!-- Columna 3 -->
-                                <div class="col-md-3">
-                                    <!-- DNI -->
-                                    <div class="mb-3">
-                                        <FloatInput id="dni" label="DNI" v-model="form.dni" icon="pi pi-id-card"
-                                            :errors="errors" :invalid="!!errors.dni" size="small" type="tel" required
-                                            maxlength="8" @input="onlyNumbersDNI" />
-                                    </div>
-
-                                    <!-- Celular -->
-                                    <div class="mb-1">
-                                        <FloatInput id="celular" label="Celular" v-model="form.celular"
-                                            icon="pi pi-mobile" :invalid="!!errors.celular" :errors="errors"
-                                            size="small" maxlength="9" @input="onlyNumbersCelular" />
-                                    </div>
-
-                                    <!-- Es Padre / Madre -->
-                                    <div class="mb-2">
-                                        <Dropdown id="padre_madre" v-model="form.padre_madre" :options="opcionesSiNo"
-                                            optionLabel="label" optionValue="value" placeholder="Es Padre / Madre"
-                                            :class="{ 'p-invalid': !!errors.padre_madre }" class="w-100" size="small"
-                                            :showClear="true" @change="handlePadreMadreChange">
-                                        </Dropdown>
-                                        <small v-if="errors.padre_madre" class="p-error">
-                                            {{ errors.padre_madre[0] }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <!-- Columna 4 -->
-                                <div class="col-md-3">
-
-                                    <!-- RUC -->
-                                    <div class="mb-3">
-                                        <FloatInput id="ruc" label="RUC" v-model="form.ruc"
-                                            icon="bi bi-person-badge-fill" :errors="errors" :invalid="!!errors.ruc"
-                                            size="small" maxlength="11" @input="onlyNumbersRUC" />
-                                    </div>
-                                    <!-- Teléfono -->
-                                    <div class="mb-1">
-                                        <FloatInput id="telefono" label="Teléfono" v-model="form.telefono"
-                                            icon="pi pi-phone" :invalid="!!errors.telefono" :errors="errors"
-                                            size="small" maxlength="8" @input="onlyNumbersTelefono"
-                                            placeholder="123-4567" />
-                                    </div>
-
-                                    <!-- Número de hijos (siempre visible pero desactivado cuando no es padre/madre) -->
-                                    <div class="mb-3">
-                                        <Dropdown id="n_hijos" v-model="form.n_hijos" :options="hijosOptions"
-                                            optionLabel="label" optionValue="value"
-                                            :placeholder="form.padre_madre === 'Si' ? 'N° de hijos' : 'N° de hijos'"
-                                            :class="{ 'p-invalid': !!errors.n_hijos, 'disabled-field': form.padre_madre !== 'Si' }"
-                                            class="w-100" size="small" :disabled="form.padre_madre !== 'Si'"
-                                            :showClear="true" />
-                                        <small v-if="errors.n_hijos" class="p-error">
-                                            {{ errors.n_hijos[0] }}
-                                        </small>
-                                    </div>
-                                </div>
+                </div>
+            </div>
+            
+            <!-- Columna 2 -->
+            <div class="space-y-3">
+                <!-- Apellido -->
+                <div class="h-20">
+                    <FloatInput id="apellido" label="Apellidos" v-model="form.apellido"
+                        icon="pi pi-user" :invalid="!!errors.apellido" :errors="errors" size="small"
+                        required @input="convertToUppercase('apellido')" />
+                </div>
+                <!-- Email personal -->
+                <div class="h-20">
+                    <FloatInput id="email_per" label="Email Personal" v-model="form.email_per"
+                        type="email" icon="pi pi-envelope" :invalid="!!errors.email_per"
+                        :errors="errors" size="small" />
+                </div>
+                <!-- Sexo -->
+                <div class="h-20">
+                    <label class="text-sm font-medium text-gray-700 block mb-2">Género</label>
+                    <Dropdown id="sexo" v-model="form.sexo" :options="sexoOptions"
+                        optionLabel="label" optionValue="value" placeholder="Seleccionar género"
+                        :class="{ 'p-invalid': !!errors.sexo }" class="w-full" size="small"
+                        :showClear="true">
+                        <template #option="slotProps">
+                            <div class="flex items-center">
+                                <i :class="slotProps.option.value === 'M' ? 'pi pi-mars text-blue-500' : 'pi pi-venus text-pink-500'"
+                                    class="text-base mr-2"></i>
+                                <span>{{ slotProps.option.label }}</span>
                             </div>
-
-                            <div class="row g-3">
-                                <div class="col-md-8">
-                                    <!-- Dirección -->
-                                    <div class="mb-3">
-                                        <FloatInput id="direccion" label="Dirección" v-model="form.direccion"
-                                            icon="pi pi-map-marker" :invalid="!!errors.direccion" :errors="errors"
-                                            size="small" />
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <!-- Distrito -->
-                                    <div class="mb-3">
-                                        <Dropdown id="distrito" v-model="form.distrito" :options="distritosLima"
-                                            optionLabel="label" optionValue="value" placeholder="Seleccione distrito"
-                                            :class="{ 'p-invalid': !!errors.distrito }" class="w-100" size="small"
-                                            :filter="true" filterPlaceholder="Buscar distrito..." :showClear="true" />
-                                        <small v-if="errors.distrito" class="p-error">
-                                            {{ errors.distrito[0] }}
-                                        </small>
-                                    </div>
-                                </div>
+                        </template>
+                        <template #value="slotProps">
+                            <div v-if="slotProps.value" class="flex items-center">
+                                <i :class="slotProps.value === 'M' ? 'pi pi-mars text-blue-500' : 'pi pi-venus text-pink-500'"
+                                    class="text-base mr-2"></i>
+                                <span>{{ slotProps.value === 'M' ? 'Masculino' : 'Femenino' }}</span>
                             </div>
-                        </div>
+                            <span v-else>
+                                {{ slotProps.placeholder }}
+                            </span>
+                        </template>
+                    </Dropdown>
+                    <small v-if="errors.sexo" class="p-error text-sm mt-1 block">
+                        {{ errors.sexo[0] }}
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Columna 3 -->
+            <div class="space-y-3">
+                <!-- DNI -->
+                <div class="h-20">
+                    <FloatInput id="dni" label="DNI" v-model="form.dni" icon="pi pi-id-card"
+                        :errors="errors" :invalid="!!errors.dni" size="small" type="tel" required
+                        maxlength="8" @input="onlyNumbersDNI" />
+                </div>
+                <!-- Celular -->
+                <div class="h-20">
+                    <FloatInput id="celular" label="Celular" v-model="form.celular"
+                        icon="pi pi-mobile" :invalid="!!errors.celular" :errors="errors"
+                        size="small" maxlength="9" @input="onlyNumbersCelular" />
+                </div>
+                <!-- Es Padre / Madre -->
+                <div class="h-20">
+                    <label class="text-sm font-medium text-gray-700 block mb-2">Es Padre / Madre</label>
+                    <Dropdown id="padre_madre" v-model="form.padre_madre" :options="opcionesSiNo"
+                        optionLabel="label" optionValue="value" placeholder="Seleccionar"
+                        :class="{ 'p-invalid': !!errors.padre_madre }" class="w-full" size="small"
+                        :showClear="true" @change="handlePadreMadreChange">
+                    </Dropdown>
+                    <small v-if="errors.padre_madre" class="p-error text-sm mt-1 block">
+                        {{ errors.padre_madre[0] }}
+                    </small>
+                </div>
+            </div>
+            
+            <!-- Columna 4 -->
+            <div class="space-y-3">
+                <!-- RUC -->
+                <div class="h-20">
+                    <FloatInput id="ruc" label="RUC" v-model="form.ruc"
+                        icon="pi pi-id-card" :errors="errors" :invalid="!!errors.ruc"
+                        size="small" maxlength="11" @input="onlyNumbersRUC" />
+                </div>
+                <!-- Teléfono -->
+                <div class="h-20">
+                    <FloatInput id="telefono" label="Teléfono" v-model="form.telefono"
+                        icon="pi pi-phone" :invalid="!!errors.telefono" :errors="errors"
+                        size="small" maxlength="8" @input="onlyNumbersTelefono"
+                        placeholder="123-4567" />
+                </div>
+                <!-- Número de hijos -->
+                <div class="h-20">
+                    <label class="text-sm font-medium text-gray-700 block mb-2">N° de hijos</label>
+                    <Dropdown id="n_hijos" v-model="form.n_hijos" :options="hijosOptions"
+                        optionLabel="label" optionValue="value" placeholder="Seleccionar"
+                        :class="{ 'p-invalid': !!errors.n_hijos, 'opacity-50': form.padre_madre !== 'Si' }"
+                        class="w-full" size="small" :disabled="form.padre_madre !== 'Si'"
+                        :showClear="true" />
+                    <small v-if="errors.n_hijos" class="p-error text-sm mt-1 block">
+                        {{ errors.n_hijos[0] }}
+                    </small>
+                </div>
+            </div>
+        </div>
 
-                        <!-- Pestaña de Datos Laborales -->
-                        <div class="tab-pane fade" id="contract" role="tabpanel" aria-labelledby="contract-tab">
-                            <div class="row g-3">
-                                <!-- Columna 1 -->
-                                <div class="col-md-4">
-                                    <!-- Dependencia -->
-                                    <div class="mb-5">
-                                        <small for="dependencia" class="form-label">
-                                            <i class="pi pi-sitemap me-2"></i> <!-- Icono de organización -->
-                                            Dependencia
-                                        </small>
-                                        <Dropdown id="dependencia" v-model="form.dependencia"
-                                            :options="dependenciasOptions" optionLabel="nombre" optionValue="id"
-                                            placeholder="Seleccionar dependencia"
-                                            :class="{ 'p-invalid': !!errors.dependencia }" class="w-100"
-                                            :showClear="true" size="small" />
-                                        <small v-if="errors.dependencia" class="p-error">
-                                            {{ errors.dependencia[0] }}
-                                        </small>
-                                    </div>
-                                    <!-- Fecha de inicio -->
-                                    <div class="mb-3">
-                                        <FloatLabel>
-                                            <label for="fecha_inicio" class="form-label" style="font-size: 0.8rem;">
-                                                <i class="pi pi-calendar-plus me-2"></i>
-                                                <!-- Icono de calendario con plus -->
-                                                Fecha de Inicio
-                                            </label>
-                                            <DatePicker v-model="form.fecha_inicio" id="fecha_inicio"
-                                                dateFormat="dd/mm/yy" :showIcon="false" class="w-100"
-                                                :class="{ 'is-invalid': !!errors.fecha_inicio }" inputId="fecha_inicio"
-                                                :showClear="true" />
-                                        </FloatLabel>
+        <div class="grid grid-cols-3 gap-4 mt-4">
+            <div class="col-span-2">
+                <!-- Dirección -->
+                <div>
+                    <FloatInput id="direccion" label="Dirección" v-model="form.direccion"
+                        icon="pi pi-map-marker" :invalid="!!errors.direccion" :errors="errors"
+                        size="small" />
+                </div>
+            </div>
+            <div>
+                <!-- Distrito -->
+                <div>
+                    <label class="text-sm font-medium text-gray-700 block mb-2">Distrito</label>
+                    <Dropdown id="distrito" v-model="form.distrito" :options="distritosLima"
+                        optionLabel="label" optionValue="value" placeholder="Seleccionar distrito"
+                        :class="{ 'p-invalid': !!errors.distrito }" class="w-full" size="small"
+                        :filter="true" filterPlaceholder="Buscar distrito..." :showClear="true" />
+                    <small v-if="errors.distrito" class="p-error text-sm mt-1 block">
+                        {{ errors.distrito[0] }}
+                    </small>
+                </div>
+            </div>
+        </div>
+    </TabPanel>
 
-                                        <div v-if="errors.fecha_inicio" class="invalid-feedback d-block">
-                                            {{ errors.fecha_inicio[0] }}
-                                        </div>
-                                    </div>
-                                    <!-- Estado -->
-                                    <div class="mb-3">
-                                        <small for="estado" class="form-label">
-                                            <i class="pi pi-info-circle me-2"></i> <!-- Icono de información -->
-                                            Estado
-                                        </small>
-                                        <Dropdown id="estado" v-model="form.estado" :options="estadoOptions"
-                                            optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado"
-                                            :class="{ 'p-invalid': !!errors.estado }" class="w-100" :showClear="true"
-                                            size="small" />
-                                        <small v-if="errors.estado" class="p-error">
-                                            {{ errors.estado[0] }}
-                                        </small>
-                                    </div>
-                                    <!-- Grupo Ocupacional -->
-                                    <div class="mb-3">
-                                        <small for="grupo_ocupacional" class="form-label">
-                                            <i class="pi pi-briefcase me-2"></i> <!-- Icono de maletín -->
-                                            Grupo Ocupacional
-                                        </small>
-                                        <Dropdown id="grupo_ocupacional" v-model="form.grupo_ocupacional"
-                                            :options="grupoOcupacionalOptions" optionLabel="nombre" optionValue="id"
-                                            placeholder="Seleccionar grupo ocupacional"
-                                            :class="{ 'p-invalid': !!errors.grupo_ocupacional }" class="w-100"
-                                            :showClear="true" size="small" />
-                                        <small v-if="errors.grupo_ocupacional" class="p-error">
-                                            {{ errors.grupo_ocupacional[0] }}
-                                        </small>
-                                    </div>
-                                    <!-- Nivel -->
-                                    <div class="mb-3">
-                                        <small for="nivel" class="form-label">
-                                            <i class="pi pi-sort-alt me-2"></i> <!-- Icono de niveles -->
-                                            Nivel
-                                        </small>
-                                        <Dropdown id="nivel" v-model="form.nivel" :options="nivelOptions"
-                                            optionLabel="name" optionValue="id" placeholder="Seleccionar nivel"
-                                            :class="{ 'p-invalid': !!errors.nivel }" class="w-100" :showClear="true"
-                                            size="small" />
-                                        <small v-if="errors.nivel" class="p-error">
-                                            {{ errors.nivel[0] }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <!-- Columna 2 -->
-                                <div class="col-md-4">
-                                    <!-- Área (dependiente de la dependencia) -->
-                                    <div class="mb-5">
-                                        <small for="area" class="form-label">
-                                            <i class="pi pi-building me-2"></i> <!-- Icono de edificio -->
-                                            Área
-                                        </small>
-                                        <Dropdown id="area" v-model="form.area" :options="areasOptions"
-                                            optionLabel="nombre" optionValue="id" placeholder="Seleccionar área"
-                                            :disabled="!form.dependencia || personalStore.loading"
-                                            :class="{ 'p-invalid': !!errors.area }" class="w-100 " :showClear="true"
-                                            size="small" />
-                                        <small v-if="errors.area" class="p-error">
-                                            {{ errors.area[0] }}
-                                        </small>
+    <!-- Datos Laborales -->
+    <TabPanel value="1">
+        <div class="grid grid-cols-3 gap-6 mt-3">
+            <!-- Columna 1 -->
+            <div class="space-y-4">
+                <!-- Dependencia -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-sitemap mr-2"></i>
+                        Dependencia
+                    </label>
+                    <Dropdown id="dependencia" v-model="form.dependencia"
+                        :options="dependenciasOptions" optionLabel="nombre" optionValue="id"
+                        placeholder="Seleccionar dependencia"
+                        :class="{ 'p-invalid': !!errors.dependencia }" class="w-full"
+                        :showClear="true" size="small" />
+                    <small v-if="errors.dependencia" class="p-error text-sm mt-1 block">
+                        {{ errors.dependencia[0] }}
+                    </small>
+                </div>
+                <!-- Fecha de inicio -->
+                <div class="h-24">
+                    <FloatLabel>
+                        <label for="fecha_inicio" class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                            <i class="pi pi-calendar-plus mr-2"></i>
+                            Fecha de Inicio
+                        </label>
+                        <DatePicker v-model="form.fecha_inicio" id="fecha_inicio"
+                            dateFormat="dd/mm/yy" :showIcon="true" class="w-full"
+                            :class="{ 'p-invalid': !!errors.fecha_inicio }" inputId="fecha_inicio"
+                            :showClear="true" />
+                    </FloatLabel>
+                    <div v-if="errors.fecha_inicio" class="p-error text-sm mt-1">
+                        {{ errors.fecha_inicio[0] }}
+                    </div>
+                </div>
+                <!-- Estado -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-info-circle mr-2"></i>
+                        Estado
+                    </label>
+                    <Dropdown id="estado" v-model="form.estado" :options="estadoOptions"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar estado"
+                        :class="{ 'p-invalid': !!errors.estado }" class="w-full" :showClear="true"
+                        size="small" />
+                    <small v-if="errors.estado" class="p-error text-sm mt-1 block">
+                        {{ errors.estado[0] }}
+                    </small>
+                </div>
+                <!-- Grupo Ocupacional -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-briefcase mr-2"></i>
+                        Grupo Ocupacional
+                    </label>
+                    <Dropdown id="grupo_ocupacional" v-model="form.grupo_ocupacional"
+                        :options="grupoOcupacionalOptions" optionLabel="nombre" optionValue="id"
+                        placeholder="Seleccionar grupo ocupacional"
+                        :class="{ 'p-invalid': !!errors.grupo_ocupacional }" class="w-full"
+                        :showClear="true" size="small" />
+                    <small v-if="errors.grupo_ocupacional" class="p-error text-sm mt-1 block">
+                        {{ errors.grupo_ocupacional[0] }}
+                    </small>
+                </div>
+                <!-- Nivel -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-sort-alt mr-2"></i>
+                        Nivel
+                    </label>
+                    <Dropdown id="nivel" v-model="form.nivel" :options="nivelOptions"
+                        optionLabel="name" optionValue="id" placeholder="Seleccionar nivel"
+                        :class="{ 'p-invalid': !!errors.nivel }" class="w-full" :showClear="true"
+                        size="small" />
+                    <small v-if="errors.nivel" class="p-error text-sm mt-1 block">
+                        {{ errors.nivel[0] }}
+                    </small>
+                </div>
+            </div>
+            <!-- Columna 2 -->
+            <div class="space-y-4">
+                <!-- Área -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-building mr-2"></i>
+                        Área
+                    </label>
+                    <Dropdown id="area" v-model="form.area" :options="areasOptions"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar área"
+                        :disabled="!form.dependencia || personalStore.loading"
+                        :class="{ 'p-invalid': !!errors.area }" class="w-full" :showClear="true"
+                        size="small" />
+                    <small v-if="errors.area" class="p-error text-sm mt-1 block">
+                        {{ errors.area[0] }}
+                    </small>
+                    <small v-if="personalStore.loading" class="text-blue-500 text-sm mt-1 block">
+                        <i class="pi pi-spinner pi-spin mr-1"></i> Cargando áreas...
+                    </small>
+                </div>
+                <!-- Fecha de fin -->
+                <div class="h-24">
+                    <FloatLabel>
+                        <label for="fecha_fin" class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                            <i class="pi pi-calendar-minus mr-2"></i>
+                            Fecha de Fin
+                        </label>
+                        <DatePicker v-model="form.fecha_fin" id="fecha_fin" dateFormat="dd/mm/yy"
+                            :showIcon="true" class="w-full"
+                            :class="{ 'p-invalid': !!errors.fecha_fin }" inputId="fecha_fin"
+                            :showClear="true" />
+                    </FloatLabel>
+                    <div v-if="errors.fecha_fin" class="p-error text-sm mt-1">
+                        {{ errors.fecha_fin[0] }}
+                    </div>
+                </div>
+                <!-- Cargo -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-id-card mr-2"></i>
+                        Cargo
+                    </label>
+                    <Dropdown id="cargo" v-model="form.cargo" :options="cargoOptions"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar cargo"
+                        :class="{ 'p-invalid': !!errors.cargo }" class="w-full" :filter="true"
+                        filterPlaceholder="Buscar cargo..." :showClear="true" size="small" />
+                    <small v-if="errors.cargo" class="p-error text-sm mt-1 block">
+                        {{ errors.cargo[0] }}
+                    </small>
+                </div>
+                <!-- Genérica -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-tags mr-2"></i>
+                        Genérica
+                    </label>
+                    <Dropdown id="generica" v-model="form.generica" :options="genericaOptions"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar genérica"
+                        :class="{ 'p-invalid': !!errors.generica }" class="w-full"
+                        :showClear="true" size="small" />
+                    <small v-if="errors.generica" class="p-error text-sm mt-1 block">
+                        {{ errors.generica[0] }}
+                    </small>
+                </div>
+                <!-- Régimen -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-sliders-h mr-2"></i>
+                        Régimen
+                    </label>
+                    <Dropdown id="regimen" v-model="form.regimen" :options="regimenOptions"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar régimen"
+                        :class="{ 'p-invalid': !!errors.regimen }" class="w-full" :showClear="true"
+                        size="small" />
+                    <small v-if="errors.regimen" class="p-error text-sm mt-1 block">
+                        {{ errors.regimen[0] }}
+                    </small>
+                </div>
+            </div>
+            <!-- Columna 3 -->
+            <div class="space-y-4">
+                <!-- Condición -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-check-circle mr-2"></i>
+                        Condición
+                    </label>
+                    <Dropdown id="condicion" v-model="form.condicion" :options="condicionOptions"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar condicion"
+                        :class="{ 'p-invalid': !!errors.condicion }" class="w-full" size="small"
+                        :showClear="true" />
+                    <small v-if="errors.condicion" class="p-error text-sm mt-1 block">
+                        {{ errors.condicion[0] }}
+                    </small>
+                </div>
+                <!-- Profesión -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-graduation-cap mr-2"></i>
+                        Profesión
+                    </label>
+                    <Dropdown id="profesion" v-model="form.profesion" :options="profesionOptions"
+                        optionLabel="nombre" optionValue="id" placeholder="Seleccionar profesión"
+                        :class="{ 'p-invalid': !!errors.profesion }" class="w-full" :filter="true"
+                        filterPlaceholder="Buscar profesion..." :showClear="true" size="small" />
+                    <small v-if="errors.profesion" class="p-error text-sm mt-1 block">
+                        {{ errors.profesion[0] }}
+                    </small>
+                </div>
+                <!-- Anexo -->
+                <div class="h-24">
+                    <label class="text-sm font-medium text-gray-700 flex items-center mb-2">
+                        <i class="pi pi-sliders-h mr-2"></i>
+                        Anexo
+                    </label>
+                    <Dropdown id="anexo" v-model="form.anexo" :options="anexoOptions"
+                        optionLabel="number" optionValue="id" placeholder="Seleccionar anexo"
+                        :class="{ 'p-invalid': !!errors.anexo }" class="w-full" :showClear="true"
+                        size="small" :filter="true" filterPlaceholder="Buscar anexo..." />
+                    <small v-if="errors.anexo" class="p-error text-sm mt-1 block">
+                        {{ errors.anexo[0] }}
+                    </small>
+                </div>
+                <!-- Salario -->
+                <div class="h-24">
+                    <FloatInput id="salario" label="Salario" v-model="form.salario"
+                        icon="pi pi-money-bill" :invalid="!!errors.salario" :errors="errors"
+                        size="small" type="text" @input="formatSalario" currency="PEN" />
+                </div>
+                <!-- Número de contrato -->
+                <div class="h-24">
+                    <FloatInput id="n_contrato" label="Número de Contrato" v-model="form.n_contrato"
+                        icon="pi pi-file-edit" :invalid="!!errors.n_contrato" :errors="errors"
+                        size="small" />
+                </div>
+            </div>
+        </div>
+    </TabPanel>
 
-                                        <small v-if="personalStore.loading" class="text-info">
-                                            <i class="pi pi-spinner pi-spin"></i> Cargando áreas...
-                                        </small>
-                                    </div>
-
-                                    <!-- Fecha de fin -->
-                                    <div class="mb-3">
-                                        <FloatLabel>
-                                            <label for="fecha_fin" class="form-label" style="font-size: 0.8rem;">
-                                                <i class="pi pi-calendar-minus me-2"></i>
-                                                <!-- Icono de calendario con menos -->
-                                                Fecha de Fin
-                                            </label>
-                                            <DatePicker v-model="form.fecha_fin" id="fecha_fin" dateFormat="dd/mm/yy"
-                                                :showIcon="false" class="w-100"
-                                                :class="{ 'is-invalid': !!errors.fecha_fin }" inputId="fecha_fin"
-                                                :showClear="true" />
-                                        </FloatLabel>
-
-                                        <div v-if="errors.fecha_fin" class="invalid-feedback d-block">
-                                            {{ errors.fecha_fin[0] }}
-                                        </div>
-                                    </div>
-                                    <!-- cargo -->
-                                    <div class="mb-3">
-                                        <small for="cargo" class="form-label">
-                                            <i class="pi pi-id-card me-2"></i> <!-- Icono de identificación -->
-                                            Cargo
-                                        </small>
-                                        <Dropdown id="cargo" v-model="form.cargo" :options="cargoOptions"
-                                            optionLabel="nombre" optionValue="id" placeholder="Seleccionar cargo"
-                                            :class="{ 'p-invalid': !!errors.cargo }" class="w-100" :filter="true"
-                                            filterPlaceholder="Buscar cargo..." :showClear="true" size="small" />
-                                        <small v-if="errors.cargo" class="p-error">
-                                            {{ errors.cargo[0] }}
-                                        </small>
-                                    </div>
-                                    <!-- Genérica -->
-                                    <div class="mb-3">
-                                        <div class="mb-3">
-                                            <small for="generica" class="form-label">
-                                                <i class="pi pi-tags me-2"></i> <!-- Icono de etiquetas -->
-                                                Genérica
-                                            </small>
-                                            <Dropdown id="generica" v-model="form.generica" :options="genericaOptions"
-                                                optionLabel="nombre" optionValue="id" placeholder="Seleccionar genérica"
-                                                :class="{ 'p-invalid': !!errors.generica }" class="w-100"
-                                                :showClear="true" />
-                                            <small v-if="errors.generica" class="p-error">
-                                                {{ errors.generica[0] }}
-                                            </small>
-                                        </div>
-                                    </div>
-
-                                    <!-- Régimen -->
-                                    <div class="mb-3">
-                                        <small for="regimen" class="form-label">
-                                            <i class="pi pi-sliders-h me-2"></i> <!-- Icono de ajustes -->
-                                            Régimen
-                                        </small>
-                                        <Dropdown id="regimen" v-model="form.regimen" :options="regimenOptions"
-                                            optionLabel="nombre" optionValue="id" placeholder="Seleccionar régimen"
-                                            :class="{ 'p-invalid': !!errors.regimen }" class="w-100" :showClear="true"
-                                            size="small" />
-                                        <small v-if="errors.regimen" class="p-error">
-                                            {{ errors.regimen[0] }}
-                                        </small>
-                                    </div>
-                                </div>
-                                <!-- Columna 3 -->
-                                <div class="col-md-4">
-                                    <!-- Condición -->
-                                    <div class="mb-4">
-                                        <small for="condicion" class="form-label">
-                                            <i class="pi pi-check-circle me-2"></i> <!-- Icono de verificación -->
-                                            Condición
-                                        </small>
-                                        <Dropdown id="condicion" v-model="form.condicion" :options="condicionOptions"
-                                            optionLabel="nombre" optionValue="id" placeholder="Seleccionar condicion"
-                                            :class="{ 'p-invalid': !!errors.condicion }" class="w-100" size="small"
-                                            :showClear="true" />
-                                        <small v-if="errors.condicion" class="p-error">
-                                            {{ errors.condicion[0] }}
-                                        </small>
-                                    </div>
-                                    <!-- Profesión -->
-                                    <div class="mb-3">
-                                        <small for="profesion" class="form-label">
-                                            <i class="pi pi-graduation-cap me-2"></i> <!-- Icono de graduación -->
-                                            Profesión
-                                        </small>
-                                        <Dropdown id="profesion" v-model="form.profesion" :options="profesionOptions"
-                                            optionLabel="nombre" optionValue="id" placeholder="Seleccionar profesión"
-                                            :class="{ 'p-invalid': !!errors.profesion }" class="w-100" :filter="true"
-                                            filterPlaceholder="Buscar profesion..." :showClear="true" />
-                                        <small v-if="errors.profesion" class="p-error">
-                                            {{ errors.profesion[0] }}
-                                        </small>
-                                    </div>
-                                    <!-- Anexo -->
-                                    <div class="mb-5">
-                                        <small for="regimen" class="form-label">
-                                            <i class="pi pi-sliders-h me-2"></i> <!-- Icono de ajustes -->
-                                            Anexo
-                                        </small>
-                                        <Dropdown id="anexo" v-model="form.anexo" :options="anexoOptions"
-                                            optionLabel="number" optionValue="id" placeholder="Seleccionar anexo"
-                                            :class="{ 'p-invalid': !!errors.anexo }" class="w-100" :showClear="true"
-                                            size="small" :filter="true" filterPlaceholder="Buscar anexo..." />
-                                        <small v-if="errors.anexo" class="p-error">
-                                            {{ errors.anexo[0] }}
-                                        </small>
-                                    </div>
-                                    <!-- salario -->
-                                    <div class="mb-2">
-                                        <FloatInput id="salario" label="Salario" v-model="form.salario"
-                                            icon="pi pi-money-bill" :invalid="!!errors.salario" :errors="errors"
-                                            size="small" type="text" @input="formatSalario" currency="PEN" />
-                                    </div>
-                                    <!-- Número de contrato -->
-                                    <div class="mb-1">
-                                        <FloatInput id="n_contrato" label="Número de Contrato" v-model="form.n_contrato"
-                                            icon="pi pi-file-edit" :invalid="!!errors.n_contrato" :errors="errors"
-                                            size="small" />
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Pestaña de Datos de Emergencia -->
-                        <div class="tab-pane fade" id="emergency" role="tabpanel" aria-labelledby="emergency-tab">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <!-- Contacto de emergencia -->
-                                    <div class="mb-3">
-                                        <FloatInput id="cont_emergencia" label="Contacto de Emergencia"
-                                            v-model="form.cont_emergencia" icon="pi pi-user"
-                                            :invalid="!!errors.cont_emergencia" :errors="errors" size="small" />
-                                    </div>
-
-
-                                </div>
-
-                                <div class="col-md-6">
-                                    <!-- Celular de emergencia -->
-                                    <div class="mb-3">
-                                        <FloatInput id="cel_emergencia" label="Celular de Emergencia"
-                                            v-model="form.cel_emergencia" icon="pi pi-phone"
-                                            :invalid="!!errors.cel_emergencia" :errors="errors" size="small" />
-                                    </div>
-
-
-                                </div>
-                            </div>
-                        </div>
+    <!-- Emergencia -->
+    <TabPanel value="2">
+        <div class="grid grid-cols-2 gap-6 mt-3">
+            <div>
+                <!-- Contacto de emergencia -->
+                <div class="h-20">
+                    <FloatInput id="cont_emergencia" label="Contacto de Emergencia"
+                        v-model="form.cont_emergencia" icon="pi pi-user"
+                        :invalid="!!errors.cont_emergencia" :errors="errors" size="small" />
+                </div>
+            </div>
+            <div>
+                <!-- Celular de emergencia -->
+                <div class="h-20">
+                    <FloatInput id="cel_emergencia" label="Celular de Emergencia"
+                        v-model="form.cel_emergencia" icon="pi pi-phone"
+                        :invalid="!!errors.cel_emergencia" :errors="errors" size="small" />
+                </div>
+            </div>
+        </div>
+    </TabPanel>
+</TabPanels>
+                        </Tabs>
                     </div>
                 </form>
             </template>
