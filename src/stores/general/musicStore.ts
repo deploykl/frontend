@@ -311,7 +311,16 @@ const loadTrackDuration = async (track: Track): Promise<void> => {
         duration: 0,
         cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
         durationLoaded: false
-      }
+      },
+      {
+        id: '14',
+        title: 'Only Love Can Hurt Like This',
+        artist: 'Paloma Faith',
+        url: new URL('/src/assets/audios/playlist/song14.ogg', import.meta.url).href,
+        duration: 0,
+        cover: new URL('/src/assets/icons/music/fondo_music.webp', import.meta.url).href,
+        durationLoaded: false
+      },
     ]
 
     tracks.value = trackList

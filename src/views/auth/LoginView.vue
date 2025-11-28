@@ -1,269 +1,226 @@
 <template>
-    <div class="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 flex items-center justify-center p-4">
+        <!-- Estado de carga -->
+    <div v-if="!isAppReady" class="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 transition-all duration-800">
+        <div class="text-center space-y-6">
+            <!-- Logo animado -->
+            <div class="relative">
+                <div class="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-2xl animate-pulse">
+                    <i class="pi pi-shield text-white text-2xl"></i>
+                </div>
+                <div class="absolute inset-0 rounded-2xl border-2 border-blue-400 animate-ping opacity-20"></div>
+            </div>
+            
+            <!-- Texto de carga -->
+            <div class="space-y-2">
+                <h2 class="text-xl font-bold text-gray-800 dark:text-white">Cargando Sistema</h2>
+                <p class="text-gray-600 dark:text-gray-400 text-sm">Inicializando componentes...</p>
+            </div>
+            
+            <!-- Barra de progreso -->
+            <div class="w-48 h-1 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full animate-progress"></div>
+            </div>
+        </div>
+    </div>
+    <div v-else
+        class="min-h-screen bg-linear-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-slate-900 flex items-center justify-center p-4">
+        <!-- Fondo GIF mejorado -->
+        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20 dark:opacity-10"
+            :style="{ backgroundImage: `url('/src/assets/gif/city2.gif')` }"></div>
+
         <!-- Contenedor principal con efecto glassmorphism -->
-        <div class="w-full max-w-5xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl dark:shadow-black/30 overflow-hidden border border-white/20 dark:border-gray-700/30 animate-fade-in">
-            <div class="flex flex-col lg:flex-row h-full">
-                <!-- Sección lateral izquierda - Imagen y branding -->
-                <div class="hidden lg:flex lg:w-2/5 relative overflow-hidden bg-linear-to-br from-indigo-600 via-cyan-600 to-blue-700">
-                    <!-- Patrón de fondo sutil -->
-                    <div class="absolute inset-0 bg-grid-white/[0.02] bg-size-[60px_60px]"></div>
+        <div
+            class="w-full max-w-md bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-3xl shadow-2xl dark:shadow-black/30 overflow-hidden border border-white/20 dark:border-gray-700/30 animate-fade-in">
 
-                    <!-- Efectos de gradiente animados -->
-                    <div class="absolute top-0 left-0 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
-                    <div class="absolute bottom-0 right-0 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
+            <!-- Contenedor interno -->
+            <div class="p-8 lg:p-10">
+                <!-- Contenedor para botones superiores -->
+                <div class="flex justify-between items-center mb-8">
+                    <!-- Botón de regreso con estilo mejorado -->
+                    <button @click="handleBackToHome" class="group relative p-3 rounded-2xl hover:bg-white/60 dark:hover:bg-gray-700/60 
+                                   transition-all duration-500 cursor-pointer
+                                   shadow-lg hover:shadow-xl transform hover:-translate-y-1
+                                   bg-white/40 dark:bg-gray-700/40 backdrop-blur-sm
+                                   border border-white/30 dark:border-gray-600/30">
 
-                    <!-- Contenido principal -->
-                    <div class="relative z-10 flex flex-col justify-between p-12 h-full">
-                        <!-- Botón de regreso al home -->
-                        <div class="flex justify-start mb-4">
-                            <button @click="handleBackToHome" 
-                                    class="flex items-center space-x-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm rounded-xl border border-white/20 text-white transition-all duration-300 hover:scale-105 group">
-                                <i class="pi pi-arrow-left group-hover:-translate-x-1 transition-transform duration-300"></i>
-                                <span class="text-sm font-medium">Volver al Inicio</span>
-                            </button>
+                        <!-- Ícono con animación -->
+                        <i class="pi pi-home text-gray-600 dark:text-gray-300 text-xl 
+                                group-hover:text-blue-500 dark:group-hover:text-blue-400 
+                                transition-all duration-300 
+                                transform group-hover:scale-110"></i>
+
+                        <!-- Tooltip sutil -->
+                        <div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2 
+                                  opacity-0 group-hover:opacity-100 transition-all duration-300
+                                  bg-gray-800 dark:bg-gray-200 text-white dark:text-gray-800 
+                                  text-xs px-2 py-1 rounded-lg whitespace-nowrap">
+                            Ir al Inicio
+                            <div class="absolute -top-1 left-1/2 transform -translate-x-1/2 
+                                      w-2 h-2 bg-gray-800 dark:bg-gray-200 rotate-45"></div>
                         </div>
+                    </button>
 
-                        <div class="flex-1 flex flex-col justify-center">
-                            <!-- Logo y título -->
-                            <div class="text-center mb-8">
-                                <div class="inline-flex items-center justify-center w-16 h-16 bg-white/10 rounded-2xl backdrop-blur-sm border border-white/20 mb-6">
-                                    <i class="pi pi-shield text-white text-2xl"></i>
-                                </div>
-                                <h1 class="text-3xl font-bold text-white mb-3 tracking-tight">
-                                    (SID) - SUITE DE INNOVACIÓN<br>DIGITAL
-                                </h1>
-                                <p class="text-blue-100 text-lg font-light">Portal Unificado de Gestión</p>
-                            </div>
-
-                            <!-- Características -->
-                            <div class="space-y-4 mt-12">
-                                <div class="flex items-center space-x-4 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                                    <div class="shrink-0 w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
-                                        <i class="pi pi-verified text-green-300"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-white font-medium">Acceso Unificado</p>
-                                        <p class="text-blue-200 text-sm">Todos los sistemas en un solo lugar</p>
-                                    </div>
-                                </div>
-
-                                <div class="flex items-center space-x-4 p-3 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10">
-                                    <div class="shrink-0 w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                                        <i class="pi pi-th-large text-green-300"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-white font-medium">Módulos Especializados</p>
-                                        <p class="text-blue-200 text-sm">Soluciones para cada área institucional</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Badge de desarrollo -->
-                        <div class="mt-8 p-4 bg-yellow-500/20 backdrop-blur-sm rounded-xl border border-yellow-400/30">
-                            <div class="flex items-start space-x-3">
-                                <div class="shrink-0 w-6 h-6 bg-yellow-500 rounded-full flex items-center justify-center">
-                                    <i class="pi pi-code text-white text-xs"></i>
-                                </div>
-                                <div>
-                                    <p class="text-yellow-200 font-semibold text-sm">VERSIÓN EN DESARROLLO</p>
-                                    <p class="text-yellow-100 text-xs mt-1 leading-relaxed">
-                                        Integrando soluciones para optimizar procesos y la toma de decisiones
-                                        estratégicas.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                    <!-- DarkModeToggle con estilo consistente -->
+                    <div class="transform hover:scale-105 transition-transform duration-300">
+                        <DarkModeToggle />
                     </div>
                 </div>
 
-                <!-- Sección del formulario -->
-                <div class="w-full lg:w-3/5 p-8 lg:p-12">
-                    <!-- Botón de modo oscuro -->
-                    <div class="flex justify-between items-center mb-6">
-                        <!-- Botón de regreso al home (solo en móvil) -->
-                        <button @click="handleBackToHome" 
-                                class="lg:hidden flex items-center space-x-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-xl text-gray-700 dark:text-gray-300 transition-all duration-300 hover:scale-105 group">
-                            <i class="pi pi-arrow-left group-hover:-translate-x-1 transition-transform duration-300"></i>
-                            <span class="text-sm font-medium">Inicio</span>
+                <!-- Logo y título - SOLO SE MUESTRA EN LOGIN NORMAL -->
+                <div v-if="!authStore.show2FA" class="text-center mb-8">
+                    <div class="flex justify-center mb-6">
+                        <img src="@/assets/img/account/user-account.png"
+                            class="h-20 w-48 object-contain filter drop-shadow-md transform hover:scale-105 transition-transform duration-500" />
+                    </div>
+                    <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2 tracking-tight">
+                        PANEL DE CONTROL
+                    </h1>
+                    <h2 class="text-sm text-gray-600 dark:text-gray-400 font-light">Autenticación requerida</h2>
+                </div>
+
+                <!-- 2FA Component -->
+                <TwoFactorAuth v-if="authStore.show2FA" :mode="authStore.twoFAMode" :userId="authStore.pendingUserId"
+                    @success="handle2FASuccess" @error="handle2FAError" @back="authStore.backToLogin" />
+
+                <!-- Login Normal -->
+                <div v-else class="space-y-6">
+                    <!-- Alertas de seguridad -->
+                    <div v-if="authStore.remainingAttempts !== null && authStore.remainingAttempts > 0"
+                        class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 backdrop-blur-sm">
+                        <div class="flex items-center space-x-3">
+                            <div
+                                class="shrink-0 w-8 h-8 bg-amber-100 dark:bg-amber-800 rounded-full flex items-center justify-center">
+                                <i class="pi pi-exclamation-triangle text-amber-600 dark:text-amber-400 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-amber-800 dark:text-amber-200 text-sm font-medium">
+                                    Intentos restantes:
+                                    <span class="bg-amber-600 text-white px-2 py-1 rounded-full text-xs font-bold ml-2">
+                                        {{ authStore.remainingAttempts }}
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bloqueo de cuenta -->
+                    <div v-if="authStore.blockedTimeRemaining > 0"
+                        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 animate-pulse backdrop-blur-sm">
+                        <div class="flex items-center space-x-3 mb-3">
+                            <div
+                                class="shrink-0 w-8 h-8 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
+                                <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
+                            </div>
+                            <div class="flex-1">
+                                <p class="text-red-800 dark:text-red-200 text-sm font-medium">
+                                    Cuenta bloqueada temporalmente
+                                </p>
+                                <p class="text-red-600 dark:text-red-300 text-xs mt-1">
+                                    Tiempo restante: {{ authStore.formatTime(authStore.blockedTimeRemaining) }}
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Barra de progreso -->
+                        <div class="w-full bg-red-200 dark:bg-red-700 rounded-full h-1.5">
+                            <div class="bg-red-500 dark:bg-red-400 h-1.5 rounded-full transition-all duration-1000 ease-out"
+                                :style="{ width: authStore.progressPercentage + '%' }"></div>
+                        </div>
+
+                        <button @click="authStore.useAnotherAccount"
+                            class="w-full mt-3 flex items-center justify-center space-x-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/30 rounded-lg transition-colors text-sm">
+                            <i class="pi pi-user-plus"></i>
+                            <span>Usar otra cuenta</span>
                         </button>
-                        
-                        <DarkModeToggle />
                     </div>
 
-                    <!-- Header móvil -->
-                    <div class="lg:hidden mb-8 text-center">
-                        <div class="flex justify-center mb-4">
-                            <img src="@/assets/img/account/user-account.png"
-                                class="h-20 w-48 object-contain filter drop-shadow-md" />
-                        </div>
-                        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-2">PANEL DE CONTROL</h1>
-                        <p class="text-gray-600 dark:text-gray-300 text-sm">Autenticación requerida</p>
-
-                        <!-- Badge móvil -->
-                        <div class="mt-4 p-3 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg border border-yellow-200 dark:border-yellow-800">
-                            <div class="flex items-center space-x-2">
-                                <i class="pi pi-info text-yellow-600 dark:text-yellow-400"></i>
-                                <span class="text-yellow-800 dark:text-yellow-200 text-xs font-medium">PLATAFORMA EN
-                                    DESARROLLO</span>
+                    <!-- Formulario de login -->
+                    <form @submit.prevent="handleLogin" class="space-y-6">
+                        <!-- Campo Usuario -->
+                        <div class="group">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i
+                                        class="pi pi-user text-gray-500 dark:text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+                                </div>
+                                <input type="text" id="username" v-model="authStore.username"
+                                    :disabled="authStore.isBlocked" class="block w-full pl-10 pr-4 py-4 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 
+                                                      rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
+                                                      text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400
+                                                      transition-all duration-200 backdrop-blur-sm
+                                                      disabled:opacity-50 disabled:cursor-not-allowed"
+                                    placeholder="Nombre de usuario" required @input="authStore.handleLowerCase" />
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Logo y título - SOLO SE MUESTRA EN LOGIN NORMAL -->
-                    <div v-if="!authStore.show2FA" class="text-center mb-8 hidden lg:block">
-                        <div class="flex justify-center mb-4">
-                            <img src="@/assets/img/account/user-account.png"
-                                class="h-20 w-48 object-contain filter drop-shadow-md" />
-                        </div>
-                        <h1 class="text-2xl font-bold text-gray-800 dark:text-gray-200 mb-2">
-                            PANEL DE CONTROL
-                        </h1>
-                        <h2 class="text-sm text-gray-600 dark:text-gray-400">Autenticación requerida</h2>
-                    </div>
-
-                    <!-- Contenido del formulario -->
-                    <div class="max-w-md mx-auto">
-                        <!-- 2FA Component -->
-                        <TwoFactorAuth v-if="authStore.show2FA" :mode="authStore.twoFAMode"
-                            :userId="authStore.pendingUserId" @success="handle2FASuccess" @error="handle2FAError"
-                            @back="authStore.backToLogin" />
-
-                        <!-- Login Normal -->
-                        <div v-else class="space-y-8">
-                            <!-- Alertas de seguridad -->
-                            <div v-if="authStore.remainingAttempts !== null && authStore.remainingAttempts > 0"
-                                class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4">
-                                <div class="flex items-center space-x-3">
-                                    <div class="shrink-0 w-8 h-8 bg-amber-100 dark:bg-amber-800 rounded-full flex items-center justify-center">
-                                        <i class="pi pi-exclamation-triangle text-amber-600 dark:text-amber-400 text-sm"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-amber-800 dark:text-amber-200 text-sm font-medium">
-                                            Intentos restantes:
-                                            <span class="bg-amber-600 text-white px-2 py-1 rounded-full text-xs font-bold ml-2">
-                                                {{ authStore.remainingAttempts }}
-                                            </span>
-                                        </p>
-                                    </div>
+                        <!-- Campo Contraseña -->
+                        <div class="group">
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i
+                                        class="pi pi-lock text-gray-500 dark:text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
                                 </div>
-                            </div>
-
-                            <!-- Bloqueo de cuenta -->
-                            <div v-if="authStore.blockedTimeRemaining > 0"
-                                class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 animate-pulse">
-                                <div class="flex items-center space-x-3 mb-3">
-                                    <div class="shrink-0 w-8 h-8 bg-red-100 dark:bg-red-800 rounded-full flex items-center justify-center">
-                                        <i class="pi pi-lock text-red-600 dark:text-red-400 text-sm"></i>
-                                    </div>
-                                    <div class="flex-1">
-                                        <p class="text-red-800 dark:text-red-200 text-sm font-medium">
-                                            Cuenta bloqueada temporalmente
-                                        </p>
-                                        <p class="text-red-600 dark:text-red-300 text-xs mt-1">
-                                            Tiempo restante: {{ authStore.formatTime(authStore.blockedTimeRemaining) }}
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <!-- Barra de progreso -->
-                                <div class="w-full bg-red-200 dark:bg-red-700 rounded-full h-1.5">
-                                    <div class="bg-red-500 dark:bg-red-400 h-1.5 rounded-full transition-all duration-1000 ease-out"
-                                        :style="{ width: authStore.progressPercentage + '%' }"></div>
-                                </div>
-
-                                <button @click="authStore.useAnotherAccount"
-                                    class="w-full mt-3 flex items-center justify-center space-x-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/30 rounded-lg transition-colors text-sm">
-                                    <i class="pi pi-user-plus"></i>
-                                    <span>Usar otra cuenta</span>
+                                <input :type="authStore.showPassword ? 'text' : 'password'" id="password"
+                                    v-model="authStore.password" :disabled="authStore.isBlocked" class="block w-full pl-10 pr-12 py-4 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 
+                                                      rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
+                                                      text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400
+                                                      transition-all duration-200 backdrop-blur-sm
+                                                      disabled:opacity-50 disabled:cursor-not-allowed"
+                                    placeholder="Contraseña" required />
+                                <button type="button" @click="authStore.showPassword = !authStore.showPassword"
+                                    class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
+                                    <i :class="authStore.showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
                                 </button>
                             </div>
+                        </div>
 
-                            <!-- Formulario de login -->
-                            <form @submit.prevent="handleLogin" class="space-y-6">
-                                <!-- Campo Usuario -->
-                                <div class="group">
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <i class="pi pi-user text-gray-500 dark:text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
-                                        </div>
-                                        <input type="text" id="username" v-model="authStore.username"
-                                            :disabled="authStore.isBlocked" class="block w-full pl-10 pr-4 py-4 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 
-                                                      rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                                                      text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400
-                                                      transition-all duration-200 backdrop-blur-sm
-                                                      disabled:opacity-50 disabled:cursor-not-allowed"
-                                            placeholder="Nombre de usuario" required
-                                            @input="authStore.handleLowerCase" />
-                                    </div>
-                                </div>
-
-                                <!-- Campo Contraseña -->
-                                <div class="group">
-                                    <div class="relative">
-                                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <i class="pi pi-lock text-gray-500 dark:text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
-                                        </div>
-                                        <input :type="authStore.showPassword ? 'text' : 'password'" id="password"
-                                            v-model="authStore.password" :disabled="authStore.isBlocked" class="block w-full pl-10 pr-12 py-4 bg-white/50 dark:bg-gray-700/50 border border-gray-200 dark:border-gray-600 
-                                                      rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500
-                                                      text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400
-                                                      transition-all duration-200 backdrop-blur-sm
-                                                      disabled:opacity-50 disabled:cursor-not-allowed"
-                                            placeholder="Contraseña" required />
-                                        <button type="button" @click="authStore.showPassword = !authStore.showPassword"
-                                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 transition-colors">
-                                            <i :class="authStore.showPassword ? 'pi pi-eye-slash' : 'pi pi-eye'"></i>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- Botón de login -->
-                                <button type="submit" :disabled="authStore.isLoading || authStore.isBlocked" class="w-full group relative overflow-hidden bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700
+                        <!-- Botón de login -->
+                        <button type="submit" :disabled="authStore.isLoading || authStore.isBlocked" class="w-full group relative overflow-hidden bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700
                                                disabled:from-gray-400 disabled:to-gray-500 disabled:cursor-not-allowed
                                                text-white py-4 px-6 rounded-2xl font-semibold transition-all duration-300
                                                flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl
                                                transform hover:-translate-y-0.5 disabled:transform-none">
-                                    <!-- Efecto de brillo -->
-                                    <div class="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
-                                    </div>
+                            <!-- Efecto de brillo -->
+                            <div
+                                class="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
+                            </div>
 
-                                    <!-- Contenido del botón -->
-                                    <div v-if="authStore.isLoading" class="flex items-center space-x-2 relative z-10">
-                                        <div class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
-                                        </div>
-                                        <span>Verificando...</span>
-                                    </div>
-                                    <div v-else class="flex items-center space-x-2 relative z-10">
-                                        <i class="pi pi-sign-in"></i>
-                                        <span>Acceder al Sistema</span>
-                                    </div>
-                                </button>
-                            </form>
-
-                            <!-- Información adicional -->
-                            <div class="text-center space-y-4">
-                                <div class="flex items-center justify-center space-x-6 text-xs text-gray-500 dark:text-gray-400">
-                                    <div class="flex items-center space-x-1">
-                                        <i class="pi pi-shield-check"></i>
-                                        <span>Conexión segura</span>
-                                    </div>
-                                    <div class="flex items-center space-x-1">
-                                        <i class="pi pi-clock"></i>
-                                        <span>24/7 Disponible</span>
-                                    </div>
+                            <!-- Contenido del botón -->
+                            <div v-if="authStore.isLoading" class="flex items-center space-x-2 relative z-10">
+                                <div
+                                    class="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin">
                                 </div>
+                                <span>Verificando...</span>
+                            </div>
+                            <div v-else class="flex items-center space-x-2 relative z-10">
+                                <i class="pi pi-sign-in"></i>
+                                <span>Acceder al Sistema</span>
+                            </div>
+                        </button>
+                    </form>
 
-                                <!-- Footer -->
-                                <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                    <div class="text-gray-500 dark:text-gray-400 text-xs space-y-1">
-                                        <div class="flex items-center justify-center space-x-2">
-                                            <i class="pi pi-code"></i>
-                                            <span>{{ version }} - Sistema en Desarrollo Activo</span>
-                                        </div>
-                                        <div>© {{ new Date().getFullYear() }} {{ projectName }}</div>
-                                    </div>
+                    <!-- Información adicional -->
+                    <div class="text-center space-y-4">
+                        <div
+                            class="flex items-center justify-center space-x-6 text-xs text-gray-500 dark:text-gray-400">
+                            <div class="flex items-center space-x-1">
+                                <i class="pi pi-shield-check"></i>
+                                <span>Conexión segura</span>
+                            </div>
+                            <div class="flex items-center space-x-1">
+                                <i class="pi pi-clock"></i>
+                                <span>24/7 Disponible</span>
+                            </div>
+                        </div>
+
+                        <!-- Footer -->
+                        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+                            <div class="text-gray-500 dark:text-gray-400 text-xs space-y-1">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <i class="pi pi-code"></i>
+                                    <span>{{ version }} - Sistema en Desarrollo Activo</span>
                                 </div>
+                                <div>© {{ new Date().getFullYear() }} {{ projectName }}</div>
                             </div>
                         </div>
                     </div>
@@ -274,7 +231,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "@/stores/auth/authStore";
 import { useErrorStore } from "@/stores/errors/errorStore";
@@ -381,9 +338,14 @@ const cleanup = (): void => {
         authStore.countdownInterval = null;
     }
 };
+const isAppReady = ref(false);
 
 // Lifecycle hooks
 onMounted(() => {
+     // Simular tiempo de carga inicial
+    setTimeout(() => {
+        isAppReady.value = true;
+    }, 800); // Ajusta este tiempo según necesites
     // Verificar si hay bloqueos existentes al cargar el componente
     authStore.checkExistingBlock().catch(error => {
         console.error('Error al verificar bloqueo:', error);
@@ -493,5 +455,28 @@ button:disabled:hover {
 
 .animate-float {
     animation: float 3s ease-in-out infinite;
+}
+.animate-progress {
+    animation: progress 1.5s ease-in-out infinite;
+}
+
+@keyframes progress {
+    0% {
+        transform: translateX(-100%);
+        width: 20%;
+    }
+    50% {
+        transform: translateX(0%);
+        width: 60%;
+    }
+    100% {
+        transform: translateX(100%);
+        width: 20%;
+    }
+}
+
+/* Asegurar que el contenido esté oculto hasta que Vue monte */
+[v-cloak] {
+    display: none;
 }
 </style>
