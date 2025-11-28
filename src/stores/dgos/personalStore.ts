@@ -2,6 +2,7 @@
 import { defineStore } from "pinia";
 import { ref, computed, type Ref } from "vue";
 import { api } from "@/components/services/Axios";
+import { useCustomToast } from "@/components/utils/toast";
 
 // Interfaces
 interface Anexo {
@@ -120,6 +121,7 @@ interface ApiResponse<T> {
 }
 
 export const usePersonalStore = defineStore("personalStore", () => {
+  const toast = useCustomToast();
   
   // Refs con tipos
   const loading = ref<boolean>(false);
@@ -172,6 +174,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
         err.response?.data?.detail ||
         err.response?.data?.message ||
         "Error al obtener personal";
+      toast.showError(message);
       throw err;
     }
   };
@@ -188,6 +191,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
         err.response?.data?.detail ||
         err.response?.data?.message ||
         "Error al obtener personal";
+      toast.showError(message);
       throw err;
     }
   };
@@ -200,6 +204,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
     } catch (err: any) {
       const message =
         err.response?.data?.message || "Error al cargar dependencias";
+      toast.showError(message);
       throw err;
     }
   };
@@ -211,6 +216,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar areas";
+      toast.showError(message);
       throw err;
     }
   };
@@ -222,6 +228,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar anexos";
+      toast.showError(message);
       throw err;
     }
   };
@@ -234,6 +241,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
     } catch (err: any) {
       const message =
         err.response?.data?.message || "Error al cargar condicion";
+      toast.showError(message);
       throw err;
     }
   };
@@ -245,6 +253,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar nivel";
+      toast.showError(message);
       throw err;
     }
   };
@@ -257,6 +266,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar áreas";
+      toast.showError(message);
       throw err;
     }
   };
@@ -269,6 +279,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
     } catch (err: any) {
       const message =
         err.response?.data?.message || "Error al cargar profesion";
+      toast.showError(message);
       throw err;
     }
   };
@@ -280,6 +291,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar cargo";
+      toast.showError(message);
       throw err;
     }
   };
@@ -291,6 +303,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar regimen";
+      toast.showError(message);
       throw err;
     }
   };
@@ -303,6 +316,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
     } catch (err: any) {
       const message =
         err.response?.data?.message || "Error al cargar grupo_ocupacional";
+      toast.showError(message);
       throw err;
     }
   };
@@ -314,6 +328,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar estado";
+      toast.showError(message);
       throw err;
     }
   };
@@ -325,6 +340,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       return response.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Error al cargar generica";
+      toast.showError(message);
       throw err;
     }
   };
@@ -337,6 +353,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
     } catch (err: any) {
       const message =
         err.response?.data?.message || "Error al cargar los módulos";
+      toast.showError(message);
       throw err;
     }
   };
@@ -349,7 +366,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
         personalData
       );
       personal.value.unshift(response.data);
-      //toast.showSuccess("Personal creado correctamente");
+      toast.showSuccess("Personal creado correctamente");
       return response.data;
     } catch (err: any) {
       error.value = err;
@@ -357,10 +374,10 @@ export const usePersonalStore = defineStore("personalStore", () => {
       if (err.response?.data) {
         for (const [field, messages] of Object.entries(err.response.data)) {
           const errorMsg = Array.isArray(messages) ? messages[0] : messages;
-          //toast.showError(`${field}: ${errorMsg}`);
+          toast.showError(`${field}: ${errorMsg}`);
         }
       } else {
-        //toast.showError(err.message || "Error al registrar personal");
+        toast.showError(err.message || "Error al registrar personal");
       }
       throw err;
     } finally {
@@ -381,7 +398,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
       if (index !== -1) {
         personal.value[index] = response.data;
       }
-      //toast.showSuccess("Personal actualizado correctamente");
+      toast.showSuccess("Personal actualizado correctamente");
       return response.data;
     } catch (err: any) {
       error.value = err;
@@ -394,10 +411,10 @@ export const usePersonalStore = defineStore("personalStore", () => {
             errorMsg = (errorMsg as any).string;
           }
 
-          //toast.showError(errorMsg);
+          toast.showError(errorMsg);
         }
       } else {
-        //toast.showError(err.message || "Error al actualizar personal");
+        toast.showError(err.message || "Error al actualizar personal");
       }
       throw err;
     } finally {
@@ -411,7 +428,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
     try {
       await api.delete(`dgos/administracion/personal/${id}/`);
       personal.value = personal.value.filter((t) => t.id !== id);
-      //toast.showSuccess("Personal eliminado correctamente");
+      toast.showSuccess("Personal eliminado correctamente");
       return true;
     } catch (err: any) {
       error.value = err;
@@ -419,7 +436,7 @@ export const usePersonalStore = defineStore("personalStore", () => {
         err.response?.data?.detail ||
         err.response?.data?.message ||
         "Error al eliminar personal";
-      //toast.showError(message);
+      toast.showError(message);
       return false;
     } finally {
       loading.value = false;
@@ -447,79 +464,88 @@ export const usePersonalStore = defineStore("personalStore", () => {
         );
       }
 
-      if (response.data.success) {
-        //toast.showSuccess(response.data.message);
-        await ListPersonal();
-        return response.data;
-      } else {
-        //toast.showError(response.data.message);
-        throw new Error(response.data.message);
-      }
+    // Verificar que message existe y es string
+    const message = response.data.message || "Operación completada";
+    
+    if (response.data.success) {
+      toast.showSuccess(message);
+      await ListPersonal();
+      return response.data;
+    } else {
+      toast.showError(message);
+      throw new Error(message);
+    }
     } catch (err: any) {
       const message =
         err.response?.data?.message ||
         `Error al ${mode === "habilitar" ? "habilitar" : "editar"} módulos`;
-      //toast.showError(message);
+      toast.showError(message);
       throw err;
     } finally {
       loading.value = false;
     }
   };
 
-  const deshabilitarAcceso = async (person: Personal): Promise<void> => {
-    if (
-      !confirm(`¿Deshabilitar acceso a ${person.nombre} ${person.apellido}?`)
-    ) {
-      return;
+const deshabilitarAcceso = async (person: Personal): Promise<void> => {
+  if (
+    !confirm(`¿Deshabilitar acceso a ${person.nombre} ${person.apellido}?`)
+  ) {
+    return;
+  }
+
+  loading.value = true;
+  try {
+    const response = await api.post<ApiResponse<any>>(
+      `/dgos/administracion/personal/${person.id}/deshabilitar_acceso/`
+    );
+
+    // Verificar que message existe y es string
+    const message = response.data.message || "Acceso deshabilitado correctamente";
+    
+    if (response.data.success) {
+      toast.showSuccess(message);
+      await ListPersonal();
+    } else {
+      toast.showError(message);
     }
+  } catch (err: any) {
+    const message =
+      err.response?.data?.message || "Error al deshabilitar acceso";
+    toast.showError(message);
+  } finally {
+    loading.value = false;
+  }
+};
 
-    loading.value = true;
-    try {
-      const response = await api.post<ApiResponse<any>>(
-        `/dgos/administracion/personal/${person.id}/deshabilitar_acceso/`
-      );
+const resetearPassword = async (person: Personal): Promise<void> => {
+  if (
+    !confirm(`¿Resetear contraseña de ${person.nombre} ${person.apellido}?`)
+  ) {
+    return;
+  }
 
-      if (response.data.success) {
-        //toast.showSuccess(response.data.message);
-        await ListPersonal();
-      } else {
-        //toast.showError(response.data.message);
-      }
-    } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Error al deshabilitar acceso";
-      //toast.showError(message);
-    } finally {
-      loading.value = false;
+  loading.value = true;
+  try {
+    const response = await api.post<ApiResponse<any>>(
+      `/dgos/administracion/personal/${person.id}/resetear_password/`
+    );
+
+    // Verificar que message existe y es string
+    const message = response.data.message || "Contraseña reseteada correctamente";
+    
+    if (response.data.success) {
+      toast.showSuccess(message);
+    } else {
+      toast.showError(message);
     }
-  };
-
-  const resetearPassword = async (person: Personal): Promise<void> => {
-    if (
-      !confirm(`¿Resetear contraseña de ${person.nombre} ${person.apellido}?`)
-    ) {
-      return;
-    }
-
-    loading.value = true;
-    try {
-      const response = await api.post<ApiResponse<any>>(
-        `/dgos/administracion/personal/${person.id}/resetear_password/`
-      );
-
-      if (response.data.success) {
-        //toast.showSuccess(response.data.message);
-      } else {
-        //toast.showError(response.data.message);
-      }
-    } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Error al resetear contraseña";
-      //toast.showError(message);
-    } finally {
-      loading.value = false;
-    }
-  };
+  } catch (err: any) {
+    const message =
+      err.response?.data?.message || "Error al resetear contraseña";
+    toast.showError(message);
+  } finally {
+    loading.value = false;
+  }
+};
 
   return {
     // Estado
