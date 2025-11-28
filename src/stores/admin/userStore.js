@@ -1,0 +1,252 @@
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import { api } from "@/components/services/Axios";
+import { useCustomToast } from "@/components/utils/toast";
+
+export const useUserStore = defineStore("userStore", () => {
+  const toast = useCustomToast();
+  const loading = ref(false);
+  const users = ref([]);
+  const error = ref(null);
+  const availableModules = ref([]); // ← Añade esta línea para almacenar módulos disponibles
+
+  // Métodos
+  const listUsers = async () => {
+    error.value = null;
+    try {
+      const response = await api.get("user/users/");
+      users.value = response.data;
+      return response.data;
+    } catch (err) {
+      error.value = err;
+      const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Error al obtener usuarios";
+      toast.showError(message);
+      throw err;
+    }
+  };
+
+  // Añade este método para obtener módulos disponibles
+  const fetchAvailableModules = async () => {
+    try {
+      const response = await api.get("user/modulo/");
+      availableModules.value = response.data;
+      return response.data;
+    } catch (err) {
+      error.value = err;
+      const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Error al obtener módulos";
+      toast.showError(message);
+      throw err;
+    }
+  };
+
+  // Añade este método para actualizar módulos de usuario
+  const updateUserModules = async (userId, modulosIds) => {
+    loading.value = true;
+    try {
+      const response = await api.post(
+        `user/users/${userId}/actualizar_modulos/`,
+        {
+          modulos_ids: modulosIds,
+        }
+      );
+
+      // Actualizar el usuario en la lista local
+      const userIndex = users.value.findIndex((u) => u.id === userId);
+      if (userIndex !== -1) {
+        // Refrescar los datos del usuario
+        const userResponse = await api.get(`user/users/${userId}/`);
+        users.value[userIndex] = userResponse.data;
+      }
+
+      toast.showSuccess("Módulos actualizados correctamente");
+      return { success: true, data: response.data };
+    } catch (err) {
+      error.value = err;
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.detail ||
+        "Error al actualizar módulos";
+      toast.showError(message);
+      return { success: false, message: message };
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  const createUser = async (userData) => {
+    try {
+      const { password2, ...dataToSend } = userData;
+      const response = await api.post("user/users/", dataToSend);
+
+      users.value.unshift(response.data);
+      toast.showSuccess("Usuario creado correctamente");
+      return { success: true, data: response.data };
+    } catch (err) {
+      error.value = err;
+      if (err.response?.data) {
+        return {
+          success: false,
+          errors: err.response.data,
+          message: "Error al crear usuario",
+        };
+      } else {
+        toast.showError(err.message || "Error al crear usuario");
+        return { success: false, message: err.message };
+      }
+    }
+  };
+
+  const updateUser = async (id, userData) => {
+    try {
+      const { password2, ...dataToSend } = userData;
+      const response = await api.patch(`user/users/${id}/`, dataToSend);
+
+      const index = users.value.findIndex((u) => u.id === id);
+      if (index !== -1) {
+        users.value[index] = response.data;
+      }
+      toast.showSuccess("Usuario actualizado correctamente");
+      return response.data;
+    } catch (err) {
+      error.value = err;
+      if (err.response?.data) {
+        const fieldErrors = err.response.data;
+        const knownFields = ["username", "email", "dni", "celular"];
+        let hasFieldErrors = false;
+
+        knownFields.forEach((field) => {
+          if (fieldErrors[field]) {
+            const errorMsg = Array.isArray(fieldErrors[field])
+              ? fieldErrors[field][0]
+              : fieldErrors[field];
+            toast.showError(`${field}: ${errorMsg}`);
+            hasFieldErrors = true;
+          }
+        });
+
+        if (!hasFieldErrors && fieldErrors.non_field_errors) {
+          toast.showError(fieldErrors.non_field_errors.join(", "));
+        } else if (!hasFieldErrors) {
+          toast.showError(
+            err.response.data.detail || "Error al actualizar usuario"
+          );
+        }
+      } else {
+        toast.showError(err.message || "Error al actualizar usuario");
+      }
+      throw err;
+    }
+  };
+
+  const deleteUser = async (id) => {
+    try {
+      await api.delete(`user/users/${id}/`);
+      users.value = users.value.filter((u) => u.id !== id);
+      toast.showSuccess("Usuario eliminado correctamente");
+      return true;
+    } catch (err) {
+      const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Error al eliminar usuario";
+      toast.showError(message);
+      return false;
+    }
+  };
+
+  const toggleUserStatus = async (id, newStatus) => {
+    try {
+      const endpoint = newStatus ? "activate" : "deactivate";
+      await api.post(`user/users/${id}/${endpoint}/`);
+
+      const user = users.value.find((u) => u.id === id);
+      if (user) {
+        user.is_active = newStatus;
+      }
+      toast.showSuccess(
+        `Usuario ${newStatus ? "activado" : "desactivado"} correctamente`
+      );
+      return true;
+    } catch (err) {
+      error.value = err;
+      const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        `Error al ${newStatus ? "activar" : "desactivar"} usuario`;
+      toast.showError(message);
+      throw err;
+    }
+  };
+
+  const toggleStaffStatus = async (id, newStatus) => {
+    try {
+      const endpoint = newStatus ? "make_staff" : "remove_staff";
+      await api.post(`user/users/${id}/${endpoint}/`);
+
+      const user = users.value.find((u) => u.id === id);
+      if (user) {
+        user.is_staff = newStatus;
+      }
+      toast.showSuccess(
+        `Usuario ${
+          newStatus ? "promovido a staff" : "removido de staff"
+        } correctamente`
+      );
+      return true;
+    } catch (err) {
+      error.value = err;
+      const message =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        `Error al ${newStatus ? "promover" : "remover"} staff`;
+      toast.showError(message);
+      throw err;
+    }
+  };
+
+  const resetPassword = async (userId) => {
+    loading.value = true;
+    try {
+      const response = await api.post(`user/users/${userId}/reset_password/`);
+      if (response.data.success) {
+        toast.showSuccess(response.data.message);
+        return { success: true, message: response.data.message };
+      } else {
+        toast.showError(response.data.message);
+        return { success: false, message: response.data.message };
+      }
+    } catch (err) {
+      const message =
+        err.response?.data?.message || "Error al resetear contraseña";
+      toast.showError(message);
+      return { success: false, message };
+    } finally {
+      loading.value = false;
+    }
+  };
+
+  return {
+    // Estado
+    loading,
+    users,
+    error,
+    availableModules, // ← Añade esto al return
+
+    // Métodos
+    listUsers,
+    createUser,
+    updateUser,
+    deleteUser,
+    toggleUserStatus,
+    toggleStaffStatus,
+    resetPassword,
+    fetchAvailableModules, // ← Añade esto
+    updateUserModules, // ← Añade esto
+  };
+});

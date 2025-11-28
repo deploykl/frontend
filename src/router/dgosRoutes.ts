@@ -33,13 +33,13 @@ const DGOS_ROUTES: RouteRecordRaw[] = [
     },
   },
   {
-    path: "/dgos/administracion/personal",
+    path: "/dgos/administracion/personal/list",
     name: "Personal DGOS",
-    component: () => import("@/views/dgos/administracion/PersonalView.vue"),
+    component: () => import("@/views/dgos/administracion/PersonalListView.vue"),
     meta: {
-      title: "Personal",
+      title: "Lista de Personal",
       requiresAuth: true,
-      requiredModule: [PERMISSIONS.PERSONAL],
+      requiredModule: [PERMISSIONS.PERSONAL, PERMISSIONS.PERSONAL_LECTURA],
     },
   },
    {

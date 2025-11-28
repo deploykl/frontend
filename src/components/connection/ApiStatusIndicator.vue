@@ -70,8 +70,8 @@ const iconClass = computed(() => {
 // Textos
 const statusText = computed(() => {
   if (props.isCheckingApi) return 'Verificando...'
-  if (props.isApiConnected === true) return 'Conectado'
-  return 'Desconectado'
+  if (props.isApiConnected === true) return 'API en línea'
+  return 'Servicio caído'
 })
 
 const tooltipText = computed(() => {

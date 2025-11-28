@@ -139,37 +139,35 @@
                                     </p>
 
                                     <!-- Botón de Acción mejorado -->
-                                    <div class="flex justify-start mt-8 relative z-10">
-                                        <button v-if="module.status === 'enabled' && module.id !== 4"
-                                            @click.stop="handleModuleAction(module)"
-                                            class="inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg group/btn relative overflow-hidden"
-                                            :style="{
-                                                background: `linear-gradient(135deg, ${module.color} 0%, ${getDarkerColor(module.color)} 100%)`,
-                                                color: 'white'
-                                            }" :class="{
-                                                'hover:shadow-xl': isAuthenticated,
-                                                'animate-pulse': !isAuthenticated
-                                            }">
-                                            <!-- Efecto de brillo en hover -->
-                                            <span class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></span>
-                                            <i class="pi pi-arrow-right mr-3 text-xl relative z-10 group-hover/btn:translate-x-1 transition-transform duration-300"></i>
-                                            <span class="relative z-10 cursor-pointer">{{ isAuthenticated ? 'Acceder' : 'Iniciar Sesión' }}</span>
-                                        </button>
+    <!-- Botón de Acción mejorado -->
+    <div class="flex justify-start mt-8 relative z-10">
+        <button v-if="module.status === 'enabled' && module.id !== 4"
+            @click.stop="handleModuleAction(module)"
+            class="inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg group/btn relative overflow-hidden"
+            :style="{
+                background: `linear-gradient(135deg, ${module.color} 0%, ${getDarkerColor(module.color)} 100%)`,
+                color: 'white'
+            }">
+            <!-- Efecto de brillo en hover -->
+            <span class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></span>
+            <i class="pi pi-sign-in mr-3 text-xl relative z-10 group-hover/btn:translate-x-1 transition-transform duration-300"></i>
+            <span class="relative z-10 cursor-pointer">Ingresar</span>
+        </button>
 
-                                        <!-- Botón especial para módulo 4 (sin login) -->
-                                        <button v-else-if="module.status === 'enabled' && module.id === 4"
-                                            @click.stop="handleModuleAction(module)"
-                                            class="inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg group/btn relative overflow-hidden"
-                                            :style="{
-                                                background: `linear-gradient(135deg, ${module.color} 0%, ${getDarkerColor(module.color)} 100%)`,
-                                                color: 'white'
-                                            }">
-                                            <!-- Efecto de brillo en hover -->
-                                            <span class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></span>
-                                            <i class="pi pi-external-link mr-3 text-xl relative z-10 group-hover/btn:translate-x-1 transition-transform duration-300"></i>
-                                            <span class="relative z-10">Acceder</span>
-                                        </button>
-                                    </div>
+        <!-- Botón especial para módulo 4 (sin login) -->
+        <button v-else-if="module.status === 'enabled' && module.id === 4"
+            @click.stop="handleModuleAction(module)"
+            class="inline-flex items-center px-8 py-4 rounded-2xl font-bold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg group/btn relative overflow-hidden"
+            :style="{
+                background: `linear-gradient(135deg, ${module.color} 0%, ${getDarkerColor(module.color)} 100%)`,
+                color: 'white'
+            }">
+            <!-- Efecto de brillo en hover -->
+            <span class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></span>
+            <i class="pi pi-external-link mr-3 text-xl relative z-10 group-hover/btn:translate-x-1 transition-transform duration-300"></i>
+            <span class="relative z-10">Ingresar</span>
+        </button>
+    </div>
 
                                     <!-- Línea decorativa inferior con color del módulo -->
                                     <div class="h-1.5 w-32 rounded-full mt-8 opacity-0 group-hover:opacity-100 transition-all duration-700 group-hover:w-40 relative z-10"
@@ -233,11 +231,6 @@ import Footer from '@/components/layout/Footer.vue'
 // Variables de entorno
 const soporte = import.meta.env.VITE_SOPORTE
 const router = useRouter();
-
-// Variables para el modal de Power BI
-const powerBIVisible = ref(false);
-const currentPowerBIUrl = ref('');
-const currentPowerBITitle = ref('');
 
 const isAuthenticated = computed(() => {
     const token = localStorage.getItem('auth_token');
@@ -349,26 +342,21 @@ const handleModuleAction = (module: Module) => {
         return;
     }
 
-    // Para otros módulos: verificar autenticación
-    if (!isAuthenticated.value) {
-        localStorage.setItem('redirectAfterLogin', module.path);
-        router.push('/login');
-        return;
-    }
-
-    redirectToModule(module);
+    // PARA TODOS LOS DEMÁS MÓDULOS: Redirigir al login
+    localStorage.setItem('redirectAfterLogin', module.path);
+    router.push('/login');
 };
 
 const redirectToModule = (module: Module) => {
-    if (module.type === 'powerbi') {
-        currentPowerBIUrl.value = module.path;
-        currentPowerBITitle.value = module.title;
-        powerBIVisible.value = true;
-        return;
+       
+    // Verificar si es una URL externa (http/https)
+    if (module.path.startsWith('http://') || module.path.startsWith('https://')) {
+        // Abrir en nueva pestaña para URLs externas
+        window.open(module.path, '_blank');
+    } else {
+        // Usar router para rutas internas
+        router.push(module.path);
     }
-
-    console.log('[redirectToModule] Intentando ir a:', module.path);
-    router.push(module.path);
 };
 
 // Efecto de aparición progresiva para las tarjetas

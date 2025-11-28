@@ -239,24 +239,30 @@ const handleLogin = async (): Promise<void> => {
             return;
         }
 
-        // Ejecutar login pasando el router
+        // Ejecutar login
         await authStore.login(router);
-        // 🔥 AGREGAR DELAY PARA QUE SE VEA EL TOAST
-        setTimeout(() => {
-            errorStore.showMessage('Inicio de sesión exitoso', 'success', 2000);
-        }, 100);
+        
+        // Mensaje de éxito
+        errorStore.showMessage('Inicio de sesión exitoso', 'success', 3000);
 
     } catch (error: any) {
-        // El error específico ya es manejado por el store
         console.error('❌ Error en login:', error);
-
-        // Mostrar mensaje genérico solo si no es bloqueo de cuenta
-        if (error.message !== 'La cuenta está bloqueada temporalmente') {
-            errorStore.showMessage('Error al iniciar sesión. Verifica tus credenciales.', 'error');
+        
+        // Manejar diferentes tipos de errores
+        if (error.message?.includes('bloqueada')) {
+            errorStore.showMessage(error.message, 'warning');
+        } else if (error.message?.includes('Credenciales inválidas')) {
+            errorStore.showMessage('Usuario o contraseña incorrectos', 'error');
+        } else if (error.message?.includes('módulos asignados')) {
+            errorStore.showMessage(error.message, 'warning');
+        } else {
+            errorStore.showMessage(
+                error.message || 'Error al iniciar sesión. Verifica tus credenciales.', 
+                'error'
+            );
         }
     }
 };
-
 /**
  * Maneja el éxito de la autenticación 2FA
  */

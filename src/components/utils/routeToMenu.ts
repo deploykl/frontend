@@ -64,7 +64,10 @@ const routeSections: Record<
 > = {
   "/dashboard": { title: "Principal", requiredModule: PERMISSIONS.SUPER_USER },
   "/noticias": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
-  "/general/birthday": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
+  "/general/birthday": {
+    title: "GENERAL",
+    requiredModule: PERMISSIONS.GENERAL,
+  },
   "/general/anexos": { title: "GENERAL", requiredModule: PERMISSIONS.GENERAL },
   "/dgos": {
     title: "DGOS",
@@ -83,12 +86,12 @@ const routeSections: Record<
 
 // ORDEN FIJO DE SECCIONES
 const SECTION_ORDER = [
+  "ADMIN",
   "GENERAL",
   "Principal",
   "DGOS",
   "DIMON",
   "DIEM",
-  "ADMIN",
 ];
 
 export const generateMenuFromRoutes = (
@@ -116,8 +119,8 @@ export const generateMenuFromRoutes = (
         path: fullPath,
         requiredModule: route.meta.requiredModule as string,
         meta: {
-          ...route.meta
-        }
+          ...route.meta,
+        },
       };
 
       allItems.push(menuItem);
@@ -141,7 +144,7 @@ export const generateMenuFromRoutes = (
     const sectionConfig = Object.values(routeSections).find(
       (s) => s?.title === sectionTitle
     );
-    
+
     if (sectionConfig) {
       groupedItems.push({
         title: sectionTitle,
@@ -153,9 +156,12 @@ export const generateMenuFromRoutes = (
     // Filtrar items de esta sección
     const sectionItems = allItems.filter((item) => {
       if (!item.path) return false;
-      
+
       for (const [pathPrefix, section] of Object.entries(routeSections)) {
-        if (section?.title === sectionTitle && item.path.startsWith(pathPrefix)) {
+        if (
+          section?.title === sectionTitle &&
+          item.path.startsWith(pathPrefix)
+        ) {
           return true;
         }
       }
@@ -166,12 +172,12 @@ export const generateMenuFromRoutes = (
     if (sectionTitle === "DIMON") {
       // Lógica especial para DIMON
       const dimonGroups = new Map<string, MenuItem[]>();
-      
+
       sectionItems.forEach((item) => {
-        const baseTitle = item.title.includes(" - ") 
-          ? item.title.split(" - ")[0] 
+        const baseTitle = item.title.includes(" - ")
+          ? item.title.split(" - ")[0]
           : item.title;
-          
+
         if (baseTitle && !dimonGroups.has(baseTitle)) {
           dimonGroups.set(baseTitle, []);
         }
@@ -190,12 +196,12 @@ export const generateMenuFromRoutes = (
               icon: getAutoIcon(orderedTitle, items[0]?.path || ""),
               isSubmenu: true,
               isOpen: false,
-              submenu: items.map(item => ({
+              submenu: items.map((item) => ({
                 ...item,
-                title: item.title.includes(" - ") 
-                  ? item.title.replace(`${orderedTitle} - `, "") 
-                  : item.title
-              }))
+                title: item.title.includes(" - ")
+                  ? item.title.replace(`${orderedTitle} - `, "")
+                  : item.title,
+              })),
             });
           } else {
             groupedItems.push(...items);
@@ -212,28 +218,26 @@ export const generateMenuFromRoutes = (
             icon: getAutoIcon(baseTitle, items[0]?.path || ""),
             isSubmenu: true,
             isOpen: false,
-            submenu: items.map(item => ({
+            submenu: items.map((item) => ({
               ...item,
-              title: item.title.includes(" - ") 
-                ? item.title.replace(`${baseTitle} - `, "") 
-                : item.title
-            }))
+              title: item.title.includes(" - ")
+                ? item.title.replace(`${baseTitle} - `, "")
+                : item.title,
+            })),
           });
         } else {
           groupedItems.push(...items);
         }
       });
-
     } else if (sectionTitle === "DGOS") {
       // 🔥 ORDEN ALFABÉTICO SIMPLE PARA DGOS
-      const sortedItems = sectionItems.sort((a, b) => 
+      const sortedItems = sectionItems.sort((a, b) =>
         a.title.localeCompare(b.title)
       );
       groupedItems.push(...sortedItems);
-
     } else {
       // Orden alfabético para otras secciones
-      const sortedItems = sectionItems.sort((a, b) => 
+      const sortedItems = sectionItems.sort((a, b) =>
         a.title.localeCompare(b.title)
       );
       groupedItems.push(...sortedItems);

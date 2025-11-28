@@ -1,26 +1,76 @@
 // stores/errors/errorStore.ts
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, type Ref } from 'vue'
+
+type MessageType = 'error' | 'success' | 'warning' | 'info'
 
 export const useErrorStore = defineStore('error', () => {
-  const toastComponent = ref<any>(null)
+  const message: Ref<string> = ref('')
+  const type: Ref<MessageType> = ref('error')
+  const timeout: Ref<number> = ref(4500)
+  const timer: Ref<ReturnType<typeof setTimeout> | null> = ref(null)
+  
+  // Referencia al componente Toast de PrimeVue
+  let toastComponent: any = null
 
-  const setToastComponent = (component: any) => {
-    toastComponent.value = component
+  const setToastComponent = (toast: any) => {
+    toastComponent = toast
   }
 
-  const showMessage = (msg: string, type: string = "info", timeout = 5000) => {
-    if (toastComponent.value && toastComponent.value.showToast) {
-      toastComponent.value.showToast(msg, type, timeout)
+  const showMessage = (
+    msg: string, 
+    msgType: MessageType = 'error', 
+    msgTimeout: number = 4500
+  ): void => {
+    if (timer.value) {
+      clearTimeout(timer.value)
+    }
+    
+    message.value = msg
+    type.value = msgType
+    timeout.value = msgTimeout
+    
+    // Si tenemos el componente Toast de PrimeVue, usarlo
+    if (toastComponent) {
+      toastComponent.add({
+        severity: msgType,
+        summary: getSummary(msgType),
+        detail: msg,
+        life: msgTimeout
+      })
     } else {
-      console.log('Toast component not available:', msg, type)
-      // Fallback: mostrar en consola si el toast no está disponible
-      console.log(`[${type.toUpperCase()}] ${msg}`)
+      // Fallback: usar el sistema antiguo
+      console.warn('Toast component not available, using fallback')
+      timer.value = setTimeout(() => {
+        message.value = ''
+      }, timeout.value)
     }
   }
 
-  return {
-    setToastComponent,
-    showMessage,
+  const getSummary = (type: MessageType): string => {
+    const summaries = {
+      error: 'Error',
+      success: 'Éxito', 
+      warning: 'Advertencia',
+      info: 'Información'
+    }
+    return summaries[type]
+  }
+
+  const clearMessage = (): void => {
+    if (timer.value) {
+      clearTimeout(timer.value)
+      timer.value = null
+    }
+    message.value = ''
+  }
+
+  return { 
+    message, 
+    type, 
+    timeout,
+    showMessage, 
+    clearMessage,
+    setToastComponent // ← ESTO DEBE ESTAR EN EL RETURN
   }
 })
