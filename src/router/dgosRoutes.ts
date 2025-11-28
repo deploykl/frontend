@@ -42,6 +42,7 @@ const DGOS_ROUTES: RouteRecordRaw[] = [
       requiredModule: [PERMISSIONS.PERSONAL, PERMISSIONS.PERSONAL_LECTURA],
     },
   },
+
    {
     path: "/dgos/administracion/dashboard",
     name: "Presupuesto",

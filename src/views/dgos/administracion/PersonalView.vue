@@ -96,7 +96,7 @@
                                                     <i :class="slotProps.value === 'M' ? 'pi pi-mars text-primary' : 'pi pi-venus text-danger'"
                                                         style="font-size: 1rem; margin-right: 8px;"></i>
                                                     <span>{{ slotProps.value === 'M' ? 'Masculino' : 'Femenino'
-                                                    }}</span>
+                                                        }}</span>
                                                 </div>
                                                 <span v-else>
                                                     {{ slotProps.placeholder }}
@@ -626,84 +626,81 @@
             </template>
 
             <template #expansion="{ data }">
-                <div class="expansion-content p-4">
-                    <div class="row">
-                        <!-- Columna 1:  Información Laboral -->
-                        <div class="col-5">
-                            <div class="expansion-card p-3 h-100">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="pi pi-user text-primary me-2" style="font-size: 1.35rem;"></i>
-                                    <h6 class="m-0 text-900 fw-semibold">Información Laboral</h6>
+                <div class="p-4 bg-linear-to-br from-gray-50 to-gray-100 rounded-xl">
+                    <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+                        <!-- Columna 1: Información Laboral -->
+                        <div class="md:col-span-5">
+                            <div class="expansion-card">
+                                <div class="flex items-center mb-3">
+                                    <i class="pi pi-user text-blue-500 mr-2 text-xl"></i>
+                                    <h6 class="m-0 text-gray-900 font-semibold">Información Laboral</h6>
                                 </div>
-
-                                <div class="row">
-                                    <!-- Columna 1: Información básica del contrato -->
-                                    <div class="col-12 col-md-4">
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">N° Contrato</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.n_contrato || '-' }}</p>
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                    <div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">N° Contrato</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.n_contrato || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Fecha Inicio</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.fecha_inicio || '-' }}</p>
-                                            <small class="m-0 text-500 fw-medium time-with-underline">
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Fecha Inicio</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.fecha_inicio || '-' }}</p>
+                                            <small class="time-with-underline">
                                                 ({{ calculateTimeWorked(data.fecha_inicio) }})
                                             </small>
-
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Fecha Fin</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.fecha_fin || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Fecha Fin</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.fecha_fin || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Salario</label>
-                                            <p class="m-0 text-900 fw-medium">{{ formatCurrency(data.salario || '-') }}
-                                            </p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Salario</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ formatCurrency(data.salario ||
+                                                '-') }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Anexo</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.anexo_number || '-' }}</p>
-                                        </div>
-                                    </div>
-
-                                    <!-- Columna 2: Información de puesto y categoría -->
-                                    <div class="col-12 col-md-4">
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Cargo</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.cargo_nombre || '-' }}</p>
-                                        </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Condición</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.condicion_nombre || '-' }}</p>
-                                        </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Estado</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.estado_nombre || '-' }}</p>
-                                        </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Régimen</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.regimen_nombre || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Anexo</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.anexo_number || '-' }}</p>
                                         </div>
                                     </div>
-
-                                    <!-- Columna 3: Información de clasificación laboral -->
-                                    <div class="col-12 col-md-4">
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Nivel</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.nivel_name || '-' }}</p>
+                                    <div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Cargo</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.cargo_nombre || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Grupo Ocupacional</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.grupoo_cupacional_nombre || '-' }}
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Condición</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.condicion_nombre || '-' }}
                                             </p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Genérica</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.generica_nombre || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Estado</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.estado_nombre || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Profesión</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.profesion_nombre || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Régimen</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.regimen_nombre || '-' }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Nivel</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.nivel_name || '-' }}</p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Grupo Ocupacional</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.grupoo_cupacional_nombre ||
+                                                '-' }}</p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Genérica</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.generica_nombre || '-' }}
+                                            </p>
+                                        </div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Profesión</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.profesion_nombre || '-' }}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -711,92 +708,87 @@
                         </div>
 
                         <!-- Columna 2: Información del sistema -->
-                        <div class="col-12 col-md-5 col-lg-5">
-                            <div class="expansion-card p-3 h-100">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="pi pi-cog text-primary me-2" style="font-size: 1.35rem;"></i>
-                                    <h6 class="m-0 text-900 fw-semibold">Información adicional</h6>
+                        <div class="md:col-span-5">
+                            <div class="expansion-card">
+                                <div class="flex items-center mb-3">
+                                    <i class="pi pi-cog text-blue-500 mr-2 text-xl"></i>
+                                    <h6 class="m-0 text-gray-900 font-semibold">Información adicional</h6>
                                 </div>
-                                <div class="row">
-                                    <!-- Dirección ocupa toda la primera fila -->
-                                    <div class="col-12">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="md:col-span-2">
                                         <div class="field mb-3">
-                                            <label class="text-600 small fw-medium">Dirección</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.direccion || '-' }}</p>
+                                            <label class="text-gray-600 text-sm font-medium">Dirección</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.direccion || '-' }}</p>
                                         </div>
                                     </div>
-
-                                    <!-- Campos restantes en 2 columnas -->
-                                    <div class="col-12 col-md-6">
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Distrito</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.distrito || '-' }}</p>
+                                    <div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Distrito</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.distrito || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Telefono</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.telefono || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Telefono</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.telefono || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Es Padre / Madre</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.padre_madre || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Es Padre / Madre</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.padre_madre || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">N° Hijos</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.n_hijos || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">N° Hijos</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.n_hijos || '-' }}</p>
                                         </div>
                                     </div>
-                                    <div class="col-12 col-md-6">
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Email Personal</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.email_per || '-' }}</p>
+                                    <div>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Email Personal</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.email_per || '-' }}</p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">Contacto Emergencia</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.cont_emergencia || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">Contacto Emergencia</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.cont_emergencia || '-' }}
+                                            </p>
                                         </div>
-                                        <div class="field mb-1">
-                                            <label class="text-600 small fw-medium">N° Celular</label>
-                                            <p class="m-0 text-900 fw-medium">{{ data.cel_emergencia || '-' }}</p>
+                                        <div class="field">
+                                            <label class="text-gray-600 text-sm font-medium">N° Celular</label>
+                                            <p class="m-0 text-gray-900 font-medium">{{ data.cel_emergencia || '-' }}
+                                            </p>
                                         </div>
-                                        <!-- Eliminé los campos duplicados de N° Hijos -->
                                     </div>
                                 </div>
                             </div>
                         </div>
 
                         <!-- Columna 3: Grupos -->
-                        <div class="col-12 col-md-2 col-lg-2">
-                            <div class="expansion-card p-3 h-100">
-                                <div class="d-flex align-items-center mb-3">
-                                    <i class="pi pi-users text-primary me-2" style="font-size: 1.35rem;"></i>
-                                    <h6 class="m-0 text-900 fw-semibold">Otros</h6>
+                        <div class="md:col-span-2">
+                            <div class="expansion-card">
+                                <div class="flex items-center mb-3">
+                                    <i class="pi pi-users text-blue-500 mr-2 text-xl"></i>
+                                    <h6 class="m-0 text-gray-900 font-semibold">Otros</h6>
                                 </div>
-                                <div class="field mb-1">
-                                    <label class="text-600 small fw-medium">Creado por</label>
-                                    <p class="m-0 text-900 fw-medium">{{ data.created_by_username || '-' }}</p>
+                                <div class="field">
+                                    <label class="text-gray-600 text-sm font-medium">Creado por</label>
+                                    <p class="m-0 text-gray-900 font-medium">{{ data.created_by_username || '-' }}</p>
                                 </div>
-                                <!-- Campos que solo verá el superusuario -->
                                 <template v-if="isSuperuser">
-                                    <div class="field mb-1">
-                                        <label class="text-600 small fw-medium">Habilitado por</label>
-                                        <p class="m-0 text-900 fw-medium">{{ data.habilitado_por || '-' }}</p>
+                                    <div class="field">
+                                        <label class="text-gray-600 text-sm font-medium">Habilitado por</label>
+                                        <p class="m-0 text-gray-900 font-medium">{{ data.habilitado_por || '-' }}</p>
                                     </div>
-                                    <div class="field mb-1">
-                                        <label class="text-600 small fw-medium">Acceso</label>
-                                        <p class="m-0 text-900 fw-medium">{{ data.fecha_habilitacion_acceso || '-' }}
-                                        </p>
+                                    <div class="field">
+                                        <label class="text-gray-600 text-sm font-medium">actualizado por</label>
+                                        <p class="m-0 text-gray-900 font-medium">{{ data.updated_by || '-' }}</p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="text-gray-600 text-sm font-medium">Ultima actualización</label>
+                                        <p class="m-0 text-gray-900 font-medium">{{ data.updated_at_lima || '-' }}</p>
+                                    </div>
+                                    <div class="field">
+                                        <label class="text-gray-600 text-sm font-medium">Acceso</label>
+                                        <p class="m-0 text-gray-900 font-medium">{{ data.fecha_habilitacion_acceso ||
+                                            '-' }}</p>
                                     </div>
                                 </template>
-                                <div class="field mb-1">
-                                    <label class="text-600 small fw-medium">actualizado por</label>
-                                    <p class="m-0 text-900 fw-medium">{{ data.updated_by || '-' }}</p>
-                                </div>
-                                <div class="field mb-1">
-                                    <label class="text-600 small fw-medium">Ultima actualización</label>
-                                    <p class="m-0 text-900 fw-medium">{{ data.updated_at_lima || '-' }}
-                                    </p>
-                                </div>
-
                             </div>
                         </div>
                     </div>
@@ -1448,6 +1440,7 @@ watch(() => form.value.dependencia, async (newDependencia) => {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    padding: 12px;
 }
 
 .expansion-card::before {
@@ -1464,7 +1457,6 @@ watch(() => form.value.dependencia, async (newDependencia) => {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
 }
-
 .custom-tag {
     border-radius: 20px;
     font-weight: 600;

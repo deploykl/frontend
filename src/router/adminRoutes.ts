@@ -12,6 +12,16 @@ const ADMIN_ROUTES: Array<RouteRecordRaw> = [
       requiredModule: [PERMISSIONS.SUPER_USER],
     },
   },
+    {
+    path: "/admin/personal",
+    name: "Personal",
+    component: () => import("@/views/dgos/administracion/PersonalView.vue"),
+    meta: {
+      title: "Lista de Personal",
+      requiresAuth: true,
+      requiredModule: [PERMISSIONS.PERSONAL, PERMISSIONS.PERSONAL_LECTURA],
+    },
+  },
 ];
 
 export default ADMIN_ROUTES;
