@@ -21,7 +21,7 @@
                 <div class="relative mx-auto w-32 h-32">
                     <div class="absolute inset-0 bg-blue-400/20 rounded-3xl transform rotate-45 animate-ping-slow"></div>
                     <div class="absolute inset-2 bg-white/5 rounded-2xl backdrop-blur-sm border border-white/20 flex items-center justify-center">
-                        <i class="pi pi-shield text-blue-300 text-4xl animate-pulse"></i>
+                        <i class="bi bi-shield-check text-blue-300 text-4xl animate-pulse"></i>
                     </div>
                 </div>
 

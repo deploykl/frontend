@@ -23,9 +23,9 @@
         </div>
     </div>
 
-    <!-- Loading Screen después del login -->
+    <!-- Loading Screen después del login - SOLO CUANDO NO HAY 2FA -->
     <LoadingScreen 
-        v-if="showLoadingScreen"
+        v-if="showLoadingScreen && !authStore.show2FA"
         :show="true"
         :duration="6000"
         @complete="handleLoadingComplete"
@@ -284,8 +284,10 @@ const handleLogin = async (): Promise<void> => {
         // Ejecutar login
         await authStore.login(router);
 
-        // ✅ MOSTRAR LOADING SCREEN Y NO REDIRIGIR INMEDIATAMENTE
-        showLoadingScreen.value = true;
+        // ✅ MOSTRAR LOADING SCREEN SOLO SI NO HAY 2FA REQUERIDO
+        if (!authStore.show2FA) {
+            showLoadingScreen.value = true;
+        }
 
     } catch (error: any) {
         console.error('❌ Error en login:', error);
@@ -338,7 +340,7 @@ const handle2FASuccess = (data: any): void => {
         authStore.handle2FASuccess(data);
 
         if (authStore.twoFAMode !== "setup") {
-            // Mostrar loading screen en lugar de redirigir inmediatamente
+            // ✅ MOSTRAR LOADING SCREEN DESPUÉS DE 2FA EXITOSO
             showLoadingScreen.value = true;
         } else {
             // Mensaje de éxito para configuración 2FA
@@ -394,6 +396,7 @@ onUnmounted(() => {
 </script>
 
 <style scoped>
+/* Tus estilos existentes se mantienen igual */
 .animate-fade-in {
     animation: fadeIn 0.8s ease-out;
 }
@@ -403,7 +406,6 @@ onUnmounted(() => {
         opacity: 0;
         transform: translateY(30px) scale(0.95);
     }
-
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
@@ -450,7 +452,6 @@ input:focus {
     .p-12 {
         padding: 1.5rem;
     }
-
     .rounded-3xl {
         border-radius: 1.5rem;
     }
@@ -478,12 +479,9 @@ button:disabled:hover {
 
 /* Animaciones personalizadas */
 @keyframes float {
-
-    0%,
-    100% {
+    0%, 100% {
         transform: translateY(0px);
     }
-
     50% {
         transform: translateY(-5px);
     }
