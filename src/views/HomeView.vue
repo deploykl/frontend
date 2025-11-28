@@ -59,7 +59,7 @@
         <!-- Tecnologías -->
         <div class="mb-4 md:mb-6 my-4 md:my-5 text-center">
           <h3 class="text-base md:text-lg font-semibold text-gray-700 dark:text-gray-200 mb-3 md:mb-4">
-            Desarrollado con las tecnologías más modernas:
+            Desarrollado con las tecnologías modernas:
           </h3>
           <!-- DIVIDER -->
           <div class="my-3 md:my-4 mb-3 md:mb-4 border-t border-gray-200 dark:border-gray-700 mx-auto w-24 md:w-32">
