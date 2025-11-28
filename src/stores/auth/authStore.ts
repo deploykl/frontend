@@ -324,33 +324,32 @@ export const useAuthStore = defineStore("auth", () => {
 
   };
 
-  const handleLoginError = (error: any) => {
+// En tu authStore.ts - MODIFICA handleLoginError:
+const handleLoginError = (error: any) => {
     console.error("Error en login:", error);
-    // ✅ MOSTRAR EL MENSAJE DIRECTAMENTE DEL BACKEND
-    if (error.response?.data?.detail) {
-        throw new Error(error.response.data.detail); // ← Esto hará que se muestre "Credenciales inválidas"
-    }
-    // Manejar bloqueo de cuenta
-    if (error.response?.status === 403 && error.response.data.detail?.includes("bloqueada")) {
-      const match = error.response.data.detail.match(/(\d+)\s*minutos/);
-      if (match && match[1]) {
-        const minutes = parseInt(match[1]);
-        const expiryTime = new Date();
-        expiryTime.setMinutes(expiryTime.getMinutes() + minutes);
-        localStorage.setItem("accountBlockExpiry", expiryTime.getTime().toString());
-        startCountdown(minutes);
-      }
-    }
-
-    // Manejar intentos restantes
+    
+    // ✅ PRIMERO manejar intentos restantes
     if (error.response?.data) {
         if (error.response.data.remaining_attempts !== undefined) {
             remainingAttempts.value = error.response.data.remaining_attempts;
+            console.log('🔄 Intentos restantes en store:', remainingAttempts.value);
         }
+    }
 
-        // ✅ Si no hay detail pero hay otro mensaje, usarlo
-        if (error.response.data.message) {
-            throw new Error(error.response.data.message);
+    // ✅ LUEGO lanzar el error con el mensaje
+    if (error.response?.data?.detail) {
+        throw new Error(error.response.data.detail);
+    }
+
+    // Manejar bloqueo de cuenta
+    if (error.response?.status === 403 && error.response.data.detail?.includes("bloqueada")) {
+        const match = error.response.data.detail.match(/(\d+)\s*minutos/);
+        if (match && match[1]) {
+            const minutes = parseInt(match[1]);
+            const expiryTime = new Date();
+            expiryTime.setMinutes(expiryTime.getMinutes() + minutes);
+            localStorage.setItem("accountBlockExpiry", expiryTime.getTime().toString());
+            startCountdown(minutes);
         }
     }
 
