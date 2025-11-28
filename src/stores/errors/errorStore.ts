@@ -13,10 +13,6 @@ export const useErrorStore = defineStore('error', () => {
   // Referencia al componente Toast de PrimeVue
   let toastComponent: any = null
 
-  const setToastComponent = (toast: any) => {
-    toastComponent = toast
-  }
-
   const showMessage = (
     msg: string, 
     msgType: MessageType = 'error', 
@@ -71,6 +67,5 @@ export const useErrorStore = defineStore('error', () => {
     timeout,
     showMessage, 
     clearMessage,
-    setToastComponent // ← ESTO DEBE ESTAR EN EL RETURN
   }
 })

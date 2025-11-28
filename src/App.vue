@@ -32,10 +32,9 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed, ref } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useUIStore } from '@/stores/sidebar/uiStore'
 import { useThemeStore } from '@/stores/sidebar/themeStore'
-import { useErrorStore } from '@/stores/errors/errorStore'
 import GlobalMusicPlayer from '@/components/widgets/GlobalMusicPlayer.vue'
 
 import Footer from './components/layout/Footer.vue'
@@ -46,22 +45,17 @@ import OnlineStatus from '@/components/ui/status/OnlineStatus.vue' // Ajusta la 
 
 const uiStore = useUIStore()
 const themeStore = useThemeStore()
-const errorStore = useErrorStore()
 
 // ✅ Computed para verificar autenticación
 const isAuthenticated = computed(() => {
   return !!localStorage.getItem("auth_token")
 })
 const sidebarCollapsed = computed(() => uiStore.sidebarCollapsed)
-const toastRef = ref()
 
 // Inicializar el theme cuando se monta la app
 onMounted(() => {
   themeStore.initializeTheme()
-  
-  if (toastRef.value) {
-    errorStore.setToastComponent(toastRef.value)
-  }
+
 })
 </script>
 <style scoped></style>

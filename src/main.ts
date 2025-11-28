@@ -6,6 +6,7 @@ import { initializeApi } from "@/components/services/Axios";
 
 import PrimeVue from 'primevue/config';
 
+import ErrorMessage from '@/components/utils/ErrorMessage.vue'
 import "primeicons/primeicons.css";
 import Aura from '@primeuix/themes/aura';
 import ToastService from "primevue/toastservice";
@@ -201,6 +202,7 @@ app.component("Editor", Editor);
 app.component("Calendar", Calendar);
 app.component("AutoComplete", AutoComplete);
 app.component("FileUpload", FileUpload);
+app.component('ErrorMessage', ErrorMessage)
 
 // Montar la apppero
 app.mount("#app");

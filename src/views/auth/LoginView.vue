@@ -24,12 +24,12 @@
     </div>
 
     <!-- Loading Screen después del login -->
-<LoadingScreen 
-    v-if="showLoadingScreen"
-    :show="true"
-    :duration="6000"
-    @complete="handleLoadingComplete"
-/>
+    <LoadingScreen 
+        v-if="showLoadingScreen"
+        :show="true"
+        :duration="6000"
+        @complete="handleLoadingComplete"
+    />
 
     <!-- Contenido principal del login -->
     <div v-else-if="isAppReady"
@@ -88,13 +88,15 @@
                     <h2 class="text-sm text-gray-600 dark:text-gray-400 font-light">Autenticación requerida</h2>
                 </div>
 
+                <ErrorMessage />
+
                 <!-- 2FA Component -->
                 <TwoFactorAuth v-if="authStore.show2FA" :mode="authStore.twoFAMode" :userId="authStore.pendingUserId"
                     @success="handle2FASuccess" @error="handle2FAError" @back="authStore.backToLogin" />
 
                 <!-- Login Normal -->
                 <div v-else class="space-y-6">
-                    <!-- Alertas de seguridad -->
+                    <!-- INTENTOS RESTANTES - CORREGIDO -->
                     <div v-if="authStore.remainingAttempts !== null && authStore.remainingAttempts > 0"
                         class="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-2xl p-4 backdrop-blur-sm">
                         <div class="flex items-center space-x-3">
@@ -113,7 +115,7 @@
                         </div>
                     </div>
 
-                    <!-- Bloqueo de cuenta -->
+                    <!-- BLOQUEO DE CUENTA - CORREGIDO -->
                     <div v-if="authStore.blockedTimeRemaining > 0"
                         class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl p-4 animate-pulse backdrop-blur-sm">
                         <div class="flex items-center space-x-3 mb-3">
@@ -131,14 +133,14 @@
                             </div>
                         </div>
 
-                        <!-- Barra de progreso -->
-                        <div class="w-full bg-red-200 dark:bg-red-700 rounded-full h-1.5">
-                            <div class="bg-red-500 dark:bg-red-400 h-1.5 rounded-full transition-all duration-1000 ease-out"
+                        <!-- Barra de progreso - CORREGIDA -->
+                        <div class="w-full bg-red-200 dark:bg-red-700 rounded-full h-2 mb-3">
+                            <div class="bg-red-500 dark:bg-red-400 h-2 rounded-full transition-all duration-1000 ease-out"
                                 :style="{ width: authStore.progressPercentage + '%' }"></div>
                         </div>
 
                         <button @click="authStore.useAnotherAccount"
-                            class="w-full mt-3 flex items-center justify-center space-x-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/30 rounded-lg transition-colors text-sm">
+                            class="w-full flex items-center justify-center space-x-2 px-4 py-2 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-800/30 rounded-lg transition-colors text-sm">
                             <i class="pi pi-user-plus"></i>
                             <span>Usar otra cuenta</span>
                         </button>
@@ -204,7 +206,7 @@
                             </div>
                             <div v-else class="flex items-center space-x-2 relative z-10">
                                 <i class="pi pi-sign-in"></i>
-                                <span>Acceder al Sistema</span>
+                                <span>{{ authStore.buttonText }}</span>
                             </div>
                         </button>
                     </form>
@@ -214,7 +216,7 @@
                         <div
                             class="flex items-center justify-center space-x-6 text-xs text-gray-500 dark:text-gray-400">
                             <div class="flex items-center space-x-1">
-                                <i class="pi pi-shield-check"></i>
+                                <i class="bi bi-shield-check"></i>
                                 <span>Conexión segura</span>
                             </div>
                             <div class="flex items-center space-x-1">
@@ -238,13 +240,6 @@
             </div>
         </div>
     </div>
-     <!-- BOTÓN DE PRUEBA - Solo para desarrollo -->
-        <button 
-            @click="testLoadingScreen"
-            class="fixed top-4 right-4 z-50 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg shadow-lg transition-all duration-300 transform hover:scale-105"
-        >
-            🎨 Probar LoadingScreen
-        </button>
 </template>
 
 <script setup lang="ts">
@@ -254,7 +249,8 @@ import { useAuthStore } from "@/stores/auth/authStore";
 import { useErrorStore } from "@/stores/errors/errorStore";
 import TwoFactorAuth from "@/components/security/TwoFactorAuth.vue";
 import DarkModeToggle from '@/components/DarkModeToggle.vue'
-import LoadingScreen from '@/components/ui/LoadingScreen.vue'; // Ajusta la ruta
+import LoadingScreen from '@/components/ui/LoadingScreen.vue';
+import ErrorMessage from '@/components/utils/ErrorMessage.vue';
 
 // Router y stores
 const router = useRouter();
@@ -269,10 +265,6 @@ const showLoadingScreen = ref(false);
 const projectName = import.meta.env.VITE_PROJECT_NAME || "Sistema";
 const version = import.meta.env.VITE_VERSION || "1.0.0";
 
-const testLoadingScreen = (): void => {
-    console.log('🧪 Probando LoadingScreen...');
-    showLoadingScreen.value = true;
-};
 /**
  * Maneja el proceso de login
  */
@@ -295,16 +287,21 @@ const handleLogin = async (): Promise<void> => {
         // ✅ MOSTRAR LOADING SCREEN Y NO REDIRIGIR INMEDIATAMENTE
         showLoadingScreen.value = true;
 
-        // ❌ ELIMINAR cualquier redirección automática del authStore.login()
-
     } catch (error: any) {
         console.error('❌ Error en login:', error);
 
+        // ✅ MOSTRAR EL MENSAJE DIRECTAMENTE DEL BACKEND
+        if (error.response?.data?.detail) {
+            errorStore.showMessage(error.response.data.detail, 'error');
+            
+            // ✅ ACTUALIZAR INTENTOS RESTANTES SI VIENEN DEL BACKEND
+            if (error.response.data.remaining_attempts !== undefined) {
+                authStore.remainingAttempts = error.response.data.remaining_attempts;
+            }
+        } 
         // Manejar diferentes tipos de errores
-        if (error.message?.includes('bloqueada')) {
+        else if (error.message?.includes('bloqueada')) {
             errorStore.showMessage(error.message, 'warning');
-        } else if (error.message?.includes('Credenciales inválidas')) {
-            errorStore.showMessage('Usuario o contraseña incorrectos', 'error');
         } else if (error.message?.includes('módulos asignados')) {
             errorStore.showMessage(error.message, 'warning');
         } else {
@@ -517,5 +514,19 @@ button:disabled:hover {
 /* Asegurar que el contenido esté oculto hasta que Vue monte */
 [v-cloak] {
     display: none;
+}
+
+/* Estilos específicos para la barra de progreso del bloqueo */
+.bg-red-200 {
+    background-color: #fed7d7;
+}
+.dark .bg-red-700 {
+    background-color: #742a2a;
+}
+.bg-red-500 {
+    background-color: #f56565;
+}
+.dark .bg-red-400 {
+    background-color: #fc8181;
 }
 </style>

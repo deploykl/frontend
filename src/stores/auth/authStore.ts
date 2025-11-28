@@ -326,7 +326,10 @@ export const useAuthStore = defineStore("auth", () => {
 
   const handleLoginError = (error: any) => {
     console.error("Error en login:", error);
-
+    // ✅ MOSTRAR EL MENSAJE DIRECTAMENTE DEL BACKEND
+    if (error.response?.data?.detail) {
+        throw new Error(error.response.data.detail); // ← Esto hará que se muestre "Credenciales inválidas"
+    }
     // Manejar bloqueo de cuenta
     if (error.response?.status === 403 && error.response.data.detail?.includes("bloqueada")) {
       const match = error.response.data.detail.match(/(\d+)\s*minutos/);
@@ -341,16 +344,19 @@ export const useAuthStore = defineStore("auth", () => {
 
     // Manejar intentos restantes
     if (error.response?.data) {
-      if (error.response.data.remaining_attempts !== undefined) {
-        remainingAttempts.value = error.response.data.remaining_attempts;
-      }
+        if (error.response.data.remaining_attempts !== undefined) {
+            remainingAttempts.value = error.response.data.remaining_attempts;
+        }
 
-      if (error.response.data.detail) {
-        console.error("Error del servidor:", error.response.data.detail);
-      }
+        // ✅ Si no hay detail pero hay otro mensaje, usarlo
+        if (error.response.data.message) {
+            throw new Error(error.response.data.message);
+        }
     }
-  };
 
+    // ✅ Si no hay mensaje específico, lanzar error genérico
+    throw new Error('Error al iniciar sesión');
+};
   // Actions - Logout
   const logout = async (): Promise<void> => {
     try {
